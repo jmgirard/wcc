@@ -7,9 +7,9 @@
 create_wcc_matrix(x, y, w_max, w_inc, tau_max, tau_inc)
 }
 \arguments{
-\item{x}{Desc}
+\item{x}{A vector containing one time series (same length as `y`).}
 
-\item{y}{Desc}
+\item{y}{A vector containing another time series (same length as `x`).}
 
 \item{w_max}{Window size}
 
