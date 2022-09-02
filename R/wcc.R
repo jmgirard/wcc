@@ -83,6 +83,8 @@ create_wcc_matrix <- function(x, y, w_max, w_inc, tau_max, tau_inc) {
 #'   Boker et al. recommend setting the lag increment to the longest lag
 #'   increment that still results in related change between successive columns.
 #'   (default = `1`)
+#' @return A list object of class "wcc" containing the results matrix and useful
+#'   summaries of it.
 wcc <- function(x, y, window_size, lag_max,
                 window_increment = 1, lag_increment = 1) {
 

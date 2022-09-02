@@ -37,6 +37,10 @@ Boker et al. recommend setting the lag increment to the longest lag
 increment that still results in related change between successive columns.
 (default = `1`)}
 }
+\value{
+A list object of class "wcc" containing the results matrix and useful
+  summaries of it.
+}
 \description{
 Conduct a windowed cross-correlation analysis
 }
