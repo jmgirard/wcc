@@ -1,4 +1,6 @@
 
+# Create windows at specified location and offset -------------------------
+
 make_windows <- function(x, y, i, tau, w_max) {
 
   assertthat::assert_that(rlang::is_double(i, n = 1), i > 0)
@@ -16,6 +18,9 @@ make_windows <- function(x, y, i, tau, w_max) {
   WxWy
 }
 
+
+# Calculate cross-correlation ---------------------------------------------
+
 calc_cc <- function(WxWy, na.rm = TRUE) {
 
   assertthat::assert_that(rlang::is_list(WxWy))
@@ -31,6 +36,9 @@ calc_cc <- function(WxWy, na.rm = TRUE) {
 
   r
 }
+
+
+# Create results matrix ---------------------------------------------------
 
 create_wcc_matrix <- function(x, y, w_max, w_inc, tau_max, tau_inc) {
   n_x <- length(x)
@@ -54,6 +62,25 @@ create_wcc_matrix <- function(x, y, w_max, w_inc, tau_max, tau_inc) {
 
   r_WxWy
 }
+
+
+# r-to-z transformation ---------------------------------------------------
+
+r_to_z <- function(r) {
+  0.5 * log((1 + r) / (1 - r))
+}
+
+
+# Fisher's Z calculation --------------------------------------------------
+
+fisher_z <- function(results_matrix) {
+  results_matrix |>
+    base::as.vector() |>
+    r_to_z() |>
+    base::abs() |>
+    base::mean()
+}
+
 
 #' Windowed Cross-Correlation
 #'
@@ -109,7 +136,8 @@ wcc <- function(x, y, window_size, lag_max,
   )
 
   out <- list(
-    r_WxWy = r_WxWy
+    results_matrix = r_WxWy,
+    fisher_z = fisher_z(r_WxWy)
   )
 
   out
