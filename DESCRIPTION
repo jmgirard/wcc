@@ -11,7 +11,13 @@ Encoding: UTF-8
 LazyData: true
 Imports: 
     assertthat,
-    rlang
+    dplyr,
+    furrr,
+    future,
+    ggplot2,
+    RColorBrewer,
+    rlang,
+    tidyr
 RoxygenNote: 7.2.1
 Suggests: 
     testthat (>= 3.0.0)

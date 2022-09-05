@@ -1,7 +1,7 @@
 
-# Create windows at specified location and offset -------------------------
+# Calculate windowed cross-correlation ------------------------------------
 
-make_windows <- function(x, y, i, tau, w_max) {
+calc_wcc <- function(i, tau, x, y, w_max, na.rm = TRUE) {
 
   assertthat::assert_that(rlang::is_double(i, n = 1), i > 0)
   assertthat::assert_that(rlang::is_double(tau, n = 1))
@@ -13,72 +13,84 @@ make_windows <- function(x, y, i, tau, w_max) {
     Wx <- x[(i - tau):(i - tau + w_max)]
     Wy <- y[(i):(i + w_max)]
   }
-  WxWy <- list(Wx = Wx, Wy = Wy)
 
-  WxWy
-}
-
-
-# Calculate cross-correlation ---------------------------------------------
-
-calc_cc <- function(WxWy, na.rm = TRUE) {
-
-  assertthat::assert_that(rlang::is_list(WxWy))
-  assertthat::assert_that(rlang::is_logical(na.rm, n = 1))
-
-  Wx <- windows$Wx
-  Wy <- windows$Wy
   mWx <- mean(Wx, na.rm = na.rm)
   sWx <- sd(Wx, na.rm = na.rm)
   mWy <- mean(Wy, na.rm = na.rm)
   sWy <- sd(Wy, na.rm = na.rm)
-  r <- mean(((Wx - mWx) * (Wy - mWy)) / (sWx * sWy), na.rm = na.rm)
 
-  r
+  wcc <- mean(((Wx - mWx) * (Wy - mWy)) / (sWx * sWy), na.rm = na.rm)
+
+  wcc
 }
 
 
-# Create results matrix ---------------------------------------------------
+# Create wcc results df ---------------------------------------------------
 
-create_wcc_matrix <- function(x, y, w_max, w_inc, tau_max, tau_inc) {
+create_wcc_df <- function(x, y, settings) {
+
   n_x <- length(x)
   n_y <- length(y)
 
-  lags <- base::seq(-tau_max, tau_max, by = tau_inc)
+  assertthat::assert_that(assertthat::are_equal(n_x, n_y))
 
-  r_WxWy <- matrix(
-    nrow = floor((n - w_max - tau_max) / w_inc),
-    ncol = length(lags)
-  )
+  w_max <- settings$window_size
+  w_inc <- settings$window_increment
+  tau_max <- settings$lag_max
+  tau_inc <- settings$lag_increment
+  na.rm <- settings$na.rm
 
-  for (rrow in 1:nrow(r_WxWy)) {
-    i <- 1 + tau_max + (rrow - 1) * w_inc
-    for (rcol in 1:ncol(r_WxWy)) {
-      tau <- lags[[rcol]]
-      WxWy <- make_windows(x, y, i, tau, w_max)
-      r_WxWy[rrow, rcol] <- calc_cc(WxWy)
-    }
-  }
+  # Generate sequence of lags to use
+  lags <- seq(-tau_max, tau_max, by = tau_inc)
 
-  r_WxWy
+  # Calculate the size of the results matrix
+  n_r <- floor((n_x - w_max - tau_max) / w_inc)
+  n_c <- length(lags)
+
+  results_df <-
+    tidyr::crossing(row = 1:n_r, col = 1:n_c) |>
+    dplyr::mutate(
+      i = 1 + tau_max + (row - 1) * w_inc,
+      tau = lags[col],
+      wcc = furrr::future_map2_dbl(.x = i, .y = tau, .f = calc_wcc,
+                            x = x, y = y, w_max = w_max, na.rm = na.rm)
+    )
+
+  results_df
 }
 
+
+
+# df to matrix transformation ---------------------------------------------
+
+df_to_matrix <- function(results_df) {
+
+  out <- matrix(
+    data = results_df$wcc,
+    nrow = max(results_df$row),
+    ncol = max(results_df$col),
+    dimnames = list(time = unique(results_df$i), lag = unique(results_df$tau))
+  )
+
+  out
+}
 
 # r-to-z transformation ---------------------------------------------------
 
 r_to_z <- function(r) {
-  0.5 * log((1 + r) / (1 - r))
+  0.5 * base::log((1 + r) / (1 - r))
 }
 
 
 # Fisher's Z calculation --------------------------------------------------
 
-fisher_z <- function(results_matrix) {
-  results_matrix |>
-    base::as.vector() |>
-    r_to_z() |>
-    base::abs() |>
-    base::mean()
+fisher_z <- function(results_df) {
+  rvec <- results_df$wcc
+  zvec <- r_to_z(rvec)
+  azvec <- base::abs(zvec)
+  res <- base::mean(azvec)
+
+  res
 }
 
 
@@ -110,10 +122,14 @@ fisher_z <- function(results_matrix) {
 #'   Boker et al. recommend setting the lag increment to the longest lag
 #'   increment that still results in related change between successive columns.
 #'   (default = `1`)
+#' @param na.rm A logical indicating whether to remove missing values from the
+#'   windows when calculating windowed cross-correlations. (default = `TRUE`)
 #' @return A list object of class "wcc" containing the results matrix and useful
 #'   summaries of it.
+#' @export
+#'
 wcc <- function(x, y, window_size, lag_max,
-                window_increment = 1, lag_increment = 1) {
+                window_increment = 1, lag_increment = 1, na.rm = TRUE) {
 
   assertthat::assert_that(rlang::is_double(x))
   assertthat::assert_that(rlang::is_double(y))
@@ -125,19 +141,26 @@ wcc <- function(x, y, window_size, lag_max,
   assertthat::assert_that(window_increment > 0)
   assertthat::assert_that(rlang::is_integerish(lag_increment, n = 1))
   assertthat::assert_that(lag_increment > 0)
+  assertthat::assert_that(rlang::is_logical(na.rm, n = 1))
 
-  r_WxWy <- create_wcc_matrix(
+  settings <- list(
+    window_size = window_size,
+    window_increment = window_increment,
+    lag_max = lag_max,
+    lag_increment = lag_increment,
+    na.rm = na.rm
+  )
+
+  results_df <- create_wcc_df(
     x = x,
     y = y,
-    w_max = window_size,
-    w_inc = window_increment,
-    tau_max = lag_max,
-    tau_inc = lag_increment
+    settings = settings
   )
 
   out <- list(
-    results_matrix = r_WxWy,
-    fisher_z = fisher_z(r_WxWy)
+    results_df = results_df,
+    fisher_z = fisher_z(results_df),
+    settings = settings
   )
 
   out

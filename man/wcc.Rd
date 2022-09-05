@@ -4,7 +4,15 @@
 \alias{wcc}
 \title{Windowed Cross-Correlation}
 \usage{
-wcc(x, y, window_size, lag_max, window_increment = 1, lag_increment = 1)
+wcc(
+  x,
+  y,
+  window_size,
+  lag_max,
+  window_increment = 1,
+  lag_increment = 1,
+  na.rm = TRUE
+)
 }
 \arguments{
 \item{x}{A numeric vector containing a time series (same length as `y`).}
@@ -36,6 +44,9 @@ the interval of time separating successive columns in the results matrix).
 Boker et al. recommend setting the lag increment to the longest lag
 increment that still results in related change between successive columns.
 (default = `1`)}
+
+\item{na.rm}{A logical indicating whether to remove missing values from the
+windows when calculating windowed cross-correlations. (default = `TRUE`)}
 }
 \value{
 A list object of class "wcc" containing the results matrix and useful
