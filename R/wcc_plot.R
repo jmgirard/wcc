@@ -1,5 +1,7 @@
-
-plot.wcc <- function(results_obj) {
+#' @export plot.wcc_res
+#' @export
+#' @importFrom graphics plot
+plot.wcc_res <- function(results_obj) {
   df <- dplyr::mutate(
     results_obj$results_df,
     wcc_bin = dplyr::case_when(

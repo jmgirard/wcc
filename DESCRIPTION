@@ -15,6 +15,7 @@ Imports:
     furrr,
     future,
     ggplot2,
+    Hmisc,
     RColorBrewer,
     rlang,
     tidyr

@@ -163,5 +163,15 @@ wcc <- function(x, y, window_size, lag_max,
     settings = settings
   )
 
-  out
+  wcc_res(out)
+}
+
+#' @exportClass wcc_res
+new_wcc_res <- function(x = list()) {
+  stopifnot(is.list(x))
+  structure(x, class = c("wcc_res", class(x)))
+}
+
+wcc_res <- function(x = list()) {
+  new_wcc_res(x)
 }
