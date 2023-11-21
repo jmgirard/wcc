@@ -14,12 +14,14 @@ calc_wcc <- function(i, tau, x, y, w_max, na.rm = TRUE) {
     Wy <- y[(i):(i + w_max)]
   }
 
-  mWx <- mean(Wx, na.rm = na.rm)
-  sWx <- sd(Wx, na.rm = na.rm)
-  mWy <- mean(Wy, na.rm = na.rm)
-  sWy <- sd(Wy, na.rm = na.rm)
+  # mWx <- mean(Wx, na.rm = na.rm)
+  # sWx <- sd(Wx, na.rm = na.rm)
+  # mWy <- mean(Wy, na.rm = na.rm)
+  # sWy <- sd(Wy, na.rm = na.rm)
+  #
+  # wcc <- mean(((Wx - mWx) * (Wy - mWy)) / (sWx * sWy), na.rm = na.rm)
 
-  wcc <- mean(((Wx - mWx) * (Wy - mWy)) / (sWx * sWy), na.rm = na.rm)
+  wcc <- cor(Wx, Wy, use = "pairwise", method = "pearson")
 
   wcc
 }
@@ -88,7 +90,7 @@ fisher_z <- function(results_df) {
   rvec <- results_df$wcc
   zvec <- r_to_z(rvec)
   azvec <- base::abs(zvec)
-  res <- base::mean(azvec)
+  res <- base::mean(azvec, na.rm = TRUE)
 
   res
 }
