@@ -14,14 +14,16 @@ calc_wcc <- function(i, tau, x, y, w_max, na.rm = TRUE) {
     Wy <- y[(i):(i + w_max)]
   }
 
-  # mWx <- mean(Wx, na.rm = na.rm)
-  # sWx <- sd(Wx, na.rm = na.rm)
-  # mWy <- mean(Wy, na.rm = na.rm)
-  # sWy <- sd(Wy, na.rm = na.rm)
-  #
-  # wcc <- mean(((Wx - mWx) * (Wy - mWy)) / (sWx * sWy), na.rm = na.rm)
+  W <- cbind(Wx, Wy) |> na.omit()
 
-  wcc <- cor(Wx, Wy, use = "pairwise", method = "pearson")
+  sWx <- sd(W[, 1], na.rm = na.rm)
+  sWy <- sd(W[, 2], na.rm = na.rm)
+
+  if (is.na(sWx) || sWx == 0 || is.na(sWy) || sWy == 0) {
+    wcc <- NA_real_
+  } else {
+    wcc <- cor(Wx, Wy, use = "pairwise", method = "pearson")
+  }
 
   wcc
 }
@@ -54,8 +56,11 @@ create_wcc_df <- function(x, y, settings) {
     dplyr::mutate(
       i = 1 + tau_max + (row - 1) * w_inc,
       tau = lags[col],
-      wcc = furrr::future_map2_dbl(.x = i, .y = tau, .f = calc_wcc,
-                            x = x, y = y, w_max = w_max, na.rm = na.rm)
+      wcc = furrr::future_map2_dbl(
+        .x = i,
+        .y = tau,
+        .f = \(i, tau) calc_wcc(i, tau, x, y, w_max = w_max, na.rm = na.rm)
+      )
     )
 
   results_df
@@ -80,7 +85,10 @@ df_to_matrix <- function(results_df) {
 # r-to-z transformation ---------------------------------------------------
 
 r_to_z <- function(r) {
-  0.5 * base::log((1 + r) / (1 - r))
+  r[r == -1] <- -0.99
+  r[r == 1] <- 0.99
+  z <- 0.5 * base::log((1 + r) / (1 - r))
+  z
 }
 
 
