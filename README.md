@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of wcc is to …
+The goal of wcc is to provide an efficient, parallelized way of computing windowed cross-correlations in R.
 
 ## Installation
 
