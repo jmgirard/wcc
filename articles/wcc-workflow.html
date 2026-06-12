@@ -203,8 +203,9 @@ signals.</p>
 <span><span class="co">#&gt; Permutations: 100</span></span>
 <span><span class="co">#&gt; Observed Fisher's Z: 0.3851</span></span>
 <span><span class="co">#&gt; Average Null Z: 0.3015</span></span>
-<span><span class="co">#&gt; Empirical p-value: 0</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Observed synchrony is significantly greater than chance.</span></span></code></pre></div>
+<span><span class="co">#&gt; Empirical p-value: &lt; 0.01</span></span>
+<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Observed synchrony is significantly greater than chance.</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Note: 100 permutations may be too few for stable p-values. Consider setting `n_surrogates &gt;= 1000` for final reporting.</span></span></code></pre></div>
 <p>The output gives us an empirical p-value by calculating the
 proportion of surrogate Fisher’s Z scores that meet or exceed our
 observed Fisher’s Z. Here, our observed Z (0.3851) is higher than the
