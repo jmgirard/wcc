@@ -103,17 +103,28 @@ print.wcc_surr <- function(x, ...) {
 
   cli::cli_h1("WCC Surrogate Analysis (Pseudo-Synchrony)")
 
+  # Dynamically format the p-value based on the permutation resolution
+  if (x$p_value == 0) {
+    p_disp <- paste0("< ", 1 / x$n_surrogates)
+  } else {
+    p_disp <- as.character(round(x$p_value, 4))
+  }
+
   cli::cli_dl(c(
     "Permutations" = "{x$n_surrogates}",
     "Observed Fisher's Z" = "{round(x$observed_z, 4)}",
     "Average Null Z" = "{round(mean(x$surrogate_z), 4)}",
-    "Empirical p-value" = "{round(x$p_value, 4)}"
+    "Empirical p-value" = "{p_disp}"
   ))
 
   if (x$p_value < 0.05) {
     cli::cli_alert_success("Observed synchrony is significantly greater than chance.")
   } else {
     cli::cli_alert_warning("Observed synchrony is not significantly different from chance.")
+  }
+
+  if (x$n_surrogates < 1000) {
+    cli::cli_alert_info("Note: {x$n_surrogates} permutations may be too few for stable p-values. Consider setting `n_surrogates >= 1000` for final reporting.")
   }
 
   invisible(x)
