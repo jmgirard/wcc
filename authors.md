@@ -7,6 +7,9 @@
 
 ## Citation
 
+Source:
+[`DESCRIPTION`](https://github.com/jmgirard/bsync/blob/main/DESCRIPTION)
+
 Girard J (2026). *bsync: Behavioral Synchrony Analyses*. R package
 version 0.0.0.9000, <https://jmgirard.github.io/bsync/>.
 
