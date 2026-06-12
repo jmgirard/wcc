@@ -13,8 +13,12 @@ knitr::opts_chunk$set(
 
 # wcc
 
-[![R-CMD-check](https://github.com/jmgirard/wcc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jmgirard/wcc/actions/workflows/R-CMD-check.yaml)
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/jmgirard/wcc/actions/workflows/R-CMD-check.yaml/badge.svghttps://github.com/jmgirard/wcc/actions/workflows/R-CMD-check.yaml/badge.svghttps://github.com/jmgirard/wcc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jmgirard/wcc/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/jmgirard/wcc/graph/badge.svg)](https://app.codecov.io/gh/jmgirard/wcc)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+<!-- badges: end -->
+
 The goal of **wcc** is to provide a modern, high-efficiency R implementation of the windowed cross-correlation and peak-picking algorithms.
 
 Traditional cross-correlation assumes that the association between two time series is stationary over time. However, in many psychological and behavioral contexts (such as interpersonal conversation or synchronized movement), the lead-lag relationship between individuals is highly dynamic. This package allows researchers to quantify these nonstationary associations by evaluating correlations across sliding windows of elapsed time.
