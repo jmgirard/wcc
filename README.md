@@ -1,5 +1,5 @@
 
-# wcc
+# bsync
 
 <!-- badges: start -->
 
@@ -11,32 +11,37 @@ coverage](https://codecov.io/gh/jmgirard/wcc/graph/badge.svg)](https://app.codec
 [![test-coverage](https://github.com/jmgirard/wcc/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/jmgirard/wcc/actions/workflows/test-coverage.yaml)
 <!-- badges: end -->
 
-The goal of **wcc** is to provide a modern, high-efficiency R
-implementation of the windowed cross-correlation and peak-picking
-algorithms.
+The goal of **bsync** is to provide a modern, high-efficiency R toolkit
+for analyzing interpersonal and behavioral synchrony.
 
-Traditional cross-correlation assumes that the association between two
-time series is stationary over time. However, in many psychological and
+While traditional cross-correlation assumes that the association between
+two time series is stationary over time, in many psychological and
 behavioral contexts (such as interpersonal conversation or synchronized
 movement), the lead-lag relationship between individuals is highly
-dynamic. This package allows researchers to quantify these nonstationary
-associations by evaluating correlations across sliding windows of
-elapsed time.
+dynamic. **bsync** allows researchers to quantify these nonstationary
+associations using highly optimized windowed cross-correlation (WCC) and
+peak-picking algorithms.
+
+Furthermore, the package provides a complete analytical pipeline for
+behavioral time series. This includes robust preprocessing functions for
+time-bin aggregation, zero-phase signal smoothing, and kinematic
+velocity/speed calculations, as well as rigorous hypothesis testing via
+circular-shift surrogate data generation (pseudo-synchrony testing).
 
 ## Installation
 
-You can install the development version of wcc from
-[GitHub](https://github.com/jmgirard/wcc) with:
+You can install the development version of bsync from
+[GitHub](https://github.com/jmgirard/bsync) with:
 
 ``` r
-# install.packages("devtools")
-devtools::install_github("jmgirard/wcc")
+# install.packages("pak")
+pak::pak("jmgirard/bsync")
 ```
 
 ## Example Workflow
 
-The following example demonstrates the complete `wcc` pipeline. We will
-use the included `sim_dyad` dataset, which contains 30 seconds of
+The following example demonstrates the complete `bsync` pipeline. We
+will use the included `sim_dyad` dataset, which contains 30 seconds of
 simulated 3D motion tracking data for two individuals. In this
 simulation, Person A begins by leading a rhythmic movement, they
 synchronize in the middle, and Person B takes the lead by the end.
@@ -48,7 +53,7 @@ Here we apply a Savitzky-Golay filter and then calculate the 1D
 directional velocity on the Z-axis.
 
 ``` r
-library(wcc)
+library(bsync)
 library(dplyr)
 
 data("sim_dyad")
@@ -176,10 +181,10 @@ surrogate_results
 
 ## Citation
 
-If you use **wcc** in your research, please cite the package:
+If you use **bsync** in your research, please cite the package:
 
 ``` r
-citation("wcc")
+citation("bsync")
 ```
 
 This package builds upon the original windowed cross-correlation

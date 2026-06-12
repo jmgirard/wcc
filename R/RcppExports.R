@@ -2,10 +2,10 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 pick_peaks_cpp <- function(wcc_list, i_vals, tau_max, L_size, strict_monotonic = FALSE) {
-    .Call(`_wcc_pick_peaks_cpp`, wcc_list, i_vals, tau_max, L_size, strict_monotonic)
+    .Call(`_bsync_pick_peaks_cpp`, wcc_list, i_vals, tau_max, L_size, strict_monotonic)
 }
 
 calc_wcc_cpp <- function(x, y, i_vals, tau_vals, w_max) {
-    .Call(`_wcc_calc_wcc_cpp`, x, y, i_vals, tau_vals, w_max)
+    .Call(`_bsync_calc_wcc_cpp`, x, y, i_vals, tau_vals, w_max)
 }
 

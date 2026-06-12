@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(wcc)
+library(bsync)
 
-test_check("wcc")
+test_check("bsync")

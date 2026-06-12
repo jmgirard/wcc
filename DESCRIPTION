@@ -1,11 +1,17 @@
-Package: wcc
+Package: bsync
 Type: Package
-Title: Windowed Cross-Correlation Analysis
+Title: Behavioral Synchrony Analyses
 Version: 0.0.0.9000
 Authors@R: person("Jeffrey", "Girard", email = "me@jmgirard.com",
     role = c("aut", "cre"))
-Description: More about what it does (maybe more than one line)
-    Use four spaces when indenting paragraphs within the Description.
+Description: A comprehensive toolkit for analyzing interpersonal and behavioral
+    synchrony in continuous time series data. Provides highly efficient, C++ backed
+    implementations of windowed cross-correlation (WCC) and peak-picking algorithms
+    to quantify nonstationary lead-lag relationships. Includes a complete preprocessing
+    pipeline for behavioral data featuring zero-phase smoothing, time-bin aggregation,
+    and kinematic velocity and speed calculations. Additionally, the package supports
+    rigorous null-hypothesis testing through circular-shift surrogate data generation
+    (pseudo-synchrony analysis) to distinguish genuine interaction from spurious correlation.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true

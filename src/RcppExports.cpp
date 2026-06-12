@@ -12,7 +12,7 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 
 // pick_peaks_cpp
 DataFrame pick_peaks_cpp(List wcc_list, NumericVector i_vals, int tau_max, int L_size, bool strict_monotonic);
-RcppExport SEXP _wcc_pick_peaks_cpp(SEXP wcc_listSEXP, SEXP i_valsSEXP, SEXP tau_maxSEXP, SEXP L_sizeSEXP, SEXP strict_monotonicSEXP) {
+RcppExport SEXP _bsync_pick_peaks_cpp(SEXP wcc_listSEXP, SEXP i_valsSEXP, SEXP tau_maxSEXP, SEXP L_sizeSEXP, SEXP strict_monotonicSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -27,7 +27,7 @@ END_RCPP
 }
 // calc_wcc_cpp
 NumericVector calc_wcc_cpp(NumericVector x, NumericVector y, IntegerVector i_vals, IntegerVector tau_vals, int w_max);
-RcppExport SEXP _wcc_calc_wcc_cpp(SEXP xSEXP, SEXP ySEXP, SEXP i_valsSEXP, SEXP tau_valsSEXP, SEXP w_maxSEXP) {
+RcppExport SEXP _bsync_calc_wcc_cpp(SEXP xSEXP, SEXP ySEXP, SEXP i_valsSEXP, SEXP tau_valsSEXP, SEXP w_maxSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -42,12 +42,12 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_wcc_pick_peaks_cpp", (DL_FUNC) &_wcc_pick_peaks_cpp, 5},
-    {"_wcc_calc_wcc_cpp", (DL_FUNC) &_wcc_calc_wcc_cpp, 5},
+    {"_bsync_pick_peaks_cpp", (DL_FUNC) &_bsync_pick_peaks_cpp, 5},
+    {"_bsync_calc_wcc_cpp", (DL_FUNC) &_bsync_calc_wcc_cpp, 5},
     {NULL, NULL, 0}
 };
 
-RcppExport void R_init_wcc(DllInfo *dll) {
+RcppExport void R_init_bsync(DllInfo *dll) {
     R_registerRoutines(dll, NULL, CallEntries, NULL, NULL);
     R_useDynamicSymbols(dll, FALSE);
 }

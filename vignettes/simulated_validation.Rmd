@@ -15,7 +15,7 @@ knitr::opts_chunk$set(
 ```
 
 ```{r setup}
-library(wcc)
+library(bsync)
 
 # 1. Simulate data with a known lag shift
 set.seed(42)
