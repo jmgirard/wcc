@@ -12,10 +12,7 @@ LazyData: true
 Imports:
     assertthat,
     dplyr,
-    furrr,
-    future,
     ggplot2,
-    Hmisc,
     RColorBrewer,
     Rcpp,
     rlang,

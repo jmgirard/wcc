@@ -8,6 +8,7 @@
 coverage](https://codecov.io/gh/jmgirard/wcc/graph/badge.svg)](https://app.codecov.io/gh/jmgirard/wcc)
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![test-coverage](https://github.com/jmgirard/wcc/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/jmgirard/wcc/actions/workflows/test-coverage.yaml)
 <!-- badges: end -->
 
 The goal of **wcc** is to provide a modern, high-efficiency R

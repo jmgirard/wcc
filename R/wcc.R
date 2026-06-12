@@ -1,27 +1,3 @@
-
-# Calculate windowed cross-correlation ------------------------------------
-
-calc_wcc <- function(i, tau, x, y, w_max, na.rm = TRUE) {
-
-  assertthat::assert_that(rlang::is_double(i, n = 1), i > 0)
-  assertthat::assert_that(rlang::is_double(tau, n = 1))
-
-  # Use a universal index shift
-  Wx <- x[i:(i + w_max)]
-  Wy <- y[(i + tau):(i + tau + w_max)]
-
-  # Direct correlation calculation
-  if (na.rm) {
-    cor_method <- "pairwise.complete.obs"
-  } else {
-    cor_method <- "everything"
-  }
-
-  wcc <- suppressWarnings(cor(Wx, Wy, use = cor_method, method = "pearson"))
-
-  wcc
-}
-
 # Create wcc results df ---------------------------------------------------
 
 create_wcc_df <- function(x, y, settings) {
@@ -160,7 +136,6 @@ wcc <- function(x, y, window_size, lag_max,
   wcc_res(out)
 }
 
-#' @exportClass wcc_res
 new_wcc_res <- function(x = list()) {
   stopifnot(is.list(x))
   structure(x, class = c("wcc_res", class(x)))

@@ -6,6 +6,11 @@
 \usage{
 plot_peaks_overlay(wcc_obj, peaks_df)
 }
+\arguments{
+\item{wcc_obj}{An object of class "wcc_res" containing the windowed cross-correlation results.}
+
+\item{peaks_df}{A data frame containing the peaks to overlay.}
+}
 \description{
 Plot Windowed Cross-Correlation with Peak Overlay
 }
