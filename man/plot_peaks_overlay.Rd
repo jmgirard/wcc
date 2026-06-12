@@ -13,7 +13,9 @@ plot_peaks_overlay(
   point_stroke = "white",
   color_low = "#B2182B",
   color_mid = "#F7F7F7",
-  color_high = "#2166AC"
+  color_high = "#2166AC",
+  show_zero_lag = TRUE,
+  zero_line_color = "black"
 )
 }
 \arguments{
@@ -34,6 +36,10 @@ plot_peaks_overlay(
 \item{color_mid}{Character string specifying the heatmap color for a correlation of 0. Default is "#F7F7F7".}
 
 \item{color_high}{Character string specifying the heatmap color for a correlation of 1. Default is "#2166AC".}
+
+\item{show_zero_lag}{Logical indicating whether to draw a vertical line at lag = 0. Default is `TRUE`.}
+
+\item{zero_line_color}{Character string specifying the color of the zero-lag line. Default is "black".}
 }
 \description{
 Plot Windowed Cross-Correlation with Peak Overlay

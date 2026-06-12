@@ -6,12 +6,16 @@
 #' @param color_low Character string specifying the color for a correlation of -1. Default is "#B2182B" (Deep Red).
 #' @param color_mid Character string specifying the color for a correlation of 0. Default is "#F7F7F7" (Off-white).
 #' @param color_high Character string specifying the color for a correlation of 1. Default is "#2166AC" (Deep Blue).
+#' @param show_zero_lag Logical indicating whether to draw a vertical line at lag = 0. Default is `TRUE`.
+#' @param zero_line_color Character string specifying the color of the zero-lag line. Default is "black".
 #' @param ... Additional arguments (not used).
 #' @export
 plot.wcc_res <- function(x, time_step = 1,
                          color_low = "#B2182B",
                          color_mid = "#F7F7F7",
-                         color_high = "#2166AC", ...) {
+                         color_high = "#2166AC",
+                         show_zero_lag = TRUE,
+                         zero_line_color = "black", ...) {
 
   df <- x$results_df
 
@@ -49,6 +53,17 @@ plot.wcc_res <- function(x, time_step = 1,
       y = y_label
     )
 
+  # Add the optional zero-lag reference line
+  if (show_zero_lag) {
+    p <- p + ggplot2::geom_vline(
+      xintercept = 0,
+      color = zero_line_color,
+      linetype = "dashed",
+      alpha = 0.5,
+      linewidth = 0.5
+    )
+  }
+
   p
 }
 
@@ -63,6 +78,8 @@ plot.wcc_res <- function(x, time_step = 1,
 #' @param color_low Character string specifying the heatmap color for a correlation of -1. Default is "#B2182B".
 #' @param color_mid Character string specifying the heatmap color for a correlation of 0. Default is "#F7F7F7".
 #' @param color_high Character string specifying the heatmap color for a correlation of 1. Default is "#2166AC".
+#' @param show_zero_lag Logical indicating whether to draw a vertical line at lag = 0. Default is `TRUE`.
+#' @param zero_line_color Character string specifying the color of the zero-lag line. Default is "black".
 #' @export
 plot_peaks_overlay <- function(wcc_obj, peaks_df,
                                time_step = 1,
@@ -71,11 +88,14 @@ plot_peaks_overlay <- function(wcc_obj, peaks_df,
                                point_stroke = "white",
                                color_low = "#B2182B",
                                color_mid = "#F7F7F7",
-                               color_high = "#2166AC") {
+                               color_high = "#2166AC",
+                               show_zero_lag = TRUE,
+                               zero_line_color = "black") {
 
-  # Call the base plot method to generate the heatmap and handle axes and colors
+  # Call the base plot method to generate the heatmap and handle axes, colors, and the zero line
   p_base <- plot(wcc_obj, time_step = time_step,
-                 color_low = color_low, color_mid = color_mid, color_high = color_high)
+                 color_low = color_low, color_mid = color_mid, color_high = color_high,
+                 show_zero_lag = show_zero_lag, zero_line_color = zero_line_color)
 
   # Scale peak coordinates to match the base plot
   if (time_step != 1) {
