@@ -1,4 +1,4 @@
-# WCC Workflow
+# Windowed Cross-Correlation Workflow
 
 ## Analyzing Interpersonal Synchrony with Windowed Cross-Correlation
 
@@ -44,9 +44,10 @@ set.seed(2026)
 fs <- 30
 n_frames <- 1800 # 60 seconds of data
 
-# Generate a smooth base signal using a moving average on white noise
+# Generate a smooth base signal using a wide moving average on white noise
+# A 90-frame window ensures high autocorrelation at our 15-frame shift
 raw_noise <- rnorm(n_frames + 300)
-base_signal <- stats::filter(raw_noise, rep(1/15, 15), circular = TRUE)
+base_signal <- stats::filter(raw_noise, rep(1/90, 90), circular = TRUE)
 base_signal <- as.numeric(base_signal)
 
 person_A <- numeric(n_frames)
@@ -65,8 +66,8 @@ for (i in 1:n_frames) {
   }
 
   # Add slight independent noise to mimic realistic measurement error
-  person_A[i] <- base_signal[idx_A] + rnorm(1, sd = 0.1)
-  person_B[i] <- base_signal[idx_B] + rnorm(1, sd = 0.1)
+  person_A[i] <- base_signal[idx_A] + rnorm(1, sd = 0.05)
+  person_B[i] <- base_signal[idx_B] + rnorm(1, sd = 0.05)
 }
 
 dyad_data <- data.frame(
@@ -109,12 +110,12 @@ summary(wcc_results)
 #> Total Lags Tested: 91
 #> Window Size: 90
 #> Max Lag: 45
-#> Overall Fisher's Z: 0.2948
+#> Overall Fisher's Z: 0.2811
 #> 
 #> ── Cross-Correlation Value Distribution ──
 #> 
 #>      0%     25%     50%     75%    100% 
-#> -0.6858 -0.1998  0.0179  0.2551  0.9166
+#> -0.6538 -0.0427  0.1207  0.3515  0.8959
 #> ! 1 missing value (NA) detected.
 ```
 
@@ -136,6 +137,11 @@ function handles this by shifting one time series relative to the other,
 destroying the true synchronous relationship while preserving the
 autocorrelation of the individual signals.
 
+**Note on Permutations:** We use `n_surrogates = 100` here for speed
+during exploratory analysis. To achieve stable and trustworthy p-values
+for publication, it is recommended to run at least 1,000 to 10,000
+permutations.
+
 ``` r
 
 surrogate_results <- wcc_surrogate(
@@ -152,16 +158,16 @@ print(surrogate_results)
 #> 
 #> ── WCC Surrogate Analysis (Pseudo-Synchrony) ───────────────────────────────────
 #> Permutations: 100
-#> Observed Fisher's Z: 0.2948
-#> Average Null Z: 0.2187
+#> Observed Fisher's Z: 0.2811
+#> Average Null Z: 0.2168
 #> Empirical p-value: 0
 #> ✔ Observed synchrony is significantly greater than chance.
 ```
 
 The output gives us an empirical p-value by calculating the proportion
 of surrogate Fisher’s Z scores that meet or exceed our observed Fisher’s
-Z. If the p-value is significant, we can confidently assert that the
-observed synchrony is greater than chance.
+Z. If the p-value is significant (e.g., p \< 0.05), we can confidently
+assert that the observed synchrony is greater than chance.
 
 ### 4. Peak Picking
 
@@ -186,11 +192,11 @@ print(wcc_peaks_df)
 #> Strict Monotonic: FALSE
 #> Showing the first 5 peaks:
 #>    i peak_lag peak_value
-#>   46       15  0.7049796
-#>   76        2 -0.0561398
-#>  106       -5  0.1409913
-#>  136       -9  0.2241356
-#>  166       -9  0.3676144
+#>   46       -4  0.1101381
+#>   76        1  0.2854316
+#>  106        1  0.3327613
+#>  136        3  0.3337459
+#>  166        0  0.1093694
 #> # ... with 50 more rows
 ```
 

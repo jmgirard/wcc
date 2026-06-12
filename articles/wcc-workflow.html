@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>WCC Workflow • bsync</title>
+<title>Windowed Cross-Correlation Workflow • bsync</title>
 <!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
   window.MathJax = {
     chtml: {
@@ -16,7 +16,7 @@
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="WCC Workflow">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="Windowed Cross-Correlation Workflow">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -40,7 +40,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/wcc-params.html">Choosing WCC Parameters</a></li>
-    <li><a class="dropdown-item" href="../articles/wcc-workflow.html">WCC Workflow</a></li>
+    <li><a class="dropdown-item" href="../articles/wcc-workflow.html">Windowed Cross-Correlation Workflow</a></li>
   </ul>
 </li>
       </ul>
@@ -62,7 +62,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>WCC Workflow</h1>
+      <h1>Windowed Cross-Correlation Workflow</h1>
             
       
       <small class="dont-index">Source: <a href="https://github.com/jmgirard/bsync/blob/main/vignettes/wcc-workflow.Rmd" class="external-link"><code>vignettes/wcc-workflow.Rmd</code></a></small>
@@ -112,9 +112,10 @@ flips and Person B leads by 15 frames.</p>
 <span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fl">30</span></span>
 <span><span class="va">n_frames</span> <span class="op">&lt;-</span> <span class="fl">1800</span> <span class="co"># 60 seconds of data</span></span>
 <span></span>
-<span><span class="co"># Generate a smooth base signal using a moving average on white noise</span></span>
+<span><span class="co"># Generate a smooth base signal using a wide moving average on white noise</span></span>
+<span><span class="co"># A 90-frame window ensures high autocorrelation at our 15-frame shift</span></span>
 <span><span class="va">raw_noise</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_frames</span> <span class="op">+</span> <span class="fl">300</span><span class="op">)</span></span>
-<span><span class="va">base_signal</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">raw_noise</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">15</span>, <span class="fl">15</span><span class="op">)</span>, circular <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">base_signal</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">raw_noise</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">90</span>, <span class="fl">90</span><span class="op">)</span>, circular <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">base_signal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">base_signal</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">person_A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="va">n_frames</span><span class="op">)</span></span>
@@ -133,8 +134,8 @@ flips and Person B leads by 15 frames.</p>
 <span>  <span class="op">}</span></span>
 <span></span>
 <span>  <span class="co"># Add slight independent noise to mimic realistic measurement error</span></span>
-<span>  <span class="va">person_A</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">base_signal</span><span class="op">[</span><span class="va">idx_A</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
-<span>  <span class="va">person_B</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">base_signal</span><span class="op">[</span><span class="va">idx_B</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, sd <span class="op">=</span> <span class="fl">0.1</span><span class="op">)</span></span>
+<span>  <span class="va">person_A</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">base_signal</span><span class="op">[</span><span class="va">idx_A</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, sd <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
+<span>  <span class="va">person_B</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">base_signal</span><span class="op">[</span><span class="va">idx_B</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, sd <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
 <span><span class="va">dyad_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
@@ -172,12 +173,12 @@ frames (1 second) to allow for overlap and smooth transitions.</p>
 <span><span class="co">#&gt; Total Lags Tested: 91</span></span>
 <span><span class="co">#&gt; Window Size: 90</span></span>
 <span><span class="co">#&gt; Max Lag: 45</span></span>
-<span><span class="co">#&gt; Overall Fisher's Z: 0.2948</span></span>
+<span><span class="co">#&gt; Overall Fisher's Z: 0.2811</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── <span style="font-weight: bold;">Cross-Correlation Value Distribution</span> ──</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;      0%     25%     50%     75%    100% </span></span>
-<span><span class="co">#&gt; -0.6858 -0.1998  0.0179  0.2551  0.9166</span></span>
+<span><span class="co">#&gt; -0.6538 -0.0427  0.1207  0.3515  0.8959</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> 1 missing value (NA) detected.</span></span></code></pre></div>
 <p>The <code><a href="../reference/wcc.html">wcc()</a></code> function returns a list object of class
 <code>wcc_res</code> containing the results data frame, the overall
@@ -195,6 +196,10 @@ method.</p>
 one time series relative to the other, destroying the true synchronous
 relationship while preserving the autocorrelation of the individual
 signals.</p>
+<p><strong>Note on Permutations:</strong> We use
+<code>n_surrogates = 100</code> here for speed during exploratory
+analysis. To achieve stable and trustworthy p-values for publication, it
+is recommended to run at least 1,000 to 10,000 permutations.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">surrogate_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wcc_surrogate.html">wcc_surrogate</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">dyad_data</span><span class="op">$</span><span class="va">person_A</span>,</span>
@@ -210,14 +215,15 @@ signals.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">WCC Surrogate Analysis (Pseudo-Synchrony)</span> <span style="color: #00BBBB;">───────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; Permutations: 100</span></span>
-<span><span class="co">#&gt; Observed Fisher's Z: 0.2948</span></span>
-<span><span class="co">#&gt; Average Null Z: 0.2187</span></span>
+<span><span class="co">#&gt; Observed Fisher's Z: 0.2811</span></span>
+<span><span class="co">#&gt; Average Null Z: 0.2168</span></span>
 <span><span class="co">#&gt; Empirical p-value: 0</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Observed synchrony is significantly greater than chance.</span></span></code></pre></div>
 <p>The output gives us an empirical p-value by calculating the
 proportion of surrogate Fisher’s Z scores that meet or exceed our
-observed Fisher’s Z. If the p-value is significant, we can confidently
-assert that the observed synchrony is greater than chance.</p>
+observed Fisher’s Z. If the p-value is significant (e.g., p &lt; 0.05),
+we can confidently assert that the observed synchrony is greater than
+chance.</p>
 </div>
 <div class="section level3">
 <h3 id="peak-picking">4. Peak Picking<a class="anchor" aria-label="anchor" href="#peak-picking"></a>
@@ -240,11 +246,11 @@ region.</p>
 <span><span class="co">#&gt; Strict Monotonic: FALSE</span></span>
 <span><span class="co">#&gt; Showing the first 5 peaks:</span></span>
 <span><span class="co">#&gt;    i peak_lag peak_value</span></span>
-<span><span class="co">#&gt;   46       15  0.7049796</span></span>
-<span><span class="co">#&gt;   76        2 -0.0561398</span></span>
-<span><span class="co">#&gt;  106       -5  0.1409913</span></span>
-<span><span class="co">#&gt;  136       -9  0.2241356</span></span>
-<span><span class="co">#&gt;  166       -9  0.3676144</span></span>
+<span><span class="co">#&gt;   46       -4  0.1101381</span></span>
+<span><span class="co">#&gt;   76        1  0.2854316</span></span>
+<span><span class="co">#&gt;  106        1  0.3327613</span></span>
+<span><span class="co">#&gt;  136        3  0.3337459</span></span>
+<span><span class="co">#&gt;  166        0  0.1093694</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;"># ... with 50 more rows</span></span></span></code></pre></div>
 <p>This returns a <code>wcc_peaks</code> data frame containing the
 elapsed time indices, the peak lags, and the corresponding correlation

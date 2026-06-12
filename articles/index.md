@@ -4,5 +4,5 @@
 
 - [Choosing WCC
   Parameters](https://jmgirard.github.io/bsync/articles/wcc-params.md):
-- [WCC
+- [Windowed Cross-Correlation
   Workflow](https://jmgirard.github.io/bsync/articles/wcc-workflow.md):
