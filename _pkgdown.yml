@@ -1,4 +1,18 @@
 url: https://jmgirard.github.io/bsync/
+
+home:
+  title: Behavioral Synchrony Analyses
+
+authors:
+  Jeffrey Girard:
+    href: https://affcom.ku.edu/girard
+
 template:
   bootstrap: 5
+  math-rendering: mathjax
+  light-switch: true
 
+navbar:
+  structure:
+    left:  [reference, articles]
+    right: [search, github]

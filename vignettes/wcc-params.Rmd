@@ -1,8 +1,8 @@
 ---
-title: "Choosing Windowed Cross-Correlation Parameters"
+title: "Choosing WCC Parameters"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Choosing Windowed Cross-Correlation Parameters}
+  %\VignetteIndexEntry{Choosing WCC Parameters}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

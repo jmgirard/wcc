@@ -42,9 +42,9 @@ wcc_sim <- wcc(
 )
 
 sim_peaks <- pick_peaks(wcc_sim, L_size = 5, strict_monotonic = FALSE)
+```
 
+```{r}
 # 3. Validate the results
-# The early windows should hover around lag 0, and later windows around lag 5
-print(head(sim_peaks))
-print(tail(sim_peaks))
+sim_peaks
 ```
