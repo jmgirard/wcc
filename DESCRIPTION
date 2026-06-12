@@ -36,4 +36,5 @@ LinkingTo:
     Rcpp
 Config/roxygen2/version: 8.0.0
 VignetteBuilder: knitr
-URL: https://jmgirard.github.io/bsync/
+URL: https://jmgirard.github.io/bsync/, https://github.com/jmgirard/bsync
+BugReports: https://github.com/jmgirard/bsync/issues
