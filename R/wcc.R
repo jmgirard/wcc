@@ -12,7 +12,7 @@ create_wcc_df <- function(x, y, settings) {
   n_r <- floor((n_x - w_max - tau_max) / w_inc)
   n_c <- length(lags)
 
-  results_df <- tidyr::crossing(row = 1:n_r, col = 1:n_c) |>
+  results_df <- base::expand.grid(row = 1:n_r, col = 1:n_c) |>
     dplyr::mutate(
       i = 1 + tau_max + (row - 1) * w_inc,
       tau = lags[col],
