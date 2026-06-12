@@ -1,31 +1,30 @@
+# data-raw/sim_dyad.R
+
 set.seed(2026)
 
-# Simulation parameters
-fs <- 50                   # Sampling frequency (50 Hz)
-duration <- 30             # Duration in seconds
-N <- fs * duration         # Total number of observations
+fs <- 80
+duration <- 30
+N <- fs * duration
 t <- seq(0, duration, length.out = N)
 
-# Base rhythm: e.g., head nodding at 0.5 Hz
 freq <- 0.5
-base_signal <- sin(2 * pi * freq * t)
 
-# Create a shifting lag (in seconds)
-# Starts with A leading by 0.6s, shifts to B leading by 0.6s
-lag_shift_sec <- seq(0.6, -0.6, length.out = N)
+# Shifting lag: Person A leads by 0.5s, smoothly transitions to B leading by 0.5s
+lag_shift_sec <- seq(0.5, -0.5, length.out = N)
 
-# Simulate 3D coordinates
-# X and Y are mostly stationary noise
-x_A <- rnorm(N, mean = 0, sd = 0.05)
-y_A <- rnorm(N, mean = 0, sd = 0.05)
-x_B <- rnorm(N, mean = 0, sd = 0.05)
-y_B <- rnorm(N, mean = 0, sd = 0.05)
+# Signal generation
+signal_A <- sin(2 * pi * freq * t)
+signal_B <- sin(2 * pi * freq * (t - lag_shift_sec))
 
-# Z contains the main cyclic movement with the shifting lag
-z_A <- base_signal + rnorm(N, mean = 0, sd = 0.1)
-z_B <- sin(2 * pi * freq * (t - lag_shift_sec)) + rnorm(N, mean = 0, sd = 0.1)
+# Simulating 3D position with highly realistic, low-level sensor jitter (sd = 0.002)
+x_A <- rnorm(N, mean = 0, sd = 0.002)
+y_A <- rnorm(N, mean = 0, sd = 0.002)
+z_A <- signal_A + rnorm(N, mean = 0, sd = 0.002)
 
-# Combine into a clean data frame
+x_B <- rnorm(N, mean = 0, sd = 0.002)
+y_B <- rnorm(N, mean = 0, sd = 0.002)
+z_B <- signal_B + rnorm(N, mean = 0, sd = 0.002)
+
 sim_dyad <- data.frame(
   time = t,
   x_A = x_A, y_A = y_A, z_A = z_A,
