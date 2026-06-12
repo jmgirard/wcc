@@ -126,6 +126,19 @@ If you use **bsync** in your research, please cite the package:
 citation("bsync")
 ```
 
-This package builds upon the original windowed cross-correlation methodology proposed in the following paper:
+This package builds upon foundational methodology and modern best practices in behavioral time series analysis. We recommend citing the following papers to justify the specific analytical steps used in your pipeline.
 
-* Boker, S. M., Rotondo, J. L., Xu, M., \& King, K. (2002). Windowed cross-correlation and peak picking for the analysis of variability in the association between behavioral time series. *Psychological Methods*, *7*(3), 338.
+### Windowed Cross-Correlation & Peak-Picking
+The core WCC algorithm and peak-picking logic are based on:
+
+*	Boker, S. M., Rotondo, J. L., Xu, M., & King, K. (2002). Windowed cross-correlation and peak picking for the analysis of variability in the association between behavioral time series. *Psychological Methods, 7*(3), 338.
+
+### Pseudo-Synchrony & Surrogate Testing
+The use of circular-shifted surrogate data to establish a statistical baseline for true interpersonal synchrony was popularized in behavioral research by:
+
+*	Ramseyer, F., & Tschacher, W. (2011). Nonverbal synchrony in psychotherapy: Coordinated body movement reflects relationship quality and outcome. *Journal of Consulting and Clinical Psychology, 79*(3), 284-295.
+
+### Signal Smoothing & Velocity Calculation
+The preprocessing pipeline utilizes zero-phase moving averages and polynomial filtering techniques originally developed by:
+
+*	Savitzky, A., & Golay, M. J. (1964). Smoothing and differentiation of data by simplified least squares procedures. *Analytical Chemistry, 36*(8), 1627-1639.
