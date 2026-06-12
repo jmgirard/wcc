@@ -31,31 +31,42 @@ devtools::install_github("jmgirard/wcc")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
-
-```{r example, cache=TRUE}
+```{r example}
 library(wcc)
+data("sim_dyad")
 
-# Extract the second ten minutes of interaction
-second_ten <- dplyr::filter(head_velocity, time >= 10 * 60, time < 20 * 60)
+# Step 1: Calculate 3D velocity for both individuals
+# The v_xyz function requires time and the three spatial coordinates
+sim_dyad$vel_A <- v_xyz(sim_dyad$time, sim_dyad$x_A, sim_dyad$y_A, sim_dyad$z_A)
+sim_dyad$vel_B <- v_xyz(sim_dyad$time, sim_dyad$x_B, sim_dyad$y_B, sim_dyad$z_B)
 
-# Set up parallel processing
-future::plan(future::multisession)
-
-# Conduct windowed cross-correlation analysis
-res <- wcc(
-  x = second_ten$x,
-  y = second_ten$y,
-  window_size = 4 * 60, # 4 sec windows
-  window_increment = 60 / 10, # 1/10 sec increment
-  lag_max = 2 * 60, # 2 sec maximum lag
-  lag_increment = 60 / 10 # 1/10 sec increment
+# Step 2: Calculate Windowed Cross-Correlations
+# We correlate the velocities using a 3-second window (150 samples)
+# and evaluate lags up to +/- 1.5 seconds (75 samples)
+wcc_results <- wcc(
+  x = sim_dyad$vel_A,
+  y = sim_dyad$vel_B,
+  window_size = 150,
+  lag_max = 75,
+  window_increment = 25,
+  lag_increment = 1,
+  na.rm = TRUE
 )
 
-res$fisher_z
-```
+# Step 3: Extract the Peaks
+# Find the specific lag of maximum association for each time window
+# using a 5-lag local search region (L_size must be odd)
+peaks <- pick_peaks(
+  wcc_obj = wcc_results,
+  L_size = 5,
+  strict_monotonic = FALSE
+)
 
-```{r}
-plot(res)
-```
+# Step 4: Review the results
+# Notice how the peak_lag smoothly shifts from positive to negative over time
+head(peaks)
+tail(peaks)
 
+# Plot the underlying correlation landscape (if plot function is exported)
+plot(wcc_results)
+```

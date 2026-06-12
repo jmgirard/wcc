@@ -1,20 +1,22 @@
 #' @export
 v_xyz <- function(t, x, y, z) {
-  df <- data.frame(t, x, y, z)
 
-  df$tm1 <- Hmisc::Lag(df$t, -1)
-  df$tp1 <- Hmisc::Lag(df$t, +1)
-  df$xm1 <- Hmisc::Lag(df$x, -1)
-  df$xp1 <- Hmisc::Lag(df$x, +1)
-  df$ym1 <- Hmisc::Lag(df$y, -1)
-  df$yp1 <- Hmisc::Lag(df$y, +1)
-  df$zm1 <- Hmisc::Lag(df$z, -1)
-  df$zp1 <- Hmisc::Lag(df$z, +1)
+  tm1 <- dplyr::lag(t, 1)
+  tp1 <- dplyr::lead(t, 1)
+
+  xm1 <- dplyr::lag(x, 1)
+  xp1 <- dplyr::lead(x, 1)
+  ym1 <- dplyr::lag(y, 1)
+  yp1 <- dplyr::lead(y, 1)
+  zm1 <- dplyr::lag(z, 1)
+  zp1 <- dplyr::lead(z, 1)
+
+  dt <- tp1 - tm1
 
   v <- sqrt(
-    ( (df$xp1 - df$xm1) / (2*(df$tp1 - df$tm1)) )^2 +
-      ( (df$yp1 - df$ym1) / (2*(df$tp1 - df$tm1)) )^2 +
-        ( (df$zp1 - df$zm1) / (2*(df$tp1 - df$tm1)) )^2
+    ((xp1 - xm1) / dt)^2 +
+    ((yp1 - ym1) / dt)^2 +
+    ((zp1 - zm1) / dt)^2
   )
 
   v
@@ -22,42 +24,48 @@ v_xyz <- function(t, x, y, z) {
 
 #' @export
 v_y <- function(t, y) {
-  df <- data.frame(t, y)
 
-  df$tm1 <- Hmisc::Lag(df$t, -1)
-  df$tp1 <- Hmisc::Lag(df$t, +1)
-  df$ym1 <- Hmisc::Lag(df$y, -1)
-  df$yp1 <- Hmisc::Lag(df$y, +1)
+  tm1 <- dplyr::lag(t, 1)
+  tp1 <- dplyr::lead(t, 1)
 
-  v <- sqrt(((df$yp1 - df$ym1) / (2*(df$tp1 - df$tm1)))^2)
+  ym1 <- dplyr::lag(y, 1)
+  yp1 <- dplyr::lead(y, 1)
+
+  dt <- tp1 - tm1
+
+  v <- sqrt(((yp1 - ym1) / dt)^2)
 
   v
 }
 
 #' @export
 v_x <- function(t, x) {
-  df <- data.frame(t, x)
 
-  df$tm1 <- Hmisc::Lag(df$t, -1)
-  df$tp1 <- Hmisc::Lag(df$t, +1)
-  df$xm1 <- Hmisc::Lag(df$x, -1)
-  df$xp1 <- Hmisc::Lag(df$x, +1)
+  tm1 <- dplyr::lag(t, 1)
+  tp1 <- dplyr::lead(t, 1)
 
-  v <- sqrt(((df$xp1 - df$xm1) / (2*(df$tp1 - df$tm1)))^2)
+  xm1 <- dplyr::lag(x, 1)
+  xp1 <- dplyr::lead(x, 1)
+
+  dt <- tp1 - tm1
+
+  v <- sqrt(((xp1 - xm1) / dt)^2)
 
   v
 }
 
 #' @export
 v_z <- function(t, z) {
-  df <- data.frame(t, z)
 
-  df$tm1 <- Hmisc::Lag(df$t, -1)
-  df$tp1 <- Hmisc::Lag(df$t, +1)
-  df$zm1 <- Hmisc::Lag(df$z, -1)
-  df$zp1 <- Hmisc::Lag(df$z, +1)
+  tm1 <- dplyr::lag(t, 1)
+  tp1 <- dplyr::lead(t, 1)
 
-  v <- sqrt(((df$zp1 - df$zm1) / (2*(df$tp1 - df$tm1)))^2)
+  zm1 <- dplyr::lag(z, 1)
+  zp1 <- dplyr::lead(z, 1)
+
+  dt <- tp1 - tm1
+
+  v <- sqrt(((zp1 - zm1) / dt)^2)
 
   v
 }

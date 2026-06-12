@@ -6,67 +6,51 @@ calc_wcc <- function(i, tau, x, y, w_max, na.rm = TRUE) {
   assertthat::assert_that(rlang::is_double(i, n = 1), i > 0)
   assertthat::assert_that(rlang::is_double(tau, n = 1))
 
-  if (tau <= 0) {
-    Wx <- x[(i):(i + w_max)]
-    Wy <- y[(i + tau):(i + tau + w_max)]
+  # Use a universal index shift
+  Wx <- x[i:(i + w_max)]
+  Wy <- y[(i + tau):(i + tau + w_max)]
+
+  # Direct correlation calculation
+  if (na.rm) {
+    cor_method <- "pairwise.complete.obs"
   } else {
-    Wx <- x[(i - tau):(i - tau + w_max)]
-    Wy <- y[(i):(i + w_max)]
+    cor_method <- "everything"
   }
 
-  W <- cbind(Wx, Wy) |> na.omit()
-
-  sWx <- sd(W[, 1], na.rm = na.rm)
-  sWy <- sd(W[, 2], na.rm = na.rm)
-
-  if (is.na(sWx) || sWx == 0 || is.na(sWy) || sWy == 0) {
-    wcc <- NA_real_
-  } else {
-    wcc <- cor(Wx, Wy, use = "pairwise", method = "pearson")
-  }
+  wcc <- suppressWarnings(cor(Wx, Wy, use = cor_method, method = "pearson"))
 
   wcc
 }
-
 
 # Create wcc results df ---------------------------------------------------
 
 create_wcc_df <- function(x, y, settings) {
 
   n_x <- length(x)
-  n_y <- length(y)
-
-  assertthat::assert_that(assertthat::are_equal(n_x, n_y))
-
   w_max <- settings$window_size
   w_inc <- settings$window_increment
   tau_max <- settings$lag_max
   tau_inc <- settings$lag_increment
-  na.rm <- settings$na.rm
 
-  # Generate sequence of lags to use
   lags <- seq(-tau_max, tau_max, by = tau_inc)
-
-  # Calculate the size of the results matrix
   n_r <- floor((n_x - w_max - tau_max) / w_inc)
   n_c <- length(lags)
 
-  results_df <-
-    tidyr::crossing(row = 1:n_r, col = 1:n_c) |>
+  results_df <- tidyr::crossing(row = 1:n_r, col = 1:n_c) |>
     dplyr::mutate(
       i = 1 + tau_max + (row - 1) * w_inc,
       tau = lags[col],
-      wcc = furrr::future_map2_dbl(
-        .x = i,
-        .y = tau,
-        .f = \(i, tau) calc_wcc(i, tau, x, y, w_max = w_max, na.rm = na.rm)
+      wcc = calc_wcc_cpp(
+        x = x,
+        y = y,
+        i_vals = i,
+        tau_vals = tau,
+        w_max = w_max
       )
     )
 
   results_df
 }
-
-
 
 # df to matrix transformation ---------------------------------------------
 

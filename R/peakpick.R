@@ -1,53 +1,40 @@
-# Still in development
+#' Find Peak Windowed Cross-Correlations
+#'
+#' @param wcc_obj An object of class "wcc_res" returned by `wcc()`.
+#' @param L_size An odd integer specifying the size of the local search region.
+#' @param strict_monotonic Logical indicating whether to strictly enforce
+#'   decreasing values on the flanks of the peak. (default = FALSE)
+#' @return A data frame containing the elapsed time indices, the peak lags,
+#'   and the peak correlation values.
+#' @export
+pick_peaks <- function(wcc_obj, L_size, strict_monotonic = FALSE) {
 
-calc_peak <- function(rvec, tvec, L_size, sdeg = 2, sspan = 0.25) {
+  if (!inherits(wcc_obj, "wcc_res")) {
+    stop("Input must be a wcc_res object.")
+  }
 
-  # rvec <- economics[1:81,]$uempmed
-  # tvec <- -40:40
+  tau_max <- wcc_obj$settings$lag_max
+  df <- wcc_obj$results_df
 
-  # Smooth the row vector using loess
-  fit <- stats::loess(rvec ~ tvec, span = sspan, degree = sdeg)
+  # 1. Order data chronologically and by lag to ensure perfect vector alignment
+  df <- df[order(df$i, df$tau), ]
 
-  # Step 1: Calculate search region size
-  R_size <- ceiling(L_size / 2)
+  # 2. Split the correlation values by the time index 'i'
+  # A factor guarantees the chronological order of 'i' is preserved in the split list
+  i_factor <- factor(df$i, levels = unique(df$i))
+  wcc_list <- split(df$wcc, i_factor)
 
-  c <- 0
+  # 3. Extract unique 'i' values to pass as the structural backbone of the output
+  i_vals <- as.numeric(names(wcc_list))
 
-    ## Step 2: Define search region R
-    R <- (c - R_size):(c + R_size)
+  # 4. Pass everything directly to C++ for ultra-fast processing
+  out_df <- pick_peaks_cpp(
+    wcc_list = wcc_list,
+    i_vals = i_vals,
+    tau_max = tau_max,
+    L_size = L_size,
+    strict_monotonic = strict_monotonic
+  )
 
-    ## Step 3: Define local region L1
-    L1 <- min(R):(min(R) + L_size)
-    L1_v <- predict(fit, newdata = L1)
-
-    ## Step 4: Calculate maximum value in L1 region
-    L1_v_max <- max(L1_v, na.rm = TRUE)
-    L1_max <- L1[which.max(L1_v)]
-
-    ## Step 5a: Check if L1_max is the center element of L1
-    check1 <- L1_max == median(L1)
-
-    ## Step 5b: Check if the values from L1_v on either side of L1_max are monotonically decreasing
-    #check2 <-
-
-    #exit if done
-
-    ## Step 6: Define local region L2
-    L2 <- (max(R) - L_size):max(R)
-    L2_v <- predict(fit, newdata = L2)
-    L2_v_max <- max(L2_v, na.rm = TRUE)
-    L2_max <- L2[which.max(L2_v)]
-
-    ## Step 7a: Check if L2_max is the center element of L2
-    check3 <- L2_max == median(L2)
-
-    ## Step 7b: Check if the values from L2_v on either side of L2_max are monotonically decreasing
-    #check4 <-
-
-    # exit if done
-
-    ## Step 8: Increment R_size by one, then repeat from Step 2 if R_size <= tau_max
-
-    ## Step 9: If R_size > tau_max, then no viable peak was found, return NAs
-
+  out_df
 }
