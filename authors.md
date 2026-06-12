@@ -2,7 +2,8 @@
 
 ## Authors
 
-- **Jeffrey Girard**. Author, maintainer.
+- **[Jeffrey Girard](https://affcom.ku.edu/girard)**. Author,
+  maintainer.
 
 ## Citation
 

@@ -6,7 +6,13 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <title>Simulated Validation • bsync</title>
-<script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
+  window.MathJax = {
+    chtml: {
+      fontURL: "https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/output/chtml/fonts/woff-v2"
+    }
+  };
+</script><script src="../lightswitch.js"></script><script src="../deps/jquery-3.6.0/jquery-3.6.0.min.js"></script><meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
@@ -16,7 +22,7 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
 
 
-    <nav class="navbar navbar-expand-lg fixed-top bg-light" data-bs-theme="light" aria-label="Site navigation"><div class="container">
+    <nav class="navbar navbar-expand-lg fixed-top " aria-label="Site navigation"><div class="container">
 
     <a class="navbar-brand me-2" href="../index.html">bsync</a>
 
@@ -34,7 +40,7 @@
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
 <li><a class="dropdown-item" href="../articles/simulated_validation.html">Simulated Validation</a></li>
-    <li><a class="dropdown-item" href="../articles/wcc-params.html">Choosing Windowed Cross-Correlation Parameters</a></li>
+    <li><a class="dropdown-item" href="../articles/wcc-params.html">Choosing WCC Parameters</a></li>
   </ul>
 </li>
       </ul>
@@ -91,14 +97,13 @@
 <span>  window_increment <span class="op">=</span> <span class="fl">10</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">sim_peaks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pick_peaks.html">pick_peaks</a></span><span class="op">(</span><span class="va">wcc_sim</span>, L_size <span class="op">=</span> <span class="fl">5</span>, strict_monotonic <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># 3. Validate the results</span></span>
-<span><span class="co"># The early windows should hover around lag 0, and later windows around lag 5</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">sim_peaks</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">sim_peaks</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pick_peaks.html">pick_peaks</a></span><span class="op">(</span><span class="va">wcc_sim</span>, L_size <span class="op">=</span> <span class="fl">5</span>, strict_monotonic <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 3. Validate the results</span></span>
+<span><span class="va">sim_peaks</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">WCC Peak Picking Results</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; Total Peaks Found: 6</span></span>
+<span><span class="co">#&gt; Total Peaks Found: 94</span></span>
 <span><span class="co">#&gt; Local Search Size: 5</span></span>
 <span><span class="co">#&gt; Strict Monotonic: FALSE</span></span>
 <span><span class="co">#&gt; Showing the first 5 peaks:</span></span>
@@ -108,28 +113,14 @@
 <span><span class="co">#&gt;  31        0  0.9428786</span></span>
 <span><span class="co">#&gt;  41       -1  0.9485425</span></span>
 <span><span class="co">#&gt;  51        0  0.9061785</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;"># ... with 1 more row</span></span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">tail</a></span><span class="op">(</span><span class="va">sim_peaks</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">WCC Peak Picking Results</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; Total Peaks Found: 6</span></span>
-<span><span class="co">#&gt; Local Search Size: 5</span></span>
-<span><span class="co">#&gt; Strict Monotonic: FALSE</span></span>
-<span><span class="co">#&gt; Showing the first 5 peaks:</span></span>
-<span><span class="co">#&gt;    i peak_lag peak_value</span></span>
-<span><span class="co">#&gt;  891        6  0.9489159</span></span>
-<span><span class="co">#&gt;  901        6  0.9217317</span></span>
-<span><span class="co">#&gt;  911        5  0.9459122</span></span>
-<span><span class="co">#&gt;  921        6  0.9448646</span></span>
-<span><span class="co">#&gt;  931        4  0.8996344</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;"># ... with 1 more row</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #555555;"># ... with 89 more rows</span></span></span></code></pre></div>
   </main>
 </div>
 
 
 
     <footer><div class="pkgdown-footer-left">
-  <p>Developed by Jeffrey Girard.</p>
+  <p>Developed by <a href="https://affcom.ku.edu/girard" class="external-link">Jeffrey Girard</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">

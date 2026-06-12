@@ -29,13 +29,15 @@ wcc_sim <- wcc(
 )
 
 sim_peaks <- pick_peaks(wcc_sim, L_size = 5, strict_monotonic = FALSE)
+```
+
+``` r
 
 # 3. Validate the results
-# The early windows should hover around lag 0, and later windows around lag 5
-print(head(sim_peaks))
+sim_peaks
 #> 
 #> ── WCC Peak Picking Results ────────────────────────────────────────────────────
-#> Total Peaks Found: 6
+#> Total Peaks Found: 94
 #> Local Search Size: 5
 #> Strict Monotonic: FALSE
 #> Showing the first 5 peaks:
@@ -45,19 +47,5 @@ print(head(sim_peaks))
 #>  31        0  0.9428786
 #>  41       -1  0.9485425
 #>  51        0  0.9061785
-#> # ... with 1 more row
-print(tail(sim_peaks))
-#> 
-#> ── WCC Peak Picking Results ────────────────────────────────────────────────────
-#> Total Peaks Found: 6
-#> Local Search Size: 5
-#> Strict Monotonic: FALSE
-#> Showing the first 5 peaks:
-#>    i peak_lag peak_value
-#>  891        6  0.9489159
-#>  901        6  0.9217317
-#>  911        5  0.9459122
-#>  921        6  0.9448646
-#>  931        4  0.8996344
-#> # ... with 1 more row
+#> # ... with 89 more rows
 ```
