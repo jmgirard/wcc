@@ -1,4 +1,4 @@
-# Windowed Cross-Correlation Workflow
+# WCC Workflow
 
 ## Analyzing Interpersonal Synchrony with Windowed Cross-Correlation
 
