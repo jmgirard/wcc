@@ -105,9 +105,13 @@ summary(wcc_results)
 #> ! 1 missing value (NA) detected.
 ```
 
-The [`wcc()`](https://jmgirard.github.io/bsync/reference/wcc.md)
-function returns a list object of class `wcc_res` containing the results
-data frame, the overall Fisher’s Z score, and the input settings.
+The wcc() function returns a list object of class wcc_res containing the
+results data frame, the overall Fisher’s Z score, and the input
+settings. The summary output shows that the sliding window analyzed 55
+distinct time windows across 91 different lags. The overall Fisher’s Z
+score of 0.3851 indicates a positive global correlation, and the
+quantile distribution gives us a quick look at the spread of the
+correlation values across the entire interaction.
 
 ### 3. Surrogate Testing for Significance
 
@@ -122,11 +126,6 @@ The
 function handles this by shifting one time series relative to the other,
 destroying the true synchronous relationship while preserving the
 autocorrelation of the individual signals.
-
-**Note on Permutations:** We use `n_surrogates = 100` here for speed
-during exploratory analysis. To achieve stable and trustworthy p-values
-for publication, it is recommended to run at least 1,000 to 10,000
-permutations.
 
 ``` r
 
@@ -152,8 +151,15 @@ print(surrogate_results)
 
 The output gives us an empirical p-value by calculating the proportion
 of surrogate Fisher’s Z scores that meet or exceed our observed Fisher’s
-Z. If the p-value is significant (e.g., p \< 0.05), we can confidently
-assert that the observed synchrony is greater than chance.
+Z. Here, our observed Z (0.3851) is higher than the average null Z
+(0.3015) produced by the shifted data. Because the observed value was
+higher than all 100 permutations, the empirical p-value is 0. This
+allows us to confidently assert that the observed synchrony is
+significantly greater than what we would expect by random chance within
+this run. **Note:** We use n_surrogates = 100 here for speed during
+exploratory analysis. To achieve stable and trustworthy p-values for
+publication, it is highly recommended to run at least 1,000 to 10,000
+permutations.
 
 ### 4. Peak Picking
 
@@ -186,8 +192,11 @@ print(wcc_peaks_df)
 #> # ... with 50 more rows
 ```
 
-This returns a `wcc_peaks` data frame containing the elapsed time
-indices, the peak lags, and the corresponding correlation values.
+This returns a wcc_peaks data frame containing the elapsed time indices,
+the peak lags, and the corresponding correlation values. The summary
+confirms that the algorithm successfully identified 55 peaks, mapping
+perfectly to our 55 total time windows. It also displays the first five
+local maximums identified using our specified local search size.
 
 ### 5. Visualizing the Results
 
