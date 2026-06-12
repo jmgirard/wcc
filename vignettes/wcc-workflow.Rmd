@@ -1,8 +1,8 @@
 ---
-title: "Windowed Cross-Correlation Workflow"
+title: "WCC Workflow"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Windowed Cross-Correlation Workflow}
+  %\VignetteIndexEntry{WCC Workflow}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
