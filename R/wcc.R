@@ -193,3 +193,54 @@ summary.wcc_res <- function(object, ...) {
 
   invisible(object)
 }
+
+#' Suggest WCC Hyperparameters
+#'
+#' Calculates principled starting values for Windowed Cross-Correlation parameters
+#' based on the sampling rate of the data and the theoretical timing of the behaviors.
+#'
+#' @param sample_rate A numeric value indicating the sampling rate in Hertz (frames per second).
+#' @param event_duration_sec The expected duration of a single behavioral event in seconds.
+#'   Default is 2 (typical for brief conversational gestures).
+#' @param max_delay_sec The maximum plausible reaction time between participants in seconds.
+#'   Default is 3.
+#' @param overlap_pct The desired percentage of overlap between consecutive time windows.
+#'   Default is 0.5 (50 percent overlap).
+#' @return A list of recommended parameters ready to be passed to `wcc()`.
+#' @export
+suggest_wcc_params <- function(sample_rate,
+                               event_duration_sec = 2,
+                               max_delay_sec = 3,
+                               overlap_pct = 0.5) {
+
+  # Window size: 3 to 5 times the typical event duration
+  suggested_window <- round((event_duration_sec * 4) * sample_rate)
+
+  # Max lag: Direct conversion of theoretical delay to frames
+  suggested_lag <- round(max_delay_sec * sample_rate)
+
+  # Safety check: Ensure lag doesn't exceed half the window size
+  if (suggested_lag > (suggested_window / 2)) {
+    warning("The requested max_delay_sec is too large relative to the event_duration_sec. ",
+            "Capping lag_max at half the window_size to preserve statistical reliability.")
+    suggested_lag <- floor(suggested_window / 2)
+  }
+
+  # Window increment based on desired overlap
+  suggested_w_inc <- max(1, round(suggested_window * (1 - overlap_pct)))
+
+  cli::cli_h1("Suggested WCC Parameters")
+  cli::cli_dl(c(
+    "window_size" = "{suggested_window} ({round(suggested_window / sample_rate, 1)} seconds)",
+    "lag_max" = "{suggested_lag} ({round(suggested_lag / sample_rate, 1)} seconds)",
+    "window_increment" = "{suggested_w_inc} ({overlap_pct * 100}% overlap)",
+    "lag_increment" = "1"
+  ))
+
+  invisible(list(
+    window_size = suggested_window,
+    lag_max = suggested_lag,
+    window_increment = suggested_w_inc,
+    lag_increment = 1
+  ))
+}
