@@ -76,7 +76,7 @@ print.wcc_peaks <- function(x, n = 5, ...) {
   if (total_peaks > 0) {
     cli::cli_text("Showing the first {min(n, total_peaks)} peak{?s}:")
     # Coerce to data frame to avoid recursive print looping
-    print(head(as.data.frame(x), n), row.names = FALSE)
+    print(utils::head(as.data.frame(x), n), row.names = FALSE)
 
     if (total_peaks > n) {
       remaining <- total_peaks - n

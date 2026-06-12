@@ -11,12 +11,14 @@ Encoding: UTF-8
 LazyData: true
 Imports:
     assertthat,
+    cli,
     dplyr,
     ggplot2,
     RColorBrewer,
     Rcpp,
     rlang,
-    signal
+    signal,
+    utils
 Suggests:
     knitr,
     rmarkdown,
