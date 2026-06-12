@@ -14,9 +14,9 @@ knitr::opts_chunk$set(
 # wcc
 
 <!-- badges: start -->
-[![R-CMD-check](https://github.com/jmgirard/wcc/actions/workflows/R-CMD-check.yaml/badge.svghttps://github.com/jmgirard/wcc/actions/workflows/R-CMD-check.yaml/badge.svghttps://github.com/jmgirard/wcc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jmgirard/wcc/actions/workflows/R-CMD-check.yaml)
-[![Codecov test coverage](https://codecov.io/gh/jmgirard/wcc/graph/badge.svg)](https://app.codecov.io/gh/jmgirard/wcc)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![R-CMD-check](https://github.com/jmgirard/wcc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jmgirard/wcc/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/jmgirard/wcc/graph/badge.svg)](https://app.codecov.io/gh/jmgirard/wcc)
 [![test-coverage](https://github.com/jmgirard/wcc/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/jmgirard/wcc/actions/workflows/test-coverage.yaml)
 <!-- badges: end -->
 
@@ -37,7 +37,7 @@ devtools::install_github("jmgirard/wcc")
 
 The following example demonstrates the complete `wcc` pipeline. We will use the included `sim_dyad` dataset, which contains 30 seconds of simulated 3D motion tracking data for two individuals. In this simulation, Person A begins by leading a rhythmic movement, they synchronize in the middle, and Person B takes the lead by the end.
 
-First, we load the package and calculate the 1D directional velocity for the rhythmic movements on the Z-axis.
+First, we load the package and prepare the data. We highly recommend smoothing positional data before calculating velocities to prevent high-frequency noise from amplifying and skewing the cross-correlations. Here we apply a Savitzky-Golay filter and then calculate the 1D directional velocity on the Z-axis.
 
 ```{r example-prep, message=FALSE, warning=FALSE}
 library(wcc)
@@ -45,15 +45,17 @@ library(dplyr)
 
 data("sim_dyad")
 
-# Step 1: Calculate 1D directional velocity for both individuals
+# Step 1: Smooth the raw position data and calculate 1D velocity
 df <- sim_dyad |>
   mutate(
-    vel_A = v_z(time, z_A),
-    vel_B = v_z(time, z_B)
+    z_A_smooth = smooth_signal(z_A, method = "sgolay", window = 5),
+    z_B_smooth = smooth_signal(z_B, method = "sgolay", window = 5),
+    vel_A = calc_velocity_1d(time, z_A_smooth, fill_edges = TRUE),
+    vel_B = calc_velocity_1d(time, z_B_smooth, fill_edges = TRUE)
   )
 ```
 
-Next, we calculate the windowed cross-correlations and extract the shifting peaks.
+Next, we calculate the windowed cross-correlations. Calling `summary()` on the resulting object provides a clean, formatted overview of the analysis settings and the distribution of correlation values.
 
 ```{r example-calc}
 # Step 2: Calculate Windowed Cross-Correlations
@@ -67,18 +69,28 @@ wcc_results <- wcc(
   na.rm = TRUE
 )
 
+# View the summary
+summary(wcc_results)
+```
+
+Once the cross-correlations are calculated, we extract the specific lags that represent the peak association within each time window. Printing the peak object displays the peak-picking metadata alongside the first few results.
+
+```{r example-peaks}
 # Step 3: Extract the Peaks
 peaks <- pick_peaks(
   wcc_obj = wcc_results,
   L_size = 5,
   strict_monotonic = FALSE
 )
+
+# View the peak results
+peaks
 ```
 
-Finally, we can visualize the resulting correlation landscape. The black dots and lines represent the algorithm successfully tracking the shifting lag of maximum association over the course of the interaction.
+Finally, we visualize the resulting correlation landscape. The underlying heatmap represents the cross-correlation values at each lag and elapsed time window. The overlaid black dots and lines demonstrate the algorithm successfully tracking the shifting lag of maximum association over the course of the interaction.
 
 ```{r example-plot}
-# Step 4: Plot the landscape and overlay the shifting peaks
+# Step 4: Plot the correlation landscape and overlay the shifting peaks
 plot_peaks_overlay(wcc_results, peaks)
 ```
 

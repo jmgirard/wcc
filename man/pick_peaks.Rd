@@ -15,8 +15,8 @@ pick_peaks(wcc_obj, L_size, strict_monotonic = FALSE)
 decreasing values on the flanks of the peak. (default = FALSE)}
 }
 \value{
-A data frame containing the elapsed time indices, the peak lags,
-  and the peak correlation values.
+A data frame of class "wcc_peaks" containing the elapsed time indices,
+  the peak lags, and the peak correlation values.
 }
 \description{
 Find Peak Windowed Cross-Correlations

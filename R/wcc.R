@@ -144,3 +144,50 @@ new_wcc_res <- function(x = list()) {
 wcc_res <- function(x = list()) {
   new_wcc_res(x)
 }
+
+#' Print method for wcc_res objects
+#'
+#' @param x An object of class "wcc_res".
+#' @param ... Additional arguments (not used).
+#' @export
+print.wcc_res <- function(x, ...) {
+  s <- x$settings
+  n_windows <- length(unique(x$results_df$i))
+  n_lags <- length(unique(x$results_df$tau))
+
+  cli::cli_h1("Windowed Cross-Correlation Analysis")
+
+  cli::cli_dl(c(
+    "Total Windows" = "{n_windows}",
+    "Total Lags Tested" = "{n_lags}",
+    "Window Size" = "{s$window_size}",
+    "Max Lag" = "{s$lag_max}",
+    "Overall Fisher's Z" = "{round(x$fisher_z, 4)}"
+  ))
+
+  invisible(x)
+}
+
+#' Summary method for wcc_res objects
+#'
+#' @param object An object of class "wcc_res".
+#' @param ... Additional arguments (not used).
+#' @export
+summary.wcc_res <- function(object, ...) {
+  # Call the print method for the header and basics
+  print(object)
+
+  cli::cli_h2("Cross-Correlation Value Distribution")
+  wcc_vals <- object$results_df$wcc
+  q_vals <- stats::quantile(wcc_vals, probs = c(0, 0.25, 0.5, 0.75, 1), na.rm = TRUE)
+
+  # Print the quantiles cleanly
+  print(round(q_vals, 4))
+
+  n_na <- sum(is.na(wcc_vals))
+  if (n_na > 0) {
+    cli::cli_alert_warning("{n_na} missing value{?s} (NA) detected.")
+  }
+
+  invisible(object)
+}
