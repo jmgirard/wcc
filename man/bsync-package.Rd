@@ -12,6 +12,8 @@ A comprehensive toolkit for analyzing interpersonal and behavioral synchrony in 
 Useful links:
 \itemize{
   \item \url{https://jmgirard.github.io/bsync/}
+  \item \url{https://github.com/jmgirard/bsync}
+  \item Report bugs at \url{https://github.com/jmgirard/bsync/issues}
 }
 
 }
