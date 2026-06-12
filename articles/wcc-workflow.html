@@ -39,7 +39,7 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/wcc-params.html">Choosing WCC Parameters</a></li>
+<li><a class="dropdown-item" href="../articles/wcc-params.html">WCC Parameters</a></li>
     <li><a class="dropdown-item" href="../articles/wcc-workflow.html">WCC Workflow</a></li>
   </ul>
 </li>
@@ -92,19 +92,10 @@ the <code><a href="../reference/suggest_wcc_params.html">suggest_wcc_params()</a
 between two participants (Person A and Person B) captured at 30 Hz. We
 will generate smooth continuous data to simulate bodily motion.</p>
 <p>In this scenario, Person A leads the interaction by 15 frames (0.5
-seconds) for the first half of the task. In the second half, the dynamic
-flips and Person B leads by 15 frames.</p>
+seconds) at the start. Over the course of the 60 seconds, the dynamic
+smoothly transitions until Person B leads by 15 frames at the end.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jmgirard.github.io/bsync/">bsync</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     filter, lag</span></span>
-<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2026</span><span class="op">)</span></span>
 <span></span>
@@ -112,26 +103,21 @@ flips and Person B leads by 15 frames.</p>
 <span><span class="va">fs</span> <span class="op">&lt;-</span> <span class="fl">30</span></span>
 <span><span class="va">n_frames</span> <span class="op">&lt;-</span> <span class="fl">1800</span> <span class="co"># 60 seconds of data</span></span>
 <span></span>
-<span><span class="co"># Generate a smooth base signal using a wide moving average on white noise</span></span>
-<span><span class="co"># A 90-frame window ensures high autocorrelation at our 15-frame shift</span></span>
+<span><span class="co"># Generate a smooth base signal using a 30-frame moving average.</span></span>
+<span><span class="co"># This provides enough structure to form a distinct peak within a 90-frame WCC window.</span></span>
 <span><span class="va">raw_noise</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_frames</span> <span class="op">+</span> <span class="fl">300</span><span class="op">)</span></span>
-<span><span class="va">base_signal</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">raw_noise</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">90</span>, <span class="fl">90</span><span class="op">)</span>, circular <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">base_signal</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">raw_noise</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">30</span>, <span class="fl">30</span><span class="op">)</span>, circular <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">base_signal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">base_signal</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">person_A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="va">n_frames</span><span class="op">)</span></span>
 <span><span class="va">person_B</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="va">n_frames</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># Create the shifting leader-follower dynamic</span></span>
+<span><span class="co"># Continuous lag shift: Person A leads by 15 frames, smoothly transitioning to B leading</span></span>
+<span><span class="va">lag_shifts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">15</span>, <span class="op">-</span><span class="fl">15</span>, length.out <span class="op">=</span> <span class="va">n_frames</span><span class="op">)</span><span class="op">)</span></span>
+<span></span>
 <span><span class="kw">for</span> <span class="op">(</span><span class="va">i</span> <span class="kw">in</span> <span class="fl">1</span><span class="op">:</span><span class="va">n_frames</span><span class="op">)</span> <span class="op">{</span></span>
-<span>  <span class="kw">if</span> <span class="op">(</span><span class="va">i</span> <span class="op">&lt;=</span> <span class="va">n_frames</span> <span class="op">/</span> <span class="fl">2</span><span class="op">)</span> <span class="op">{</span></span>
-<span>    <span class="co"># First half: Person B follows Person A by 15 frames</span></span>
-<span>    <span class="va">idx_A</span> <span class="op">&lt;-</span> <span class="fl">150</span> <span class="op">+</span> <span class="va">i</span></span>
-<span>    <span class="va">idx_B</span> <span class="op">&lt;-</span> <span class="fl">150</span> <span class="op">+</span> <span class="va">i</span> <span class="op">-</span> <span class="fl">15</span></span>
-<span>  <span class="op">}</span> <span class="kw">else</span> <span class="op">{</span></span>
-<span>    <span class="co"># Second half: Person A follows Person B by 15 frames</span></span>
-<span>    <span class="va">idx_A</span> <span class="op">&lt;-</span> <span class="fl">150</span> <span class="op">+</span> <span class="va">i</span> <span class="op">-</span> <span class="fl">15</span></span>
-<span>    <span class="va">idx_B</span> <span class="op">&lt;-</span> <span class="fl">150</span> <span class="op">+</span> <span class="va">i</span></span>
-<span>  <span class="op">}</span></span>
+<span>  <span class="va">idx_A</span> <span class="op">&lt;-</span> <span class="fl">150</span> <span class="op">+</span> <span class="va">i</span></span>
+<span>  <span class="va">idx_B</span> <span class="op">&lt;-</span> <span class="fl">150</span> <span class="op">+</span> <span class="va">i</span> <span class="op">-</span> <span class="va">lag_shifts</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
 <span></span>
 <span>  <span class="co"># Add slight independent noise to mimic realistic measurement error</span></span>
 <span>  <span class="va">person_A</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">base_signal</span><span class="op">[</span><span class="va">idx_A</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, sd <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
@@ -173,12 +159,12 @@ frames (1 second) to allow for overlap and smooth transitions.</p>
 <span><span class="co">#&gt; Total Lags Tested: 91</span></span>
 <span><span class="co">#&gt; Window Size: 90</span></span>
 <span><span class="co">#&gt; Max Lag: 45</span></span>
-<span><span class="co">#&gt; Overall Fisher's Z: 0.2811</span></span>
+<span><span class="co">#&gt; Overall Fisher's Z: 0.3851</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── <span style="font-weight: bold;">Cross-Correlation Value Distribution</span> ──</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;      0%     25%     50%     75%    100% </span></span>
-<span><span class="co">#&gt; -0.6538 -0.0427  0.1207  0.3515  0.8959</span></span>
+<span><span class="co">#&gt; -0.8028 -0.2108  0.0746  0.3734  0.9576</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> 1 missing value (NA) detected.</span></span></code></pre></div>
 <p>The <code><a href="../reference/wcc.html">wcc()</a></code> function returns a list object of class
 <code>wcc_res</code> containing the results data frame, the overall
@@ -215,8 +201,8 @@ is recommended to run at least 1,000 to 10,000 permutations.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">WCC Surrogate Analysis (Pseudo-Synchrony)</span> <span style="color: #00BBBB;">───────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; Permutations: 100</span></span>
-<span><span class="co">#&gt; Observed Fisher's Z: 0.2811</span></span>
-<span><span class="co">#&gt; Average Null Z: 0.2168</span></span>
+<span><span class="co">#&gt; Observed Fisher's Z: 0.3851</span></span>
+<span><span class="co">#&gt; Average Null Z: 0.3015</span></span>
 <span><span class="co">#&gt; Empirical p-value: 0</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Observed synchrony is significantly greater than chance.</span></span></code></pre></div>
 <p>The output gives us an empirical p-value by calculating the
@@ -245,12 +231,12 @@ region.</p>
 <span><span class="co">#&gt; Local Search Size: 5</span></span>
 <span><span class="co">#&gt; Strict Monotonic: FALSE</span></span>
 <span><span class="co">#&gt; Showing the first 5 peaks:</span></span>
-<span><span class="co">#&gt;    i peak_lag peak_value</span></span>
-<span><span class="co">#&gt;   46       -4  0.1101381</span></span>
-<span><span class="co">#&gt;   76        1  0.2854316</span></span>
-<span><span class="co">#&gt;  106        1  0.3327613</span></span>
-<span><span class="co">#&gt;  136        3  0.3337459</span></span>
-<span><span class="co">#&gt;  166        0  0.1093694</span></span>
+<span><span class="co">#&gt;    i peak_lag  peak_value</span></span>
+<span><span class="co">#&gt;   46      -11 -0.06534940</span></span>
+<span><span class="co">#&gt;   76        1  0.36200916</span></span>
+<span><span class="co">#&gt;  106       -5  0.30862731</span></span>
+<span><span class="co">#&gt;  136       -7  0.04783838</span></span>
+<span><span class="co">#&gt;  166       -7  0.18667881</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;"># ... with 50 more rows</span></span></span></code></pre></div>
 <p>This returns a <code>wcc_peaks</code> data frame containing the
 elapsed time indices, the peak lags, and the corresponding correlation
@@ -272,11 +258,11 @@ automatically converted from raw frame indices to seconds.</p>
 <span>  show_zero_lag <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <p><img src="wcc-workflow_files/figure-html/visualization-1.png" class="r-plt" alt="" width="672"></p>
-<p>In the resulting plot, you should clearly see the structural shift we
-built into our data. For the first 30 seconds, the peak synchrony sits
-securely at a positive lag (indicating Person A leads). Right at the
-30-second mark, the band of high correlation drops to a negative lag
-(indicating Person B is now leading).</p>
+<p>In the resulting plot, you should clearly see a diagonal track of
+peaks. At the start, the peak synchrony sits securely at a positive lag
+(indicating Person A leads). As time elapses, the peak smoothly drifts
+across the zero-lag line until it settles at a negative lag (indicating
+Person B is now leading).</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

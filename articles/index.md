@@ -2,7 +2,7 @@
 
 ### All vignettes
 
-- [Choosing WCC
+- [WCC
   Parameters](https://jmgirard.github.io/bsync/articles/wcc-params.md):
 - [WCC
   Workflow](https://jmgirard.github.io/bsync/articles/wcc-workflow.md):

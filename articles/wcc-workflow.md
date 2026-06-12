@@ -22,21 +22,12 @@ between two participants (Person A and Person B) captured at 30 Hz. We
 will generate smooth continuous data to simulate bodily motion.
 
 In this scenario, Person A leads the interaction by 15 frames (0.5
-seconds) for the first half of the task. In the second half, the dynamic
-flips and Person B leads by 15 frames.
+seconds) at the start. Over the course of the 60 seconds, the dynamic
+smoothly transitions until Person B leads by 15 frames at the end.
 
 ``` r
 
 library(bsync)
-library(dplyr)
-#> 
-#> Attaching package: 'dplyr'
-#> The following objects are masked from 'package:stats':
-#> 
-#>     filter, lag
-#> The following objects are masked from 'package:base':
-#> 
-#>     intersect, setdiff, setequal, union
 
 set.seed(2026)
 
@@ -44,26 +35,21 @@ set.seed(2026)
 fs <- 30
 n_frames <- 1800 # 60 seconds of data
 
-# Generate a smooth base signal using a wide moving average on white noise
-# A 90-frame window ensures high autocorrelation at our 15-frame shift
+# Generate a smooth base signal using a 30-frame moving average.
+# This provides enough structure to form a distinct peak within a 90-frame WCC window.
 raw_noise <- rnorm(n_frames + 300)
-base_signal <- stats::filter(raw_noise, rep(1/90, 90), circular = TRUE)
+base_signal <- stats::filter(raw_noise, rep(1/30, 30), circular = TRUE)
 base_signal <- as.numeric(base_signal)
 
 person_A <- numeric(n_frames)
 person_B <- numeric(n_frames)
 
-# Create the shifting leader-follower dynamic
+# Continuous lag shift: Person A leads by 15 frames, smoothly transitioning to B leading
+lag_shifts <- round(seq(15, -15, length.out = n_frames))
+
 for (i in 1:n_frames) {
-  if (i <= n_frames / 2) {
-    # First half: Person B follows Person A by 15 frames
-    idx_A <- 150 + i
-    idx_B <- 150 + i - 15
-  } else {
-    # Second half: Person A follows Person B by 15 frames
-    idx_A <- 150 + i - 15
-    idx_B <- 150 + i
-  }
+  idx_A <- 150 + i
+  idx_B <- 150 + i - lag_shifts[i]
 
   # Add slight independent noise to mimic realistic measurement error
   person_A[i] <- base_signal[idx_A] + rnorm(1, sd = 0.05)
@@ -110,12 +96,12 @@ summary(wcc_results)
 #> Total Lags Tested: 91
 #> Window Size: 90
 #> Max Lag: 45
-#> Overall Fisher's Z: 0.2811
+#> Overall Fisher's Z: 0.3851
 #> 
 #> ── Cross-Correlation Value Distribution ──
 #> 
 #>      0%     25%     50%     75%    100% 
-#> -0.6538 -0.0427  0.1207  0.3515  0.8959
+#> -0.8028 -0.2108  0.0746  0.3734  0.9576
 #> ! 1 missing value (NA) detected.
 ```
 
@@ -158,8 +144,8 @@ print(surrogate_results)
 #> 
 #> ── WCC Surrogate Analysis (Pseudo-Synchrony) ───────────────────────────────────
 #> Permutations: 100
-#> Observed Fisher's Z: 0.2811
-#> Average Null Z: 0.2168
+#> Observed Fisher's Z: 0.3851
+#> Average Null Z: 0.3015
 #> Empirical p-value: 0
 #> ✔ Observed synchrony is significantly greater than chance.
 ```
@@ -191,12 +177,12 @@ print(wcc_peaks_df)
 #> Local Search Size: 5
 #> Strict Monotonic: FALSE
 #> Showing the first 5 peaks:
-#>    i peak_lag peak_value
-#>   46       -4  0.1101381
-#>   76        1  0.2854316
-#>  106        1  0.3327613
-#>  136        3  0.3337459
-#>  166        0  0.1093694
+#>    i peak_lag  peak_value
+#>   46      -11 -0.06534940
+#>   76        1  0.36200916
+#>  106       -5  0.30862731
+#>  136       -7  0.04783838
+#>  166       -7  0.18667881
 #> # ... with 50 more rows
 ```
 
@@ -225,8 +211,8 @@ plot_peaks_overlay(
 
 ![](wcc-workflow_files/figure-html/visualization-1.png)
 
-In the resulting plot, you should clearly see the structural shift we
-built into our data. For the first 30 seconds, the peak synchrony sits
-securely at a positive lag (indicating Person A leads). Right at the
-30-second mark, the band of high correlation drops to a negative lag
-(indicating Person B is now leading).
+In the resulting plot, you should clearly see a diagonal track of peaks.
+At the start, the peak synchrony sits securely at a positive lag
+(indicating Person A leads). As time elapses, the peak smoothly drifts
+across the zero-lag line until it settles at a negative lag (indicating
+Person B is now leading).

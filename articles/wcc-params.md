@@ -1,4 +1,4 @@
-# Choosing WCC Parameters
+# WCC Parameters
 
 Selecting hyperparameters is often the most challenging aspect of
 running a Windowed Cross-Correlation (WCC) analysis. Because behavioral
