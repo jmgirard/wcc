@@ -94,6 +94,28 @@ Finally, we visualize the resulting correlation landscape. The underlying heatma
 plot_peaks_overlay(wcc_results, peaks)
 ```
 
+### Surrogate Testing for Significance
+
+Psychological and behavioral time series are highly autocorrelated, which means random noise can sometimes look like genuine interaction. To verify that our observed synchronization is statistically significant, we can use the `wcc_surrogate()` function.
+
+This function uses a circular shift method to misalign the two time series, generating a null distribution of "pseudo-synchrony" that preserves the natural autocorrelation of the data but breaks the dyadic interaction.
+
+```{r example-surrogate}
+# Step 5: Run surrogate analysis to calculate an empirical p-value
+set.seed(2026)
+surrogate_results <- wcc_surrogate(
+  x = df$vel_A,
+  y = df$vel_B,
+  window_size = 150,
+  lag_max = 75,
+  window_increment = 25,
+  lag_increment = 1,
+  n_surrogates = 100
+)
+
+surrogate_results
+```
+
 ## Citation
 
 If you use **wcc** in your research, please cite the package:

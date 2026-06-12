@@ -12,9 +12,13 @@ freq <- 0.5
 # Shifting lag: Person A leads by 0.5s, smoothly transitions to B leading by 0.5s
 lag_shift_sec <- seq(0.5, -0.5, length.out = N)
 
-# Signal generation
-signal_A <- sin(2 * pi * freq * t)
-signal_B <- sin(2 * pi * freq * (t - lag_shift_sec))
+# ADDED: Amplitude envelope to make the interaction non-stationary.
+# Movement starts at 0, peaks in the middle of the 30s, and returns to 0.
+envelope <- sin(pi * t / duration)
+
+# Signal generation (multiplying by the envelope)
+signal_A <- sin(2 * pi * freq * t) * envelope
+signal_B <- sin(2 * pi * freq * (t - lag_shift_sec)) * envelope
 
 # Simulating 3D position with highly realistic, low-level sensor jitter (sd = 0.002)
 x_A <- rnorm(N, mean = 0, sd = 0.002)

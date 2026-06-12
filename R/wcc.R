@@ -101,8 +101,10 @@ fisher_z <- function(results_df) {
 wcc <- function(x, y, window_size, lag_max,
                 window_increment = 1, lag_increment = 1, na.rm = TRUE) {
 
-  assertthat::assert_that(rlang::is_double(x))
-  assertthat::assert_that(rlang::is_double(y))
+  assertthat::assert_that(is.numeric(x))
+  assertthat::assert_that(is.numeric(y))
+  x <- as.double(x)
+  y <- as.double(y)
   assertthat::assert_that(rlang::is_integerish(window_size, n = 1))
   assertthat::assert_that(window_size > 0)
   assertthat::assert_that(rlang::is_integerish(lag_max, n = 1))

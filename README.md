@@ -87,12 +87,12 @@ summary(wcc_results)
 #> Total Lags Tested: 151
 #> Window Size: 150
 #> Max Lag: 75
-#> Overall Fisher's Z: 1.1007
+#> Overall Fisher's Z: 1.065
 #> 
 #> ── Cross-Correlation Value Distribution ──
 #> 
 #>      0%     25%     50%     75%    100% 
-#> -0.9988 -0.6828  0.0474  0.7220  0.9987
+#> -0.9984 -0.6770  0.0410  0.7185  0.9986
 #> ! 78 missing values (NA) detected.
 ```
 
@@ -118,11 +118,11 @@ peaks
 #> Strict Monotonic: FALSE
 #> Showing the first 5 peaks:
 #>    i peak_lag peak_value
-#>   76       34  0.9985194
-#>  101       34  0.9981981
-#>  126       32  0.9971209
-#>  151       31  0.9979207
-#>  176       31  0.9982943
+#>   76       30  0.9742437
+#>  101       30  0.9811713
+#>  126       30  0.9839800
+#>  151       30  0.9846598
+#>  176       29  0.9900110
 #> # ... with 82 more rows
 ```
 
@@ -138,6 +138,41 @@ plot_peaks_overlay(wcc_results, peaks)
 ```
 
 <img src="man/figures/README-example-plot-1.png" alt="" width="100%" />
+
+### Surrogate Testing for Significance
+
+Psychological and behavioral time series are highly autocorrelated,
+which means random noise can sometimes look like genuine interaction. To
+verify that our observed synchronization is statistically significant,
+we can use the `wcc_surrogate()` function.
+
+This function uses a circular shift method to misalign the two time
+series, generating a null distribution of “pseudo-synchrony” that
+preserves the natural autocorrelation of the data but breaks the dyadic
+interaction.
+
+``` r
+# Step 5: Run surrogate analysis to calculate an empirical p-value
+set.seed(2026)
+surrogate_results <- wcc_surrogate(
+  x = df$vel_A,
+  y = df$vel_B,
+  window_size = 150,
+  lag_max = 75,
+  window_increment = 25,
+  lag_increment = 1,
+  n_surrogates = 100
+)
+
+surrogate_results
+#> 
+#> ── WCC Surrogate Analysis (Pseudo-Synchrony) ───────────────────────────────────
+#> Permutations: 100
+#> Observed Fisher's Z: 1.065
+#> Average Null Z: 0.9894
+#> Empirical p-value: 0
+#> ✔ Observed synchrony is significantly greater than chance.
+```
 
 ## Citation
 
