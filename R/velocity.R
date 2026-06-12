@@ -1,105 +1,157 @@
-#' Calculate 3D Velocity Magnitude (Speed)
+#' Calculate 1D Velocity
 #'
-#' Calculates the magnitude of the 3D velocity vector (speed) using a central difference method.
+#' Calculates the velocity (rate of change including direction) along a single axis using finite difference methods.
+#'
+#' @param t A numeric vector representing time.
+#' @param x A numeric vector of coordinates.
+#' @param n An integer specifying the step size for the difference calculations. Default is 1.
+#' @param method A character string specifying the method to use: "central", "forward", or "backward". Default is "central".
+#' @param fill_edges A logical indicating whether to automatically use forward and backward differences to estimate velocities at the boundaries when `method = "central"`. Default is `TRUE`.
+#' @return A numeric vector of velocities the same length as the input vectors.
+#' @export
+calc_velocity_1d <- function(t, x, n = 1, method = c("central", "forward", "backward"), fill_edges = TRUE) {
+  method <- match.arg(method)
+
+  calc_fwd <- function() (dplyr::lead(x, n) - x) / (dplyr::lead(t, n) - t)
+  calc_bwd <- function() (x - dplyr::lag(x, n)) / (t - dplyr::lag(t, n))
+
+  if (method == "forward") return(calc_fwd())
+  if (method == "backward") return(calc_bwd())
+
+  # Default to central difference
+  dt <- dplyr::lead(t, n) - dplyr::lag(t, n)
+  dx <- dplyr::lead(x, n) - dplyr::lag(x, n)
+  v <- dx / dt
+
+  if (fill_edges) {
+    v <- dplyr::coalesce(v, calc_fwd(), calc_bwd())
+  }
+
+  v
+}
+
+#' Calculate 1D Speed
+#'
+#' Calculates the absolute speed along a single axis (e.g., x-axis) using finite difference methods.
+#'
+#' @param t A numeric vector representing time.
+#' @param x A numeric vector of coordinates.
+#' @param n An integer specifying the step size for the difference calculations. Default is 1.
+#' @param method A character string specifying the method to use: "central", "forward", or "backward". Default is "central".
+#' @param fill_edges A logical indicating whether to automatically use forward and backward differences to estimate speeds at the boundaries when `method = "central"`. Default is `TRUE`.
+#' @return A numeric vector of speeds the same length as the input vectors.
+#' @export
+calc_speed_1d <- function(t, x, n = 1, method = c("central", "forward", "backward"), fill_edges = TRUE) {
+  method <- match.arg(method)
+
+  calc_fwd <- function() abs((dplyr::lead(x, n) - x) / (dplyr::lead(t, n) - t))
+  calc_bwd <- function() abs((x - dplyr::lag(x, n)) / (t - dplyr::lag(t, n)))
+
+  if (method == "forward") return(calc_fwd())
+  if (method == "backward") return(calc_bwd())
+
+  # Default to central difference
+  dt <- dplyr::lead(t, n) - dplyr::lag(t, n)
+  dx <- dplyr::lead(x, n) - dplyr::lag(x, n)
+  v <- abs(dx / dt)
+
+  if (fill_edges) {
+    v <- dplyr::coalesce(v, calc_fwd(), calc_bwd())
+  }
+
+  v
+}
+
+#' Calculate 2D Speed
+#'
+#' Calculates the magnitude of the 2D velocity vector (speed) using finite difference methods.
+#'
+#' @param t A numeric vector representing time.
+#' @param x A numeric vector of x-coordinates.
+#' @param y A numeric vector of y-coordinates.
+#' @param n An integer specifying the step size for the difference calculations. Default is 1.
+#' @param method A character string specifying the method to use: "central", "forward", or "backward". Default is "central".
+#' @param fill_edges A logical indicating whether to automatically use forward and backward differences to estimate speeds at the boundaries when `method = "central"`. Default is `TRUE`.
+#' @return A numeric vector of speeds the same length as the input vectors.
+#' @export
+calc_speed_2d <- function(t, x, y, n = 1, method = c("central", "forward", "backward"), fill_edges = TRUE) {
+  method <- match.arg(method)
+
+  calc_fwd <- function() {
+    dt <- dplyr::lead(t, n) - t
+    dx <- dplyr::lead(x, n) - x
+    dy <- dplyr::lead(y, n) - y
+    sqrt((dx / dt)^2 + (dy / dt)^2)
+  }
+
+  calc_bwd <- function() {
+    dt <- t - dplyr::lag(t, n)
+    dx <- x - dplyr::lag(x, n)
+    dy <- y - dplyr::lag(y, n)
+    sqrt((dx / dt)^2 + (dy / dt)^2)
+  }
+
+  if (method == "forward") return(calc_fwd())
+  if (method == "backward") return(calc_bwd())
+
+  # Default to central difference
+  dt <- dplyr::lead(t, n) - dplyr::lag(t, n)
+  dx <- dplyr::lead(x, n) - dplyr::lag(x, n)
+  dy <- dplyr::lead(y, n) - dplyr::lag(y, n)
+  v <- sqrt((dx / dt)^2 + (dy / dt)^2)
+
+  if (fill_edges) {
+    v <- dplyr::coalesce(v, calc_fwd(), calc_bwd())
+  }
+
+  v
+}
+
+#' Calculate 3D Speed
+#'
+#' Calculates the magnitude of the 3D velocity vector (speed) using finite difference methods.
 #'
 #' @param t A numeric vector representing time.
 #' @param x A numeric vector of x-coordinates.
 #' @param y A numeric vector of y-coordinates.
 #' @param z A numeric vector of z-coordinates.
-#' @param n An integer specifying the step size for the lag and lead calculations. Default is 1.
-#' @return A numeric vector of velocities. The first and last `n` elements will be `NA`.
+#' @param n An integer specifying the step size for the difference calculations. Default is 1.
+#' @param method A character string specifying the method to use: "central", "forward", or "backward". Default is "central".
+#' @param fill_edges A logical indicating whether to automatically use forward and backward differences to estimate speeds at the boundaries when `method = "central"`. Default is `TRUE`.
+#' @return A numeric vector of speeds the same length as the input vectors.
 #' @export
-v_xyz <- function(t, x, y, z, n = 1) {
+calc_speed_3d <- function(t, x, y, z, n = 1, method = c("central", "forward", "backward"), fill_edges = TRUE) {
+  method <- match.arg(method)
 
-  tm1 <- dplyr::lag(t, n)
-  tp1 <- dplyr::lead(t, n)
+  calc_fwd <- function() {
+    dt <- dplyr::lead(t, n) - t
+    dx <- dplyr::lead(x, n) - x
+    dy <- dplyr::lead(y, n) - y
+    dz <- dplyr::lead(z, n) - z
+    sqrt((dx / dt)^2 + (dy / dt)^2 + (dz / dt)^2)
+  }
 
-  xm1 <- dplyr::lag(x, n)
-  xp1 <- dplyr::lead(x, n)
-  ym1 <- dplyr::lag(y, n)
-  yp1 <- dplyr::lead(y, n)
-  zm1 <- dplyr::lag(z, n)
-  zp1 <- dplyr::lead(z, n)
+  calc_bwd <- function() {
+    dt <- t - dplyr::lag(t, n)
+    dx <- x - dplyr::lag(x, n)
+    dy <- y - dplyr::lag(y, n)
+    dz <- z - dplyr::lag(z, n)
+    sqrt((dx / dt)^2 + (dy / dt)^2 + (dz / dt)^2)
+  }
 
-  dt <- tp1 - tm1
+  if (method == "forward") return(calc_fwd())
+  if (method == "backward") return(calc_bwd())
 
-  v <- sqrt(
-    ((xp1 - xm1) / dt)^2 +
-    ((yp1 - ym1) / dt)^2 +
-    ((zp1 - zm1) / dt)^2
-  )
+  # Default to central difference
+  dt <- dplyr::lead(t, n) - dplyr::lag(t, n)
+  dx <- dplyr::lead(x, n) - dplyr::lag(x, n)
+  dy <- dplyr::lead(y, n) - dplyr::lag(y, n)
+  dz <- dplyr::lead(z, n) - dplyr::lag(z, n)
+  v <- sqrt((dx / dt)^2 + (dy / dt)^2 + (dz / dt)^2)
 
-  v
-}
-
-#' Calculate 1D Velocity Magnitude (X-Axis)
-#'
-#' Calculates the absolute velocity (speed) along the x-axis using a central difference method.
-#'
-#' @param t A numeric vector representing time.
-#' @param x A numeric vector of x-coordinates.
-#' @param n An integer specifying the step size for the lag and lead calculations. Default is 1.
-#' @return A numeric vector of velocities. The first and last `n` elements will be `NA`.
-#' @export
-v_x <- function(t, x, n = 1) {
-
-  tm1 <- dplyr::lag(t, n)
-  tp1 <- dplyr::lead(t, n)
-
-  xm1 <- dplyr::lag(x, n)
-  xp1 <- dplyr::lead(x, n)
-
-  dt <- tp1 - tm1
-
-  v <- abs((xp1 - xm1) / dt)
-
-  v
-}
-
-#' Calculate 1D Velocity Magnitude (Y-Axis)
-#'
-#' Calculates the absolute velocity (speed) along the y-axis using a central difference method.
-#'
-#' @param t A numeric vector representing time.
-#' @param y A numeric vector of y-coordinates.
-#' @param n An integer specifying the step size for the lag and lead calculations. Default is 1.
-#' @return A numeric vector of velocities. The first and last `n` elements will be `NA`.
-#' @export
-v_y <- function(t, y, n = 1) {
-
-  tm1 <- dplyr::lag(t, n)
-  tp1 <- dplyr::lead(t, n)
-
-  ym1 <- dplyr::lag(y, n)
-  yp1 <- dplyr::lead(y, n)
-
-  dt <- tp1 - tm1
-
-  v <- abs((yp1 - ym1) / dt)
-
-  v
-}
-
-#' Calculate 1D Velocity Magnitude (Z-Axis)
-#'
-#' Calculates the absolute velocity (speed) along the z-axis using a central difference method.
-#'
-#' @param t A numeric vector representing time.
-#' @param z A numeric vector of z-coordinates.
-#' @param n An integer specifying the step size for the lag and lead calculations. Default is 1.
-#' @return A numeric vector of velocities. The first and last `n` elements will be `NA`.
-#' @export
-v_z <- function(t, z, n = 1) {
-
-  tm1 <- dplyr::lag(t, n)
-  tp1 <- dplyr::lead(t, n)
-
-  zm1 <- dplyr::lag(z, n)
-  zp1 <- dplyr::lead(z, n)
-
-  dt <- tp1 - tm1
-
-  v <- abs((zp1 - zm1) / dt)
+  if (fill_edges) {
+    v <- dplyr::coalesce(v, calc_fwd(), calc_bwd())
+  }
 
   v
 }

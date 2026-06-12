@@ -16,6 +16,7 @@ Imports:
     RColorBrewer,
     Rcpp,
     rlang,
+    signal,
     tidyr
 Suggests:
     knitr,
