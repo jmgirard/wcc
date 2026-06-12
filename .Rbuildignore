@@ -8,3 +8,5 @@
 ^Meta$
 ^README_cache$
 ^docs$
+^_pkgdown\.yml$
+^pkgdown$
