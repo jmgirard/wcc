@@ -17,6 +17,10 @@ Useful links:
 
 - <https://jmgirard.github.io/bsync/>
 
+- <https://github.com/jmgirard/bsync>
+
+- Report bugs at <https://github.com/jmgirard/bsync/issues>
+
 ## Author
 
 **Maintainer**: Jeffrey Girard <me@jmgirard.com>
