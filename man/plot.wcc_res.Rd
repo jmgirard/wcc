@@ -4,10 +4,26 @@
 \alias{plot.wcc_res}
 \title{Plot wcc_res object}
 \usage{
-\method{plot}{wcc_res}(x, ...)
+\method{plot}{wcc_res}(
+  x,
+  time_step = 1,
+  color_low = "#B2182B",
+  color_mid = "#F7F7F7",
+  color_high = "#2166AC",
+  ...
+)
 }
 \arguments{
 \item{x}{An object of class "wcc_res".}
+
+\item{time_step}{A numeric value specifying the duration of each index.
+If not 1, axes will be converted from raw indices to time units. Default is 1.}
+
+\item{color_low}{Character string specifying the color for a correlation of -1. Default is "#B2182B" (Deep Red).}
+
+\item{color_mid}{Character string specifying the color for a correlation of 0. Default is "#F7F7F7" (Off-white).}
+
+\item{color_high}{Character string specifying the color for a correlation of 1. Default is "#2166AC" (Deep Blue).}
 
 \item{...}{Additional arguments (not used).}
 }
