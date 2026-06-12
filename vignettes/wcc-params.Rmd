@@ -1,8 +1,8 @@
 ---
-title: "Choosing WCC Parameters"
+title: "WCC Parameters"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Choosing WCC Parameters}
+  %\VignetteIndexEntry{WCC Parameters}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
