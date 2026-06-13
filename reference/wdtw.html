@@ -56,6 +56,7 @@ alignment distance between sliding windows of two time series.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">wdtw</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  <span class="va">y</span>,</span>
+<span>  time <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">window_size</span>,</span>
 <span>  <span class="va">lag_max</span>,</span>
 <span>  window_increment <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -74,6 +75,14 @@ alignment distance between sliding windows of two time series.</p>
 
 <dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
 <dd><p>A numeric vector containing a time series (same length as `x`).</p></dd>
+
+
+<dt id="arg-time">time<a class="anchor" aria-label="anchor" href="#arg-time"></a></dt>
+<dd><p>An optional numeric vector representing the timestamps for the
+data. Must be the same length as `x` and `y`. If provided, the rolling
+window indices will be mapped directly to these timestamps in the results,
+which is highly recommended to maintain accurate timelines if edge
+artifacts were trimmed prior to analysis. Default is `NULL`.</p></dd>
 
 
 <dt id="arg-window-size">window_size<a class="anchor" aria-label="anchor" href="#arg-window-size"></a></dt>

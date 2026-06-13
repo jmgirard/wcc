@@ -24,12 +24,16 @@ add random measurement noise.
 
 Unlike a perfectly stationary interaction, this scenario mimics natural
 turn-taking and includes four distinct behavioral phases over the course
-of 60 seconds: 1. **Phase 1 (0 to 20s):** Person A leads the interaction
-by 10 frames (0.33 seconds). 2. **Phase 2 (20 to 30s):** An uncorrelated
-lull where both participants move independently. 3. **Phase 3 (30 to
-46s):** Person B takes over and leads by 12 frames (0.40 seconds). 4.
-**Phase 4 (46 to 60s):** Person A interjects and leads by 8 frames (0.26
-seconds).
+of 60 seconds:
+
+1.  **Phase 1 (0 to 20s):** Person A leads the interaction by 10 frames
+    (0.33 seconds).
+2.  **Phase 2 (20 to 30s):** An uncorrelated lull where both
+    participants move independently.
+3.  **Phase 3 (30 to 46s):** Person B takes over and leads by 12 frames
+    (0.40 seconds).
+4.  **Phase 4 (46 to 60s):** Person A interjects and leads by 8 frames
+    (0.26 seconds).
 
 ``` r
 
@@ -102,7 +106,8 @@ smoothing window.
 ``` r
 
 # 4. Smooth the raw data and trim the edges
-dyad_data <- dyad_data_raw |>
+dyad_data <-
+  dyad_data_raw |>
   mutate(
     person_A = smooth_signal(person_A_raw, method = "sgolay", window = 15),
     person_B = smooth_signal(person_B_raw, method = "sgolay", window = 15)
@@ -126,6 +131,7 @@ We will use a window size of 90 frames (3 seconds) and a maximum lag of
 wcc_results <- wcc(
   x = dyad_data$person_A,
   y = dyad_data$person_B,
+  time = dyad_data$time,
   window_size = 90,
   lag_max = 45,
   window_increment = 30,
@@ -183,6 +189,7 @@ distribution using the circular shift method.
 surrogate_results <- wcc_surrogate(
   x = dyad_data$person_A,
   y = dyad_data$person_B,
+  time = dyad_data$time,
   window_size = 90,
   lag_max = 45,
   window_increment = 30,

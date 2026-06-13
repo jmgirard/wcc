@@ -11,6 +11,7 @@ chance given the inherent autocorrelation of the individual time series.
 wcc_surrogate(
   x,
   y,
+  time = NULL,
   window_size,
   lag_max,
   window_increment = 1,
@@ -29,6 +30,11 @@ wcc_surrogate(
 - y:
 
   A numeric vector containing a time series.
+
+- time:
+
+  An optional numeric vector representing the timestamps for the data.
+  Must be the same length as \`x\` and \`y\`. Default is \`NULL\`.
 
 - window_size:
 

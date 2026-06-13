@@ -95,13 +95,21 @@ will generate smooth continuous data to simulate bodily motion and then
 add random measurement noise.</p>
 <p>Unlike a perfectly stationary interaction, this scenario mimics
 natural turn-taking and includes four distinct behavioral phases over
-the course of 60 seconds: 1. <strong>Phase 1 (0 to 20s):</strong> Person
-A leads the interaction by 10 frames (0.33 seconds). 2. <strong>Phase 2
-(20 to 30s):</strong> An uncorrelated lull where both participants move
-independently. 3. <strong>Phase 3 (30 to 46s):</strong> Person B takes
-over and leads by 12 frames (0.40 seconds). 4. <strong>Phase 4 (46 to
-60s):</strong> Person A interjects and leads by 8 frames (0.26
-seconds).</p>
+the course of 60 seconds:</p>
+<ol style="list-style-type: decimal">
+<li>
+<strong>Phase 1 (0 to 20s):</strong> Person A leads the interaction
+by 10 frames (0.33 seconds).</li>
+<li>
+<strong>Phase 2 (20 to 30s):</strong> An uncorrelated lull where
+both participants move independently.</li>
+<li>
+<strong>Phase 3 (30 to 46s):</strong> Person B takes over and leads
+by 12 frames (0.40 seconds).</li>
+<li>
+<strong>Phase 4 (46 to 60s):</strong> Person A interjects and leads
+by 8 frames (0.26 seconds).</li>
+</ol>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jmgirard.github.io/bsync/">bsync</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
@@ -167,7 +175,8 @@ analysis is built strictly on stable data. A standard rule of thumb is
 to trim a length equal to your smoothing window.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 4. Smooth the raw data and trim the edges</span></span>
-<span><span class="va">dyad_data</span> <span class="op">&lt;-</span> <span class="va">dyad_data_raw</span> <span class="op">|&gt;</span></span>
+<span><span class="va">dyad_data</span> <span class="op">&lt;-</span></span>
+<span>  <span class="va">dyad_data_raw</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
 <span>    person_A <span class="op">=</span> <span class="fu"><a href="../reference/smooth_signal.html">smooth_signal</a></span><span class="op">(</span><span class="va">person_A_raw</span>, method <span class="op">=</span> <span class="st">"sgolay"</span>, window <span class="op">=</span> <span class="fl">15</span><span class="op">)</span>,</span>
 <span>    person_B <span class="op">=</span> <span class="fu"><a href="../reference/smooth_signal.html">smooth_signal</a></span><span class="op">(</span><span class="va">person_B_raw</span>, method <span class="op">=</span> <span class="st">"sgolay"</span>, window <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span>
@@ -188,6 +197,7 @@ frames (1 second) to allow for overlap and smooth transitions.</p>
 <code class="sourceCode R"><span><span class="va">wcc_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wcc.html">wcc</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">dyad_data</span><span class="op">$</span><span class="va">person_A</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">dyad_data</span><span class="op">$</span><span class="va">person_B</span>,</span>
+<span>  time <span class="op">=</span> <span class="va">dyad_data</span><span class="op">$</span><span class="va">time</span>,</span>
 <span>  window_size <span class="op">=</span> <span class="fl">90</span>,</span>
 <span>  lag_max <span class="op">=</span> <span class="fl">45</span>,</span>
 <span>  window_increment <span class="op">=</span> <span class="fl">30</span>,</span>
@@ -236,6 +246,7 @@ distribution using the circular shift method.</p>
 <code class="sourceCode R"><span><span class="va">surrogate_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wcc_surrogate.html">wcc_surrogate</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">dyad_data</span><span class="op">$</span><span class="va">person_A</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">dyad_data</span><span class="op">$</span><span class="va">person_B</span>,</span>
+<span>  time <span class="op">=</span> <span class="va">dyad_data</span><span class="op">$</span><span class="va">time</span>,</span>
 <span>  window_size <span class="op">=</span> <span class="fl">90</span>,</span>
 <span>  lag_max <span class="op">=</span> <span class="fl">45</span>,</span>
 <span>  window_increment <span class="op">=</span> <span class="fl">30</span>,</span>

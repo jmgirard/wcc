@@ -77,6 +77,7 @@ measurement units.
 wdtw_results <- wdtw(
   x = dyad_data$person_A,
   y = dyad_data$person_B,
+  time = dyad_data$time,
   window_size = 90,
   lag_max = 45,
   window_increment = 30,
@@ -119,22 +120,26 @@ global search across the window to find the absolute minimum distance
 # Extract optimal alignment lags (valleys) using the default global search
 wdtw_optima_df <- pick_optima(wdtw_results)
 
-print(wdtw_optima_df)
+summary(wdtw_optima_df)
 #> 
-#> ── WDTW Optima Results ─────────────────────────────────────────────────────────
-#> Total Windows Analyzed: 55
-#> Valid Optima Found: 55 (100%)
-#> Search Method: global
-#> Search Mode: Valleys (Minima)
-#> Threshold Applied: None
-#> Showing the first 5 results:
-#>    i optimum_lag optimum_value
-#>   46          12      19.21710
-#>   76          11      19.71480
-#>  106          11      19.48473
-#>  136          12      20.30806
-#>  166          12      19.16016
-#> # ... with 50 more rows
+#> ── WDTW Optima Summary ─────────────────────────────────────────────────────────
+#> 
+#> ── Completeness ──
+#> 
+#> • Total time windows: 55
+#> • Valid optima retained: 55 (100%)
+#> • Optima dropped (NA): 0 (0%)
+#> 
+#> ── Lag Directionality (Leadership) ──
+#> 
+#> • Positive Lags (x leads y): 24 (43.6%)
+#> • Negative Lags (y leads x): 29 (52.7%)
+#> • Zero Lags (Simultaneous): 2 (3.6%)
+#> 
+#> ── Optimum Value Distribution ──
+#> 
+#>      0%     25%     50%     75%    100% 
+#> 17.0898 19.0493 19.8450 20.5687 23.3458
 ```
 
 This returns a `wdtw_optima` data frame containing the elapsed time

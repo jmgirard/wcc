@@ -144,6 +144,7 @@ than arbitrary measurement units.</p>
 <code class="sourceCode R"><span><span class="va">wdtw_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wdtw.html">wdtw</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">dyad_data</span><span class="op">$</span><span class="va">person_A</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">dyad_data</span><span class="op">$</span><span class="va">person_B</span>,</span>
+<span>  time <span class="op">=</span> <span class="va">dyad_data</span><span class="op">$</span><span class="va">time</span>,</span>
 <span>  window_size <span class="op">=</span> <span class="fl">90</span>,</span>
 <span>  lag_max <span class="op">=</span> <span class="fl">45</span>,</span>
 <span>  window_increment <span class="op">=</span> <span class="fl">30</span>,</span>
@@ -182,22 +183,26 @@ window to find the absolute minimum distance
 <code class="sourceCode R"><span><span class="co"># Extract optimal alignment lags (valleys) using the default global search</span></span>
 <span><span class="va">wdtw_optima_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pick_optima.html">pick_optima</a></span><span class="op">(</span><span class="va">wdtw_results</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wdtw_optima_df</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">wdtw_optima_df</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">WDTW Optima Results</span> <span style="color: #00BBBB;">─────────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; Total Windows Analyzed: 55</span></span>
-<span><span class="co">#&gt; Valid Optima Found: 55 (100%)</span></span>
-<span><span class="co">#&gt; Search Method: global</span></span>
-<span><span class="co">#&gt; Search Mode: Valleys (Minima)</span></span>
-<span><span class="co">#&gt; Threshold Applied: None</span></span>
-<span><span class="co">#&gt; Showing the first 5 results:</span></span>
-<span><span class="co">#&gt;    i optimum_lag optimum_value</span></span>
-<span><span class="co">#&gt;   46          12      19.21710</span></span>
-<span><span class="co">#&gt;   76          11      19.71480</span></span>
-<span><span class="co">#&gt;  106          11      19.48473</span></span>
-<span><span class="co">#&gt;  136          12      20.30806</span></span>
-<span><span class="co">#&gt;  166          12      19.16016</span></span>
-<span><span class="co">#&gt; <span style="color: #555555;"># ... with 50 more rows</span></span></span></code></pre></div>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">WDTW Optima Summary</span> <span style="color: #00BBBB;">─────────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── <span style="font-weight: bold;">Completeness</span> ──</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Total time windows: 55</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Valid optima retained: 55 (100%)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Optima dropped (NA): 0 (0%)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── <span style="font-weight: bold;">Lag Directionality (Leadership)</span> ──</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Positive Lags (x leads y): 24 (43.6%)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Negative Lags (y leads x): 29 (52.7%)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Zero Lags (Simultaneous): 2 (3.6%)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── <span style="font-weight: bold;">Optimum Value Distribution</span> ──</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;      0%     25%     50%     75%    100% </span></span>
+<span><span class="co">#&gt; 17.0898 19.0493 19.8450 20.5687 23.3458</span></span></code></pre></div>
 <p>This returns a <code>wdtw_optima</code> data frame containing the
 elapsed time indices, the optimal lags, and the corresponding DTW
 distance values. The console output confirms that the search mode was
