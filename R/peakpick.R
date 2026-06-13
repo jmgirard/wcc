@@ -1,28 +1,31 @@
-#' Find Peak Windowed Cross-Correlations
+#' Find Peak (or Valley) Windowed Cross-Correlations
 #'
-#' @param wcc_obj An object of class "wcc_res" returned by `wcc()`.
+#' @param wcc_obj An object of class "wcc_res" or "wdtw_res".
 #' @param L_size An odd integer specifying the size of the local search region.
 #' @param strict_monotonic Logical indicating whether to strictly enforce
-#'   decreasing values on the flanks of the peak. (default = FALSE)
-#' @return A data frame of class "wcc_peaks" containing the elapsed time indices,
-#'   the peak lags, and the peak correlation values.
+#'   monotonic flanks around the extremum. (default = FALSE)
+#' @param find_min Logical indicating whether to search for local minima instead
+#'   of local maxima. Required for distance metrics like DTW. (default = FALSE)
+#' @return A data frame of class "wcc_peaks".
 #' @export
-pick_peaks <- function(wcc_obj, L_size, strict_monotonic = FALSE) {
+pick_peaks <- function(wcc_obj, L_size, strict_monotonic = FALSE, find_min = FALSE) {
 
-  if (!inherits(wcc_obj, "wcc_res")) {
-    stop("Input must be a wcc_res object.")
+  if (!inherits(wcc_obj, c("wcc_res", "wdtw_res"))) {
+    stop("Input must be a wcc_res or wdtw_res object.")
   }
 
   tau_max <- wcc_obj$settings$lag_max
   df <- wcc_obj$results_df
 
+  # Adapt to whether this is a correlation or distance object
+  metric_col <- if (inherits(wcc_obj, "wcc_res")) "wcc" else "dtw_dist"
+
   # 1. Order data chronologically and by lag to ensure perfect vector alignment
   df <- df[order(df$i, df$tau), ]
 
-  # 2. Split the correlation values by the time index 'i'
-  # A factor guarantees the chronological order of 'i' is preserved in the split list
+  # 2. Split the target metric values by the time index 'i'
   i_factor <- factor(df$i, levels = unique(df$i))
-  wcc_list <- split(df$wcc, i_factor)
+  wcc_list <- split(df[[metric_col]], i_factor)
 
   # 3. Extract unique 'i' values to pass as the structural backbone of the output
   i_vals <- as.numeric(names(wcc_list))
@@ -33,25 +36,27 @@ pick_peaks <- function(wcc_obj, L_size, strict_monotonic = FALSE) {
     i_vals = i_vals,
     tau_max = tau_max,
     L_size = L_size,
-    strict_monotonic = strict_monotonic
+    strict_monotonic = strict_monotonic,
+    find_min = find_min
   )
 
   # Return the formally constructed object
-  wcc_peaks(out_df, L_size = L_size, strict_monotonic = strict_monotonic)
+  wcc_peaks(out_df, L_size = L_size, strict_monotonic = strict_monotonic, find_min = find_min)
 }
 
-new_wcc_peaks <- function(x = data.frame(), L_size = numeric(), strict_monotonic = logical()) {
+new_wcc_peaks <- function(x = data.frame(), L_size = numeric(), strict_monotonic = logical(), find_min = logical()) {
   stopifnot(is.data.frame(x))
 
   # Store settings as attributes so they don't clutter the data frame
   attr(x, "L_size") <- L_size
   attr(x, "strict_monotonic") <- strict_monotonic
+  attr(x, "find_min") <- find_min
 
   structure(x, class = c("wcc_peaks", class(x)))
 }
 
-wcc_peaks <- function(x = data.frame(), L_size = numeric(), strict_monotonic = logical()) {
-  new_wcc_peaks(x, L_size, strict_monotonic)
+wcc_peaks <- function(x = data.frame(), L_size = numeric(), strict_monotonic = logical(), find_min = logical()) {
+  new_wcc_peaks(x, L_size, strict_monotonic, find_min)
 }
 
 #' Print method for wcc_peaks objects
@@ -63,18 +68,20 @@ wcc_peaks <- function(x = data.frame(), L_size = numeric(), strict_monotonic = l
 print.wcc_peaks <- function(x, n = 5, ...) {
   L_size <- attr(x, "L_size")
   strict <- attr(x, "strict_monotonic")
+  find_min <- attr(x, "find_min")
   total_peaks <- nrow(x)
 
   cli::cli_h1("WCC Peak Picking Results")
 
   cli::cli_dl(c(
-    "Total Peaks Found" = "{total_peaks}",
+    "Total Extremes Found" = "{total_peaks}",
     "Local Search Size" = "{L_size}",
-    "Strict Monotonic" = "{strict}"
+    "Strict Monotonic" = "{strict}",
+    "Search Mode" = "{ifelse(find_min, 'Valleys (Minima)', 'Peaks (Maxima)')}"
   ))
 
   if (total_peaks > 0) {
-    cli::cli_text("Showing the first {min(n, total_peaks)} peak{?s}:")
+    cli::cli_text("Showing the first {min(n, total_peaks)} result{?s}:")
     # Coerce to data frame to avoid recursive print looping
     print(utils::head(as.data.frame(x), n), row.names = FALSE)
 
@@ -83,7 +90,7 @@ print.wcc_peaks <- function(x, n = 5, ...) {
       cli::cli_text("{cli::col_grey('# ... with ', remaining, ' more row', ifelse(remaining == 1, '', 's'))}")
     }
   } else {
-    cli::cli_alert_info("No peaks found matching the criteria.")
+    cli::cli_alert_info("No extremes found matching the criteria.")
   }
 
   invisible(x)

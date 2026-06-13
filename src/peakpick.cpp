@@ -2,7 +2,7 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-DataFrame pick_peaks_cpp(List wcc_list, NumericVector i_vals, int tau_max, int L_size, bool strict_monotonic = false) {
+DataFrame pick_peaks_cpp(List wcc_list, NumericVector i_vals, int tau_max, int L_size, bool strict_monotonic = false, bool find_min = false) {
 
   if (L_size % 2 == 0) {
     stop("L_size must be an odd integer to possess a true center element.");
@@ -28,36 +28,59 @@ DataFrame pick_peaks_cpp(List wcc_list, NumericVector i_vals, int tau_max, int L
 
     // Helper lambda to evaluate a local region of length L_size
     auto check_window = [&](int start_idx) -> bool {
-      double max_val = R_NegInf;
-      int max_idx = -1;
+      // Set starting extreme correctly based on whether we want a min or max
+      double extreme_val = find_min ? R_PosInf : R_NegInf;
+      int extreme_idx = -1;
 
-      // Find the maximum value and its index, ignoring NAs
+      // Find the extreme value and its index, ignoring NAs
       for (int i = 0; i < L_size; ++i) {
         double val = rvec[start_idx + i];
         if (!NumericVector::is_na(val)) {
-          if (max_idx == -1 || val > max_val) {
-            max_val = val;
-            max_idx = i;
+          if (find_min) {
+            if (extreme_idx == -1 || val < extreme_val) {
+              extreme_val = val;
+              extreme_idx = i;
+            }
+          } else {
+            if (extreme_idx == -1 || val > extreme_val) {
+              extreme_val = val;
+              extreme_idx = i;
+            }
           }
         }
       }
 
-      // The peak must be exactly at the center of the local window
-      if (max_idx != half_L) return false;
+      // The extremum must be exactly at the center of the local window
+      if (extreme_idx != half_L) return false;
 
       // Monotonic flank check
       if (strict_monotonic) {
-        // Left flank must be strictly increasing
-        for (int i = 1; i <= half_L; ++i) {
-          double prev = rvec[start_idx + i - 1];
-          double curr = rvec[start_idx + i];
-          if (NumericVector::is_na(prev) || NumericVector::is_na(curr) || curr <= prev) return false;
-        }
-        // Right flank must be strictly decreasing
-        for (int i = half_L + 1; i < L_size; ++i) {
-          double prev = rvec[start_idx + i - 1];
-          double curr = rvec[start_idx + i];
-          if (NumericVector::is_na(prev) || NumericVector::is_na(curr) || curr >= prev) return false;
+        if (find_min) {
+          // Left flank must be strictly decreasing towards center
+          for (int i = 1; i <= half_L; ++i) {
+            double prev = rvec[start_idx + i - 1];
+            double curr = rvec[start_idx + i];
+            if (NumericVector::is_na(prev) || NumericVector::is_na(curr) || curr >= prev) return false;
+          }
+          // Right flank must be strictly increasing away from center
+          for (int i = half_L + 1; i < L_size; ++i) {
+            double prev = rvec[start_idx + i - 1];
+            double curr = rvec[start_idx + i];
+            if (NumericVector::is_na(prev) || NumericVector::is_na(curr) || curr <= prev) return false;
+          }
+        } else {
+          // Left flank must be strictly increasing towards center
+          for (int i = 1; i <= half_L; ++i) {
+            double prev = rvec[start_idx + i - 1];
+            double curr = rvec[start_idx + i];
+            if (NumericVector::is_na(prev) || NumericVector::is_na(curr) || curr <= prev) return false;
+          }
+          // Right flank must be strictly decreasing away from center
+          for (int i = half_L + 1; i < L_size; ++i) {
+            double prev = rvec[start_idx + i - 1];
+            double curr = rvec[start_idx + i];
+            if (NumericVector::is_na(prev) || NumericVector::is_na(curr) || curr >= prev) return false;
+          }
         }
       }
 

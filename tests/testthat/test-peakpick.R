@@ -19,7 +19,7 @@ test_that("pick_peaks validates inputs and handles errors properly", {
   mock_wcc <- create_mock_wcc(c(0.1, 0.5, 0.9, 0.5, 0.1), tau_max = 2)
 
   # Test wcc_res class check
-  expect_error(pick_peaks(list(), L_size = 3), "wcc_res object")
+  expect_error(pick_peaks(list(), L_size = 3), "wcc_res or wdtw_res object")
 
   # Test even L_size C++ exception
   expect_error(pick_peaks(mock_wcc, L_size = 4), "L_size must be an odd integer")

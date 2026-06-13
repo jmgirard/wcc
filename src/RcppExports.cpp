@@ -11,8 +11,8 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // pick_peaks_cpp
-DataFrame pick_peaks_cpp(List wcc_list, NumericVector i_vals, int tau_max, int L_size, bool strict_monotonic);
-RcppExport SEXP _bsync_pick_peaks_cpp(SEXP wcc_listSEXP, SEXP i_valsSEXP, SEXP tau_maxSEXP, SEXP L_sizeSEXP, SEXP strict_monotonicSEXP) {
+DataFrame pick_peaks_cpp(List wcc_list, NumericVector i_vals, int tau_max, int L_size, bool strict_monotonic, bool find_min);
+RcppExport SEXP _bsync_pick_peaks_cpp(SEXP wcc_listSEXP, SEXP i_valsSEXP, SEXP tau_maxSEXP, SEXP L_sizeSEXP, SEXP strict_monotonicSEXP, SEXP find_minSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -21,7 +21,8 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< int >::type tau_max(tau_maxSEXP);
     Rcpp::traits::input_parameter< int >::type L_size(L_sizeSEXP);
     Rcpp::traits::input_parameter< bool >::type strict_monotonic(strict_monotonicSEXP);
-    rcpp_result_gen = Rcpp::wrap(pick_peaks_cpp(wcc_list, i_vals, tau_max, L_size, strict_monotonic));
+    Rcpp::traits::input_parameter< bool >::type find_min(find_minSEXP);
+    rcpp_result_gen = Rcpp::wrap(pick_peaks_cpp(wcc_list, i_vals, tau_max, L_size, strict_monotonic, find_min));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -40,10 +41,26 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// calc_wdtw_cpp
+NumericVector calc_wdtw_cpp(NumericVector x, NumericVector y, IntegerVector i_vals, IntegerVector tau_vals, int w_max);
+RcppExport SEXP _bsync_calc_wdtw_cpp(SEXP xSEXP, SEXP ySEXP, SEXP i_valsSEXP, SEXP tau_valsSEXP, SEXP w_maxSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type i_vals(i_valsSEXP);
+    Rcpp::traits::input_parameter< IntegerVector >::type tau_vals(tau_valsSEXP);
+    Rcpp::traits::input_parameter< int >::type w_max(w_maxSEXP);
+    rcpp_result_gen = Rcpp::wrap(calc_wdtw_cpp(x, y, i_vals, tau_vals, w_max));
+    return rcpp_result_gen;
+END_RCPP
+}
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_bsync_pick_peaks_cpp", (DL_FUNC) &_bsync_pick_peaks_cpp, 5},
+    {"_bsync_pick_peaks_cpp", (DL_FUNC) &_bsync_pick_peaks_cpp, 6},
     {"_bsync_calc_wcc_cpp", (DL_FUNC) &_bsync_calc_wcc_cpp, 5},
+    {"_bsync_calc_wdtw_cpp", (DL_FUNC) &_bsync_calc_wdtw_cpp, 5},
     {NULL, NULL, 0}
 };
 
