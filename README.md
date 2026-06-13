@@ -19,8 +19,8 @@ two time series is stationary over time, in many psychological and
 behavioral contexts (such as interpersonal conversation or synchronized
 movement), the lead-lag relationship between individuals is highly
 dynamic. **bsync** allows researchers to quantify these nonstationary
-associations using highly optimized windowed cross-correlation (WCC) and
-peak-picking algorithms.
+associations using highly optimized windowed cross-correlation (WCC),
+windowed dynamic time warping (WDTW), and optima-extraction algorithms.
 
 Furthermore, the package provides a complete analytical pipeline for
 behavioral time series. This includes robust preprocessing functions for
@@ -196,7 +196,24 @@ If you use **bsync** in your research, please cite the package:
 
 ``` r
 citation("bsync")
+#> Warning in citation("bsync"): could not determine year for 'bsync' from package
+#> DESCRIPTION file
+#> To cite package 'bsync' in publications use:
+#> 
+#>   Girard J (????). _bsync: Behavioral Synchrony Analyses_. R package
+#>   version 0.0.0.9000, <https://jmgirard.github.io/bsync/>.
+#> 
+#> A BibTeX entry for LaTeX users is
+#> 
+#>   @Manual{,
+#>     title = {bsync: Behavioral Synchrony Analyses},
+#>     author = {Jeffrey Girard},
+#>     note = {R package version 0.0.0.9000},
+#>     url = {https://jmgirard.github.io/bsync/},
+#>   }
 ```
+
+## References
 
 This package builds upon foundational methodology and modern best
 practices in behavioral time series analysis. We recommend citing the
