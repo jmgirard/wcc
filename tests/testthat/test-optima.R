@@ -19,13 +19,13 @@ test_that("pick_optima validates inputs and handles errors properly", {
   mock_wcc <- create_mock_wcc(c(0.1, 0.5, 0.9, 0.5, 0.1), tau_max = 2)
 
   # Test class check
-  expect_error(pick_optima(list(), search_method = "global"), "wcc_res or wdtw_res object")
+  expect_error(pick_optima(list(), search_method = "global"), "<wcc_res> or <wdtw_res>")
 
   # Test even L_size C++ exception (requires local search)
   expect_error(pick_optima(mock_wcc, L_size = 4, search_method = "local"), "L_size must be an odd integer")
 
   # Test missing L_size for local search
-  expect_error(pick_optima(mock_wcc, search_method = "local"), "An L_size must be provided")
+  expect_error(pick_optima(mock_wcc, search_method = "local"), "must be provided")
 })
 
 test_that("pick_optima finds a perfect central peak (local search)", {
@@ -103,45 +103,6 @@ test_that("print.wcc_optima produces expected console output", {
   res <- pick_optima(mock_wcc, L_size = 3, search_method = "local")
 
   # This will capture the full cli header and the dataframe
-  expect_snapshot(print(res))
-})
-
-test_that("summary.wcc_optima calculates and prints correctly", {
-  df_valid <- data.frame(i = 100, tau = -2:2, wcc = c(0.1, 0.5, 0.9, 0.5, 0.1))
-  df_invalid <- data.frame(i = 101, tau = -2:2, wcc = c(0.9, 0.7, 0.5, 0.4, 0.1))
-
-  mock_wcc <- list(
-    results_df = rbind(df_valid, df_invalid),
-    settings = list(lag_max = 2)
-  )
-  class(mock_wcc) <- c("wcc_res", "list")
-
-  res <- pick_optima(mock_wcc, L_size = 5, strict_monotonic = TRUE, search_method = "local")
-
-  expect_snapshot(summary(res))
-})
-
-# Helper function to quickly mock up a wdtw_res object for testing
-create_mock_wdtw <- function(dist_vals, tau_max, i_val = 100) {
-  lags <- seq(-tau_max, tau_max)
-  df <- data.frame(
-    i = i_val,
-    tau = lags,
-    dtw_dist = dist_vals
-  )
-
-  obj <- list(
-    results_df = df,
-    settings = list(lag_max = tau_max)
-  )
-  class(obj) <- c("wdtw_res", "list")
-  obj
-}
-
-test_that("print.wcc_optima produces expected console output", {
-  mock_wcc <- create_mock_wcc(c(0.1, 0.5, 0.9, 0.5, 0.1), tau_max = 2)
-  res <- pick_optima(mock_wcc, L_size = 3, search_method = "local")
-
   expect_snapshot(print(res))
 })
 

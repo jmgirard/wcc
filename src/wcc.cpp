@@ -1,6 +1,10 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+// -----------------------------------------------------------------------------
+// Calculate Windowed Cross-Correlation Core
+// -----------------------------------------------------------------------------
+
 // [[Rcpp::export]]
 NumericVector calc_wcc_cpp(NumericVector x, NumericVector y,
                            IntegerVector i_vals, IntegerVector tau_vals,
@@ -10,8 +14,7 @@ NumericVector calc_wcc_cpp(NumericVector x, NumericVector y,
   NumericVector results(n_calcs);
 
   for(int k = 0; k < n_calcs; k++) {
-    // C++ uses 0-based indexing, so we subtract 1 from the R indices
-    int i = i_vals[k] - 1;
+    int i = i_vals[k] - 1; // 0-based indexing
     int tau = tau_vals[k];
 
     // Safety check to ensure windows do not go out of bounds
@@ -41,7 +44,6 @@ NumericVector calc_wcc_cpp(NumericVector x, NumericVector y,
     }
 
     if (valid_n > 1) {
-      // Calculate variance and covariance using the computational formula
       double var_x = (sum_x2 - (sum_x * sum_x) / valid_n) / (valid_n - 1);
       double var_y = (sum_y2 - (sum_y * sum_y) / valid_n) / (valid_n - 1);
       double cov_xy = (sum_xy - (sum_x * sum_y) / valid_n) / (valid_n - 1);

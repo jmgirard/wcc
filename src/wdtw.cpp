@@ -4,6 +4,10 @@
 
 using namespace Rcpp;
 
+// -----------------------------------------------------------------------------
+// Calculate Windowed Dynamic Time Warping Core
+// -----------------------------------------------------------------------------
+
 // [[Rcpp::export]]
 NumericVector calc_wdtw_cpp(NumericVector x, NumericVector y,
                             IntegerVector i_vals, IntegerVector tau_vals,
@@ -11,17 +15,14 @@ NumericVector calc_wdtw_cpp(NumericVector x, NumericVector y,
 
   int n_calcs = i_vals.size();
   NumericVector results(n_calcs, NA_REAL);
-
-  // w_len is the number of elements in the window (w_max + 1)
   int w_len = w_max + 1;
 
-  // Space-optimized Dynamic Programming:
-  // We only need the previous row and current row to calculate DTW
+  // Space-optimized Dynamic Programming
   std::vector<double> prev_row(w_len + 1);
   std::vector<double> curr_row(w_len + 1);
 
   for(int k = 0; k < n_calcs; k++) {
-    int i = i_vals[k] - 1; // 0-based indexing for C++
+    int i = i_vals[k] - 1; // 0-based indexing
     int tau = tau_vals[k];
 
     // Safety check to ensure windows do not go out of bounds
@@ -29,7 +30,7 @@ NumericVector calc_wdtw_cpp(NumericVector x, NumericVector y,
       continue;
     }
 
-    // Initialize the first DP row with infinity, except for the origin [0]
+    // Initialize the first DP row with infinity, except for the origin
     std::fill(prev_row.begin(), prev_row.end(), R_PosInf);
     prev_row[0] = 0.0;
 
@@ -52,19 +53,14 @@ NumericVector calc_wdtw_cpp(NumericVector x, NumericVector y,
           break;
         }
 
-        // Calculate absolute distance (Euclidean 1D cost)
         double cost = std::abs(val_x - val_y);
-
-        // Find the minimum cost from the previous steps (insertion, deletion, match)
         double min_prev = std::min({curr_row[w_y - 1], prev_row[w_y], prev_row[w_y - 1]});
         curr_row[w_y] = cost + min_prev;
       }
 
-      // The current row becomes the previous row for the next iteration
       prev_row = curr_row;
     }
 
-    // If no missing values were encountered, store the final accumulated distance
     if (!has_na) {
       results[k] = prev_row[w_len];
     }

@@ -26,7 +26,6 @@ BugReports: https://github.com/jmgirard/bsync/issues
 Depends:
     R (>= 4.1)
 Imports:
-    assertthat,
     cli,
     dplyr,
     ggplot2,

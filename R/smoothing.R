@@ -1,3 +1,5 @@
+# Main Functions ----------------------------------------------------------
+
 #' Smooth a Time Series Signal
 #'
 #' Applies a smoothing filter to a numeric vector. Smoothing is highly recommended
@@ -23,9 +25,16 @@ smooth_signal <- function(x,
                           bw_cutoff = 0.1,
                           bw_order = 2) {
 
+  if (!is.numeric(x)) {
+    cli::cli_abort("{.arg x} must be a numeric vector.")
+  }
+
   method <- match.arg(method)
 
   if (method == "moving_average") {
+    if (!rlang::is_integerish(window, n = 1) || window <= 0) {
+      cli::cli_abort("{.arg window} must be a positive integer for the moving average filter.")
+    }
     # Uses a centered moving average to prevent phase shifts
     weights <- rep(1 / window, window)
     res <- as.numeric(stats::filter(x, weights, sides = 2))
@@ -33,22 +42,22 @@ smooth_signal <- function(x,
   }
 
   if (method == "sgolay") {
-    if (!requireNamespace("signal", quietly = TRUE)) {
-      stop("The 'signal' package is required for the Savitzky-Golay filter. Please run `install.packages('signal')`.")
+    if (!rlang::is_integerish(window, n = 1) || window %% 2 == 0) {
+      cli::cli_abort("{.arg window} must be an odd integer for the Savitzky-Golay filter.")
     }
-    if (window %% 2 == 0) {
-      stop("The 'window' argument must be an odd integer for the Savitzky-Golay filter.")
-    }
-    if (sg_order >= window) {
-      stop("The 'sg_order' must be strictly less than the 'window' size.")
+    if (!rlang::is_integerish(sg_order, n = 1) || sg_order >= window) {
+      cli::cli_abort("{.arg sg_order} must be strictly less than the {.arg window} size.")
     }
     res <- signal::sgolayfilt(x, p = sg_order, n = window)
     return(as.numeric(res))
   }
 
   if (method == "butterworth") {
-    if (!requireNamespace("signal", quietly = TRUE)) {
-      stop("The 'signal' package is required for the Butterworth filter. Please run `install.packages('signal')`.")
+    if (!is.numeric(bw_cutoff) || length(bw_cutoff) != 1 || bw_cutoff <= 0 || bw_cutoff >= 1) {
+      cli::cli_abort("{.arg bw_cutoff} must be a single numeric value between 0 and 1.")
+    }
+    if (!rlang::is_integerish(bw_order, n = 1) || bw_order <= 0) {
+      cli::cli_abort("{.arg bw_order} must be a positive integer.")
     }
     # Uses filtfilt for zero-phase filtering to prevent phase shifts
     bf <- signal::butter(bw_order, bw_cutoff, type = "low")
@@ -75,6 +84,17 @@ smooth_signal <- function(x,
 #'   are dropped.
 #' @export
 aggregate_by_time <- function(data, time_var, bin_width, na.rm = TRUE) {
+
+  if (!is.data.frame(data)) {
+    cli::cli_abort("{.arg data} must be a data frame.")
+  }
+  if (!is.numeric(bin_width) || length(bin_width) != 1 || bin_width <= 0) {
+    cli::cli_abort("{.arg bin_width} must be a single positive number.")
+  }
+  if (!rlang::is_logical(na.rm, n = 1)) {
+    cli::cli_abort("{.arg na.rm} must be a single logical value.")
+  }
+
   data |>
     dplyr::mutate(
       .bin_center = floor({{ time_var }} / bin_width) * bin_width + (bin_width / 2)
@@ -100,22 +120,24 @@ aggregate_by_time <- function(data, time_var, bin_width, na.rm = TRUE) {
 #' @return An object of the same class as `x` with the edges removed.
 #' @export
 trim_edges <- function(x, trim_length) {
-  assertthat::assert_that(rlang::is_integerish(trim_length, n = 1))
-  assertthat::assert_that(trim_length > 0)
+
+  if (!rlang::is_integerish(trim_length, n = 1) || trim_length <= 0) {
+    cli::cli_abort("{.arg trim_length} must be a single positive integer.")
+  }
 
   if (is.data.frame(x) || is.matrix(x)) {
     n_rows <- nrow(x)
     if (n_rows <= 2 * trim_length) {
-      stop("trim_length is too large; it would remove all rows from the data.")
+      cli::cli_abort("{.arg trim_length} is too large; it would remove all rows from the data.")
     }
     return(x[(trim_length + 1):(n_rows - trim_length), , drop = FALSE])
   } else if (is.vector(x)) {
     n_len <- length(x)
     if (n_len <= 2 * trim_length) {
-      stop("trim_length is too large; it would remove all elements from the vector.")
+      cli::cli_abort("{.arg trim_length} is too large; it would remove all elements from the vector.")
     }
     return(x[(trim_length + 1):(n_len - trim_length)])
   } else {
-    stop("Input must be a vector, matrix, or data frame.")
+    cli::cli_abort("Input {.arg x} must be a vector, matrix, or data frame.")
   }
 }

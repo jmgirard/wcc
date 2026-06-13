@@ -1,73 +1,4 @@
-# Create wcc results df ---------------------------------------------------
-
-create_wcc_df <- function(x, y, time = NULL, settings) {
-
-  n_x <- length(x)
-  w_max <- settings$window_size
-  w_inc <- settings$window_increment
-  tau_max <- settings$lag_max
-  tau_inc <- settings$lag_increment
-
-  lags <- seq(-tau_max, tau_max, by = tau_inc)
-
-  n_r <- floor((n_x - w_max - 2 * tau_max) / w_inc)
-  n_c <- length(lags)
-
-  results_df <- base::expand.grid(row = 1:n_r, col = 1:n_c) |>
-    dplyr::mutate(
-      i = 1 + tau_max + (row - 1) * w_inc,
-      tau = lags[col],
-      wcc = calc_wcc_cpp(
-        x = x,
-        y = y,
-        i_vals = i,
-        tau_vals = tau,
-        w_max = w_max
-      )
-    )
-
-  if (!is.null(time)) {
-    results_df$i <- time[results_df$i]
-  }
-
-  results_df
-}
-
-# df to matrix transformation ---------------------------------------------
-
-df_to_matrix <- function(results_df) {
-
-  out <- matrix(
-    data = results_df$wcc,
-    nrow = max(results_df$row),
-    ncol = max(results_df$col),
-    dimnames = list(time = unique(results_df$i), lag = unique(results_df$tau))
-  )
-
-  out
-}
-
-# r-to-z transformation ---------------------------------------------------
-
-r_to_z <- function(r) {
-  r[r == -1] <- -0.99
-  r[r == 1] <- 0.99
-  z <- 0.5 * base::log((1 + r) / (1 - r))
-  z
-}
-
-
-# Fisher's Z calculation --------------------------------------------------
-
-fisher_z <- function(results_df) {
-  rvec <- results_df$wcc
-  zvec <- r_to_z(rvec)
-  azvec <- base::abs(zvec)
-  res <- base::mean(azvec, na.rm = TRUE)
-
-  res
-}
-
+# Main Functions ----------------------------------------------------------
 
 #' Windowed Cross-Correlation
 #'
@@ -107,29 +38,38 @@ fisher_z <- function(results_df) {
 #' @return A list object of class "wcc" containing the results matrix and useful
 #'   summaries of it.
 #' @export
-#'
 wcc <- function(x, y, time = NULL, window_size, lag_max,
                 window_increment = 1, lag_increment = 1, na.rm = TRUE) {
 
-  assertthat::assert_that(is.numeric(x))
-  assertthat::assert_that(is.numeric(y))
+  # Assertions
+  if (!is.numeric(x)) cli::cli_abort("{.arg x} must be a numeric vector.")
+  if (!is.numeric(y)) cli::cli_abort("{.arg y} must be a numeric vector.")
+  if (length(x) != length(y)) cli::cli_abort("{.arg x} and {.arg y} must be the same length.")
 
   if (!is.null(time)) {
-    assertthat::assert_that(is.numeric(time))
-    assertthat::assert_that(length(time) == length(x))
+    if (!is.numeric(time)) cli::cli_abort("{.arg time} must be a numeric vector.")
+    if (length(time) != length(x)) cli::cli_abort("{.arg time} must be the same length as {.arg x}.")
   }
 
+  if (!rlang::is_integerish(window_size, n = 1) || window_size <= 0) {
+    cli::cli_abort("{.arg window_size} must be a single positive integer.")
+  }
+  if (!rlang::is_integerish(lag_max, n = 1) || lag_max <= 0) {
+    cli::cli_abort("{.arg lag_max} must be a single positive integer.")
+  }
+  if (!rlang::is_integerish(window_increment, n = 1) || window_increment <= 0) {
+    cli::cli_abort("{.arg window_increment} must be a single positive integer.")
+  }
+  if (!rlang::is_integerish(lag_increment, n = 1) || lag_increment <= 0) {
+    cli::cli_abort("{.arg lag_increment} must be a single positive integer.")
+  }
+  if (!rlang::is_logical(na.rm, n = 1)) {
+    cli::cli_abort("{.arg na.rm} must be a single logical value.")
+  }
+
+  # Conversions
   x <- as.double(x)
   y <- as.double(y)
-  assertthat::assert_that(rlang::is_integerish(window_size, n = 1))
-  assertthat::assert_that(window_size > 0)
-  assertthat::assert_that(rlang::is_integerish(lag_max, n = 1))
-  assertthat::assert_that(lag_max > 0)
-  assertthat::assert_that(rlang::is_integerish(window_increment, n = 1))
-  assertthat::assert_that(window_increment > 0)
-  assertthat::assert_that(rlang::is_integerish(lag_increment, n = 1))
-  assertthat::assert_that(lag_increment > 0)
-  assertthat::assert_that(rlang::is_logical(na.rm, n = 1))
 
   settings <- list(
     window_size = window_size,
@@ -156,6 +96,56 @@ wcc <- function(x, y, time = NULL, window_size, lag_max,
   wcc_res(out)
 }
 
+#' Suggest WCC Hyperparameters
+#'
+#' Calculates principled starting values for Windowed Cross-Correlation parameters
+#' based on the sampling rate of the data and the theoretical timing of the behaviors.
+#'
+#' @param sample_rate A numeric value indicating the sampling rate in Hertz (frames per second).
+#' @param event_duration_sec The expected duration of a single behavioral event in seconds.
+#'   Default is 2 (typical for brief conversational gestures).
+#' @param max_delay_sec The maximum plausible reaction time between participants in seconds.
+#'   Default is 3.
+#' @param overlap_pct The desired percentage of overlap between consecutive time windows.
+#'   Default is 0.5 (50 percent overlap).
+#' @return A list of recommended parameters ready to be passed to `wcc()`.
+#' @export
+suggest_wcc_params <- function(sample_rate,
+                               event_duration_sec = 2,
+                               max_delay_sec = 3,
+                               overlap_pct = 0.5) {
+
+  suggested_window <- round((event_duration_sec * 4) * sample_rate)
+  suggested_lag <- round(max_delay_sec * sample_rate)
+
+  if (suggested_lag > (suggested_window / 2)) {
+    cli::cli_warn(c(
+      "The requested {.arg max_delay_sec} is too large relative to the {.arg event_duration_sec}.",
+      "i" = "Capping {.arg lag_max} at half the {.arg window_size} to preserve statistical reliability."
+    ))
+    suggested_lag <- floor(suggested_window / 2)
+  }
+
+  suggested_w_inc <- max(1, round(suggested_window * (1 - overlap_pct)))
+
+  cli::cli_h1("Suggested WCC Parameters")
+  cli::cli_dl(c(
+    "window_size" = "{suggested_window} ({round(suggested_window / sample_rate, 1)} seconds)",
+    "lag_max" = "{suggested_lag} ({round(suggested_lag / sample_rate, 1)} seconds)",
+    "window_increment" = "{suggested_w_inc} ({overlap_pct * 100}% overlap)",
+    "lag_increment" = "1"
+  ))
+
+  invisible(list(
+    window_size = suggested_window,
+    lag_max = suggested_lag,
+    window_increment = suggested_w_inc,
+    lag_increment = 1
+  ))
+}
+
+# Constructors ------------------------------------------------------------
+
 new_wcc_res <- function(x = list()) {
   stopifnot(is.list(x))
   structure(x, class = c("wcc_res", class(x)))
@@ -164,6 +154,8 @@ new_wcc_res <- function(x = list()) {
 wcc_res <- function(x = list()) {
   new_wcc_res(x)
 }
+
+# S3 Methods --------------------------------------------------------------
 
 #' Print method for wcc_res objects
 #'
@@ -194,14 +186,12 @@ print.wcc_res <- function(x, ...) {
 #' @param ... Additional arguments (not used).
 #' @export
 summary.wcc_res <- function(object, ...) {
-  # Call the print method for the header and basics
   print(object)
 
   cli::cli_h2("Cross-Correlation Value Distribution")
   wcc_vals <- object$results_df$wcc
   q_vals <- stats::quantile(wcc_vals, probs = c(0, 0.25, 0.5, 0.75, 1), na.rm = TRUE)
 
-  # Print the quantiles cleanly
   print(round(q_vals, 4))
 
   n_na <- sum(is.na(wcc_vals))
@@ -212,53 +202,56 @@ summary.wcc_res <- function(object, ...) {
   invisible(object)
 }
 
-#' Suggest WCC Hyperparameters
-#'
-#' Calculates principled starting values for Windowed Cross-Correlation parameters
-#' based on the sampling rate of the data and the theoretical timing of the behaviors.
-#'
-#' @param sample_rate A numeric value indicating the sampling rate in Hertz (frames per second).
-#' @param event_duration_sec The expected duration of a single behavioral event in seconds.
-#'   Default is 2 (typical for brief conversational gestures).
-#' @param max_delay_sec The maximum plausible reaction time between participants in seconds.
-#'   Default is 3.
-#' @param overlap_pct The desired percentage of overlap between consecutive time windows.
-#'   Default is 0.5 (50 percent overlap).
-#' @return A list of recommended parameters ready to be passed to `wcc()`.
-#' @export
-suggest_wcc_params <- function(sample_rate,
-                               event_duration_sec = 2,
-                               max_delay_sec = 3,
-                               overlap_pct = 0.5) {
+# Internal Helpers --------------------------------------------------------
 
-  # Window size: 3 to 5 times the typical event duration
-  suggested_window <- round((event_duration_sec * 4) * sample_rate)
+#' @noRd
+create_wcc_df <- function(x, y, time = NULL, settings) {
 
-  # Max lag: Direct conversion of theoretical delay to frames
-  suggested_lag <- round(max_delay_sec * sample_rate)
+  n_x <- length(x)
+  w_max <- settings$window_size
+  w_inc <- settings$window_increment
+  tau_max <- settings$lag_max
+  tau_inc <- settings$lag_increment
 
-  # Safety check: Ensure lag doesn't exceed half the window size
-  if (suggested_lag > (suggested_window / 2)) {
-    warning("The requested max_delay_sec is too large relative to the event_duration_sec. ",
-            "Capping lag_max at half the window_size to preserve statistical reliability.")
-    suggested_lag <- floor(suggested_window / 2)
+  lags <- seq(-tau_max, tau_max, by = tau_inc)
+
+  n_r <- floor((n_x - w_max - 2 * tau_max) / w_inc)
+  n_c <- length(lags)
+
+  results_df <- base::expand.grid(row = 1:n_r, col = 1:n_c) |>
+    dplyr::mutate(
+      i = 1 + tau_max + (row - 1) * w_inc,
+      tau = lags[col],
+      wcc = calc_wcc_cpp(
+        x = x,
+        y = y,
+        i_vals = i,
+        tau_vals = tau,
+        w_max = w_max
+      )
+    )
+
+  if (!is.null(time)) {
+    results_df$i <- time[results_df$i]
   }
 
-  # Window increment based on desired overlap
-  suggested_w_inc <- max(1, round(suggested_window * (1 - overlap_pct)))
+  results_df
+}
 
-  cli::cli_h1("Suggested WCC Parameters")
-  cli::cli_dl(c(
-    "window_size" = "{suggested_window} ({round(suggested_window / sample_rate, 1)} seconds)",
-    "lag_max" = "{suggested_lag} ({round(suggested_lag / sample_rate, 1)} seconds)",
-    "window_increment" = "{suggested_w_inc} ({overlap_pct * 100}% overlap)",
-    "lag_increment" = "1"
-  ))
+#' @noRd
+r_to_z <- function(r) {
+  r[r == -1] <- -0.99
+  r[r == 1] <- 0.99
+  z <- 0.5 * base::log((1 + r) / (1 - r))
+  z
+}
 
-  invisible(list(
-    window_size = suggested_window,
-    lag_max = suggested_lag,
-    window_increment = suggested_w_inc,
-    lag_increment = 1
-  ))
+#' @noRd
+fisher_z <- function(results_df) {
+  rvec <- results_df$wcc
+  zvec <- r_to_z(rvec)
+  azvec <- base::abs(zvec)
+  res <- base::mean(azvec, na.rm = TRUE)
+
+  res
 }
