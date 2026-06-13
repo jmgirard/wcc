@@ -101,3 +101,95 @@ test_that("wdtw handles out-of-bounds cleanly by returning NA", {
   # the C++ bounds check and should cleanly return NA rather than crashing
   expect_true(any(is.na(res$results_df$dtw_dist)))
 })
+
+test_that("wdtw input assertions trigger appropriate errors", {
+  # 1. Vector type and length assertions
+  expect_error(wdtw(x = c("a", "b"), y = sig2, window_size = 10, lag_max = 5), "must be a numeric vector")
+  expect_error(wdtw(x = sig1, y = c("a", "b"), window_size = 10, lag_max = 5), "must be a numeric vector")
+  expect_error(wdtw(x = sig1, y = sig2[-1], window_size = 10, lag_max = 5), "must be the same length")
+
+  # 2. Time vector assertions
+  expect_error(wdtw(sig1, sig2, time = c("t1", "t2"), window_size = 10, lag_max = 5), "must be a numeric vector")
+  expect_error(wdtw(sig1, sig2, time = 1:5, window_size = 10, lag_max = 5), "must be the same length as")
+
+  # 3. Logical assertions
+  expect_error(wdtw(sig1, sig2, window_size = 10, lag_max = 5, scale_data = "yes"), "single logical value")
+  expect_error(wdtw(sig1, sig2, window_size = 10, lag_max = 5, scale_data = c(TRUE, FALSE)), "single logical value")
+
+  # 4. Integer and positivity assertions
+  expect_error(wdtw(sig1, sig2, window_size = -5, lag_max = 5), "single positive integer")
+  expect_error(wdtw(sig1, sig2, window_size = 10.5, lag_max = 5), "single positive integer")
+  expect_error(wdtw(sig1, sig2, window_size = 10, lag_max = 0), "single positive integer")
+  expect_error(wdtw(sig1, sig2, window_size = 10, lag_max = 5, window_increment = -1), "single positive integer")
+  expect_error(wdtw(sig1, sig2, window_size = 10, lag_max = 5, lag_increment = 0), "single positive integer")
+})
+
+test_that("wdtw correctly maps the optional time vector", {
+  # Create a dummy time vector
+  time_vec <- seq(0, 100, length.out = length(sig1))
+
+  res_with_time <- wdtw(
+    x = sig1,
+    y = sig2,
+    time = time_vec,
+    window_size = 10,
+    lag_max = 5
+  )
+
+  # The settings flag should be marked TRUE
+  expect_true(res_with_time$settings$has_time)
+
+  # The values in the 'i' column should be mapped exactly to values in the time_vec
+  # rather than raw indices
+  expect_true(all(res_with_time$results_df$i %in% time_vec))
+})
+
+test_that("calc_velocity_1d handles forward and backward methods", {
+  t <- 1:5
+  x <- c(0, 10, 20, 10, 0)
+
+  # Forward looks ahead, so the last value should be NA
+  v_fwd <- calc_velocity_1d(t, x, method = "forward")
+  expect_equal(v_fwd, c(10, 10, -10, -10, NA))
+
+  # Backward looks behind, so the first value should be NA
+  v_bwd <- calc_velocity_1d(t, x, method = "backward")
+  expect_equal(v_bwd, c(NA, 10, 10, -10, -10))
+})
+
+test_that("calc_speed_1d handles forward and backward methods", {
+  t <- 1:5
+  x <- c(0, 10, 20, 10, 0)
+
+  # Speed is absolute, so all non-NA values should be positive
+  s_fwd <- calc_speed_1d(t, x, method = "forward")
+  expect_equal(s_fwd, c(10, 10, 10, 10, NA))
+
+  s_bwd <- calc_speed_1d(t, x, method = "backward")
+  expect_equal(s_bwd, c(NA, 10, 10, 10, 10))
+})
+
+test_that("calc_speed_2d handles forward and backward methods", {
+  t <- 1:5
+  x <- c(0, 3, 6, 9, 12)
+  y <- c(0, 4, 8, 12, 16)
+
+  s_fwd <- calc_speed_2d(t, x, y, method = "forward")
+  expect_equal(s_fwd, c(5, 5, 5, 5, NA))
+
+  s_bwd <- calc_speed_2d(t, x, y, method = "backward")
+  expect_equal(s_bwd, c(NA, 5, 5, 5, 5))
+})
+
+test_that("calc_speed_3d handles forward and backward methods", {
+  t <- 1:5
+  x <- c(0, 10, 20, 30, 40)
+  y <- rep(0, 5)
+  z <- rep(0, 5)
+
+  s_fwd <- calc_speed_3d(t, x, y, z, method = "forward")
+  expect_equal(s_fwd, c(10, 10, 10, 10, NA))
+
+  s_bwd <- calc_speed_3d(t, x, y, z, method = "backward")
+  expect_equal(s_bwd, c(NA, 10, 10, 10, 10))
+})
