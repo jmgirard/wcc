@@ -5,10 +5,10 @@
 
 [![Lifecycle:
 experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![R-CMD-check](https://github.com/jmgirard/wcc/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jmgirard/wcc/actions/workflows/R-CMD-check.yaml)
 [![Codecov test
-coverage](https://codecov.io/gh/jmgirard/wcc/graph/badge.svg)](https://app.codecov.io/gh/jmgirard/wcc)
-[![test-coverage](https://github.com/jmgirard/wcc/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/jmgirard/wcc/actions/workflows/test-coverage.yaml)
+coverage](https://codecov.io/gh/jmgirard/bsync/graph/badge.svg)](https://app.codecov.io/gh/jmgirard/bsync)
+[![test-coverage](https://github.com/jmgirard/bsync/actions/workflows/test-coverage.yaml/badge.svg)](https://github.com/jmgirard/bsync/actions/workflows/test-coverage.yaml)
+[![R-CMD-check](https://github.com/jmgirard/bsync/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/jmgirard/bsync/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The goal of **bsync** is to provide a modern, high-efficiency R toolkit
