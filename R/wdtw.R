@@ -1,7 +1,5 @@
 # Create wdtw results df --------------------------------------------------
 
-# Create wdtw results df --------------------------------------------------
-
 create_wdtw_df <- function(x, y, time = NULL, settings) {
 
   n_x <- length(x)
@@ -11,7 +9,8 @@ create_wdtw_df <- function(x, y, time = NULL, settings) {
   tau_inc <- settings$lag_increment
 
   lags <- seq(-tau_max, tau_max, by = tau_inc)
-  n_r <- floor((n_x - w_max - tau_max) / w_inc)
+
+  n_r <- floor((n_x - w_max - 2 * tau_max) / w_inc)
   n_c <- length(lags)
 
   results_df <- base::expand.grid(row = 1:n_r, col = 1:n_c) |>
@@ -27,7 +26,6 @@ create_wdtw_df <- function(x, y, time = NULL, settings) {
       )
     )
 
-  # Map the raw index to the actual timestamp if provided
   if (!is.null(time)) {
     results_df$i <- time[results_df$i]
   }

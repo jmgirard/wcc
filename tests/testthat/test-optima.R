@@ -80,3 +80,152 @@ test_that("pick_optima finds the correct absolute extremum (global search)", {
   expect_equal(res_global$optimum_lag, -1)
   expect_equal(res_global$optimum_value, 0.9)
 })
+
+# Helper function to quickly mock up a wdtw_res object for testing
+create_mock_wdtw <- function(dist_vals, tau_max, i_val = 100) {
+  lags <- seq(-tau_max, tau_max)
+  df <- data.frame(
+    i = i_val,
+    tau = lags,
+    dtw_dist = dist_vals
+  )
+
+  obj <- list(
+    results_df = df,
+    settings = list(lag_max = tau_max)
+  )
+  class(obj) <- c("wdtw_res", "list")
+  obj
+}
+
+test_that("print.wcc_optima produces expected console output", {
+  mock_wcc <- create_mock_wcc(c(0.1, 0.5, 0.9, 0.5, 0.1), tau_max = 2)
+  res <- pick_optima(mock_wcc, L_size = 3, search_method = "local")
+
+  # This will capture the full cli header and the dataframe
+  expect_snapshot(print(res))
+})
+
+test_that("summary.wcc_optima calculates and prints correctly", {
+  df_valid <- data.frame(i = 100, tau = -2:2, wcc = c(0.1, 0.5, 0.9, 0.5, 0.1))
+  df_invalid <- data.frame(i = 101, tau = -2:2, wcc = c(0.9, 0.7, 0.5, 0.4, 0.1))
+
+  mock_wcc <- list(
+    results_df = rbind(df_valid, df_invalid),
+    settings = list(lag_max = 2)
+  )
+  class(mock_wcc) <- c("wcc_res", "list")
+
+  res <- pick_optima(mock_wcc, L_size = 5, strict_monotonic = TRUE, search_method = "local")
+
+  expect_snapshot(summary(res))
+})
+
+# Helper function to quickly mock up a wdtw_res object for testing
+create_mock_wdtw <- function(dist_vals, tau_max, i_val = 100) {
+  lags <- seq(-tau_max, tau_max)
+  df <- data.frame(
+    i = i_val,
+    tau = lags,
+    dtw_dist = dist_vals
+  )
+
+  obj <- list(
+    results_df = df,
+    settings = list(lag_max = tau_max)
+  )
+  class(obj) <- c("wdtw_res", "list")
+  obj
+}
+
+test_that("print.wcc_optima produces expected console output", {
+  mock_wcc <- create_mock_wcc(c(0.1, 0.5, 0.9, 0.5, 0.1), tau_max = 2)
+  res <- pick_optima(mock_wcc, L_size = 3, search_method = "local")
+
+  expect_snapshot(print(res))
+})
+
+test_that("summary.wcc_optima calculates and prints correctly", {
+  # Create a scenario with one valid peak and one invalid peak
+  df_valid <- data.frame(i = 100, tau = -2:2, wcc = c(0.1, 0.5, 0.9, 0.5, 0.1))
+  df_invalid <- data.frame(i = 101, tau = -2:2, wcc = c(0.9, 0.7, 0.5, 0.4, 0.1))
+
+  mock_wcc <- list(
+    results_df = rbind(df_valid, df_invalid),
+    settings = list(lag_max = 2)
+  )
+  class(mock_wcc) <- c("wcc_res", "list")
+
+  res <- pick_optima(mock_wcc, L_size = 5, strict_monotonic = TRUE, search_method = "local")
+
+  expect_snapshot(summary(res))
+})
+
+test_that("print.wdtw_optima produces expected console output", {
+  mock_wdtw <- create_mock_wdtw(c(5.0, 3.2, 1.1, 3.2, 5.0), tau_max = 2)
+  res <- pick_optima(mock_wdtw)
+
+  expect_snapshot(print(res))
+})
+
+test_that("summary.wdtw_optima calculates and prints correctly", {
+  # Mock a negative lag (y leads x) scenario
+  mock_wdtw <- create_mock_wdtw(c(1.1, 3.2, 5.0, 6.1, 7.0), tau_max = 2)
+  res <- pick_optima(mock_wdtw, search_method = "global")
+
+  expect_snapshot(summary(res))
+})
+
+test_that("wcc accurately calculates correlations for identical and shifted series", {
+  # Use a continuous sine wave to prevent zero-variance edge cases and boundary limits
+  master <- sin(seq(0, 10, length.out = 50))
+
+  # 1. Identical series test
+  x_ident <- master[1:30]
+  y_ident <- master[1:30]
+
+  res_ident <- wcc(x_ident, y_ident, window_size = 10, lag_max = 3)
+  df_ident <- res_ident$results_df
+
+  # The correlation at lag 0 should be precisely 1 for all time windows
+  lag_zero_wcc <- df_ident$wcc[df_ident$tau == 0]
+  expect_equal(lag_zero_wcc, rep(1, length(lag_zero_wcc)))
+
+  # 2. Shifted series test (y is delayed by 1 step relative to x)
+  x_shift <- master[2:31]
+  y_shift <- master[1:30]
+
+  res_shift <- wcc(x_shift, y_shift, window_size = 10, lag_max = 3)
+  opt_shift <- pick_optima(res_shift, search_method = "global")
+
+  # The global peak for every window should be exactly 1 at a lag of magnitude 1.
+  expect_equal(abs(opt_shift$optimum_lag), rep(1, nrow(opt_shift)))
+  expect_equal(opt_shift$optimum_value, rep(1, nrow(opt_shift)))
+})
+
+test_that("wdtw accurately calculates distances for identical and shifted series", {
+  master <- sin(seq(0, 10, length.out = 50))
+
+  # 1. Identical series test
+  x_ident <- master[1:30]
+  y_ident <- master[1:30]
+
+  # Set scale_data = FALSE to verify the absolute raw distance logic
+  res_ident <- wdtw(x_ident, y_ident, window_size = 10, lag_max = 3, scale_data = FALSE)
+  df_ident <- res_ident$results_df
+
+  # The distance at lag 0 should be exactly 0 for all time windows
+  lag_zero_dtw <- df_ident$dtw_dist[df_ident$tau == 0]
+  expect_equal(lag_zero_dtw, rep(0, length(lag_zero_dtw)))
+
+  # 2. Shifted series test (y is delayed by 1 step relative to x)
+  x_shift <- master[2:31]
+  y_shift <- master[1:30]
+
+  res_shift <- wdtw(x_shift, y_shift, window_size = 10, lag_max = 3, scale_data = FALSE)
+  opt_shift <- pick_optima(res_shift, search_method = "global")
+
+  # The global minimum distance should be exactly 0 at a lag of magnitude 1
+  expect_equal(abs(opt_shift$optimum_lag), rep(1, nrow(opt_shift)))
+  expect_equal(opt_shift$optimum_value, rep(0, nrow(opt_shift)))
+})
