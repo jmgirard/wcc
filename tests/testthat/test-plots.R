@@ -11,12 +11,13 @@ sig1 <- sin(seq(0, 4 * pi, length.out = 30))
 sig2 <- sin(seq(0, 4 * pi, length.out = 30) + 0.5)
 time_vec <- seq(0, 14.5, by = 0.5)
 
-# Generate wcc and wdtw objects
+# Generate wcc and wdtw objects (No native time)
 mock_wcc <- wcc(sig1, sig2, window_size = 6, lag_max = 3)
 mock_wdtw <- wdtw(sig1, sig2, window_size = 6, lag_max = 3)
 
-# Generate time-mapped object for testing the 'has_time' logic
+# Generate time-mapped objects (Native time provided)
 mock_wcc_time <- wcc(sig1, sig2, time = time_vec, window_size = 6, lag_max = 3)
+mock_wdtw_time <- wdtw(sig1, sig2, time = time_vec, window_size = 6, lag_max = 3)
 
 # Generate optima objects
 mock_wcc_optima <- pick_optima(mock_wcc, L_size = 3, search_method = "local")
@@ -24,44 +25,83 @@ mock_wdtw_optima <- pick_optima(mock_wdtw, search_method = "global")
 
 
 # -------------------------------------------------------------------------
-# Structural Tests
+# Structural Tests: WCC
 # -------------------------------------------------------------------------
 
 test_that("plot.wcc_res handles logical arguments and layers correctly", {
 
-  # Default plot
   p_default <- plot(mock_wcc)
   expect_s3_class(p_default, "ggplot")
 
   # A default plot with zero-lag line should have 2 layers (tile + vline)
   expect_length(p_default$layers, 2)
-  expect_equal(p_default$labels$x, "Lag (\u03c4) Index")
-  expect_equal(p_default$labels$y, "Elapsed Time Window Index")
 
   # Plot without zero-lag line
   p_no_line <- plot(mock_wcc, show_zero_lag = FALSE)
   expect_length(p_no_line$layers, 1)
+})
 
-  # Plot with time_step scaling
+test_that("plot.wcc_res handles tau scaling and time axis logic", {
+
+  # 1. Raw Indices (No time vector, time_step = 1)
+  p_raw <- plot(mock_wcc)
+  expect_equal(p_raw$labels$x, "Lag (\u03c4) Index")
+  expect_equal(p_raw$labels$y, "Elapsed Time Window Index")
+
+  # 2. Calculated Time (No time vector, time_step != 1)
   p_scaled <- plot(mock_wcc, time_step = 2)
   expect_equal(p_scaled$labels$x, "Lag (\u03c4) in Seconds")
   expect_equal(p_scaled$labels$y, "Elapsed Time (Seconds)")
 
-  # Check if data was scaled by time_step = 2
+  # Verify both tau and i data were scaled
   expect_equal(max(p_scaled$data$tau), mock_wcc$settings$lag_max * 2)
+  expect_equal(max(p_scaled$data$i), max(mock_wcc$results_df$i) * 2)
+
+  # 3. Native Time (Time vector provided)
+  p_native <- plot(mock_wcc_time)
+  expect_equal(p_native$labels$x, "Lag (\u03c4) Index")
+  expect_equal(p_native$labels$y, "Elapsed Time")
+  expect_true(all(p_native$data$i %in% time_vec))
+
+  # 4. Native Time + Tau Scaling
+  # When both occur, tau should scale, but the natively mapped 'i' should not.
+  p_hybrid <- plot(mock_wcc_time, time_step = 2)
+  expect_equal(p_hybrid$labels$x, "Lag (\u03c4) in Seconds")
+  expect_equal(p_hybrid$labels$y, "Elapsed Time")
+  expect_equal(max(p_hybrid$data$tau), mock_wcc_time$settings$lag_max * 2)
+  expect_true(all(p_hybrid$data$i %in% time_vec)) # i remains unscaled
 })
 
-test_that("plot.wdtw_res respects native time mapping from the object", {
 
-  p_native_time <- plot(mock_wcc_time)
+# -------------------------------------------------------------------------
+# Structural Tests: WDTW
+# -------------------------------------------------------------------------
 
-  # Because the object was built with a time vector, the y-axis label
-  # should naturally say "Elapsed Time" without needing time_step
-  expect_equal(p_native_time$labels$y, "Elapsed Time")
+test_that("plot.wdtw_res handles tau scaling and time axis logic", {
 
-  # The data should already reflect the time vector mapping
-  expect_true(all(p_native_time$data$i %in% time_vec))
+  # 1. Raw Indices
+  p_raw <- plot(mock_wdtw)
+  expect_s3_class(p_raw, "ggplot")
+  expect_equal(p_raw$labels$x, "Lag (\u03c4) Index")
+  expect_equal(p_raw$labels$y, "Elapsed Time Window Index")
+
+  # 2. Calculated Time
+  p_scaled <- plot(mock_wdtw, time_step = 0.5)
+  expect_equal(p_scaled$labels$x, "Lag (\u03c4) in Seconds")
+  expect_equal(p_scaled$labels$y, "Elapsed Time (Seconds)")
+  expect_equal(max(p_scaled$data$tau), mock_wdtw$settings$lag_max * 0.5)
+  expect_equal(max(p_scaled$data$i), max(mock_wdtw$results_df$i) * 0.5)
+
+  # 3. Native Time
+  p_native <- plot(mock_wdtw_time)
+  expect_equal(p_native$labels$y, "Elapsed Time")
+  expect_true(all(p_native$data$i %in% time_vec))
 })
+
+
+# -------------------------------------------------------------------------
+# Structural Tests: Overlays
+# -------------------------------------------------------------------------
 
 test_that("plot_optima_overlay dynamically updates layers and titles", {
 

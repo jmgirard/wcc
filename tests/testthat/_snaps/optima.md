@@ -85,3 +85,54 @@
         0%  25%  50%  75% 100% 
        1.1  1.1  1.1  1.1  1.1 
 
+# print.wcc_optima handles empty objects and row limits correctly
+
+    Code
+      print(res_large)
+    Message
+      
+      -- WCC Optima Results ----------------------------------------------------------
+      Total Windows Analyzed: 10
+      Valid Optima Found: 10 (100%)
+      Search Method: global
+      Search Mode: Peaks (Maxima)
+      Threshold Applied: None
+      Showing the first 5 results:
+    Output
+       i optimum_lag optimum_value
+       1           0           0.9
+       2           0           0.9
+       3           0           0.9
+       4           0           0.9
+       5           0           0.9
+    Message
+      # ... with 5 more rows
+
+---
+
+    Code
+      print(res_empty)
+    Message
+      
+      -- WCC Optima Results ----------------------------------------------------------
+      Total Windows Analyzed: 0
+      Valid Optima Found: 0 (NaN%)
+      Search Method: global
+      Search Mode: Peaks (Maxima)
+      Threshold Applied: None
+      i No optima found matching the criteria.
+
+# summary methods gracefully handle objects with zero valid optima
+
+    Code
+      summary(res)
+    Message
+      
+      -- WCC Optima Summary ----------------------------------------------------------
+      
+      -- Completeness --
+      
+      * Total time windows: 1
+      * Valid optima retained: 0 (0%)
+      * Optima dropped (NA): 1 (100%)
+

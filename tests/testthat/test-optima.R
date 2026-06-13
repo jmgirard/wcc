@@ -190,3 +190,59 @@ test_that("wdtw accurately calculates distances for identical and shifted series
   expect_equal(abs(opt_shift$optimum_lag), rep(1, nrow(opt_shift)))
   expect_equal(opt_shift$optimum_value, rep(0, nrow(opt_shift)))
 })
+
+test_that("pick_optima rejects invalid search_method arguments", {
+  mock_wcc <- create_mock_wcc(c(0.1, 0.5, 0.9, 0.5, 0.1), tau_max = 2)
+
+  expect_error(
+    pick_optima(mock_wcc, search_method = "magic"),
+    "must be either"
+  )
+})
+
+test_that("pick_optima correctly applies thresholds to filter weak optima", {
+  # 1. WCC Threshold (Optima below threshold become NA)
+  # The peak is 0.3. A threshold of 0.5 should wipe it out.
+  mock_wcc <- create_mock_wcc(c(0.1, 0.2, 0.3, 0.2, 0.1), tau_max = 2)
+  res_wcc <- pick_optima(mock_wcc, search_method = "global", threshold = 0.5)
+
+  expect_true(is.na(res_wcc$optimum_lag))
+  expect_true(is.na(res_wcc$optimum_value))
+
+  # 2. WDTW Threshold (Optima distance above threshold become NA)
+  # The minimum distance is 5.0. A threshold of 3.0 should wipe it out.
+  mock_wdtw <- create_mock_wdtw(c(10.0, 8.0, 5.0, 8.0, 10.0), tau_max = 2)
+  res_wdtw <- pick_optima(mock_wdtw, search_method = "global", threshold = 3.0)
+
+  expect_true(is.na(res_wdtw$optimum_lag))
+  expect_true(is.na(res_wdtw$optimum_value))
+})
+
+test_that("print.wcc_optima handles empty objects and row limits correctly", {
+  # Test with > 5 rows to trigger the "remaining rows" text block
+  df_large <- data.frame(i = 1:10, tau = rep(0, 10), wcc = rep(0.9, 10))
+  mock_wcc_large <- list(results_df = df_large, settings = list(lag_max = 2))
+  class(mock_wcc_large) <- c("wcc_res", "list")
+
+  res_large <- pick_optima(mock_wcc_large, search_method = "global")
+  expect_snapshot(print(res_large))
+
+  # Test with an empty dataframe (0 rows)
+  df_empty <- data.frame(i = integer(), tau = integer(), wcc = numeric())
+  mock_wcc_empty <- list(results_df = df_empty, settings = list(lag_max = 2))
+  class(mock_wcc_empty) <- c("wcc_res", "list")
+
+  res_empty <- pick_optima(mock_wcc_empty, search_method = "global")
+  expect_snapshot(print(res_empty))
+})
+
+test_that("summary methods gracefully handle objects with zero valid optima", {
+  mock_wcc <- create_mock_wcc(c(0.1, 0.2, 0.3, 0.2, 0.1), tau_max = 2)
+
+  # By setting a massive threshold, the only row becomes NA
+  res <- pick_optima(mock_wcc, search_method = "global", threshold = 0.99)
+
+  # The summary should print completeness stats but cleanly skip
+  # the value distributions since there are no valid lags to summarize
+  expect_snapshot(summary(res))
+})
