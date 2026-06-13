@@ -123,7 +123,7 @@
 <span><span class="co">#&gt;      0%     25%     50%     75%    100% </span></span>
 <span><span class="co">#&gt; -0.9984 -0.6770  0.0410  0.7185  0.9986</span></span>
 <span><span class="co">#&gt; ! 78 missing values (NA) detected.</span></span></code></pre></div>
-<p>Once the cross-correlations are calculated, we extract the specific lags that represent the optimal association within each time window. Printing the optima object displays the extraction metadata alongside the first few results.</p>
+<p>Once the cross-correlations are calculated, we extract the specific lags that represent the optimal association within each time window. Summarizing the optima object displays the extraction metadata alongside an overview of results.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Step 3: Extract the Optima (Local Maxima)</span></span>
 <span><span class="va">optima</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pick_optima.html">pick_optima</a></span><span class="op">(</span></span>
@@ -134,22 +134,26 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># View the optima results</span></span>
-<span><span class="va">optima</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">optima</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── WCC Optima Results ──────────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Total Optima Found: 87</span></span>
-<span><span class="co">#&gt; Search Method: local</span></span>
-<span><span class="co">#&gt; Search Mode: Peaks (Maxima)</span></span>
-<span><span class="co">#&gt; Local Search Size: 5</span></span>
-<span><span class="co">#&gt; Strict Monotonic: FALSE</span></span>
-<span><span class="co">#&gt; Showing the first 5 results:</span></span>
-<span><span class="co">#&gt;    i optimum_lag optimum_value</span></span>
-<span><span class="co">#&gt;   76          30     0.9742437</span></span>
-<span><span class="co">#&gt;  101          30     0.9811713</span></span>
-<span><span class="co">#&gt;  126          30     0.9839800</span></span>
-<span><span class="co">#&gt;  151          30     0.9846598</span></span>
-<span><span class="co">#&gt;  176          29     0.9900110</span></span>
-<span><span class="co">#&gt; # ... with 82 more rows</span></span></code></pre></div>
+<span><span class="co">#&gt; ── WCC Optima Summary ──────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Completeness ──</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; • Total time windows: 87</span></span>
+<span><span class="co">#&gt; • Valid optima retained: 87 (100%)</span></span>
+<span><span class="co">#&gt; • Optima dropped (NA): 0 (0%)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Lag Directionality (Leadership) ──</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; • Positive Lags (x leads y): 41 (47.1%)</span></span>
+<span><span class="co">#&gt; • Negative Lags (y leads x): 43 (49.4%)</span></span>
+<span><span class="co">#&gt; • Zero Lags (Simultaneous): 3 (3.4%)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; ── Optimum Value Distribution ──</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     0%    25%    50%    75%   100% </span></span>
+<span><span class="co">#&gt; 0.9710 0.9947 0.9970 0.9976 0.9986</span></span></code></pre></div>
 <p>Finally, we visualize the resulting correlation landscape. The underlying heatmap represents the cross-correlation values at each lag and elapsed time window. The overlaid points and connecting lines demonstrate the algorithm successfully tracking the shifting lag of optimum association over the course of the interaction.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Step 4: Plot the correlation landscape and overlay the shifting optima</span></span>
@@ -177,7 +181,6 @@
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">surrogate_results</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── WCC Surrogate Analysis (Pseudo-Synchrony) ───────────────────────────────────</span></span>
 <span><span class="co">#&gt; Permutations: 100</span></span>
 <span><span class="co">#&gt; Observed Fisher's Z: 1.065</span></span>
@@ -194,20 +197,19 @@
 <p>If you use <strong>bsync</strong> in your research, please cite the package:</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"bsync"</span><span class="op">)</span></span>
-<span><span class="co">#&gt; Warning in citation("bsync"): could not determine year for 'bsync' from package</span></span>
-<span><span class="co">#&gt; DESCRIPTION file</span></span>
 <span><span class="co">#&gt; To cite package 'bsync' in publications use:</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;   Girard J (????). _bsync: Behavioral Synchrony Analyses_. R package</span></span>
-<span><span class="co">#&gt;   version 0.0.0.9000, &lt;https://jmgirard.github.io/bsync/&gt;.</span></span>
+<span><span class="co">#&gt;   Girard J (2026). _bsync: Behavioral Synchrony Analyses_. R package</span></span>
+<span><span class="co">#&gt;   version 0.0.0.9000, &lt;https://github.com/jmgirard/bsync&gt;.</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; A BibTeX entry for LaTeX users is</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;   @Manual{,</span></span>
 <span><span class="co">#&gt;     title = {bsync: Behavioral Synchrony Analyses},</span></span>
-<span><span class="co">#&gt;     author = {Jeffrey Girard},</span></span>
+<span><span class="co">#&gt;     author = {Jeffrey M. Girard},</span></span>
+<span><span class="co">#&gt;     year = {2026},</span></span>
 <span><span class="co">#&gt;     note = {R package version 0.0.0.9000},</span></span>
-<span><span class="co">#&gt;     url = {https://jmgirard.github.io/bsync/},</span></span>
+<span><span class="co">#&gt;     url = {https://github.com/jmgirard/bsync},</span></span>
 <span><span class="co">#&gt;   }</span></span></code></pre></div>
 </div>
 <div class="section level2">
