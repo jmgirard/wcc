@@ -112,17 +112,16 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">wcc_results</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── Windowed Cross-Correlation Analysis ─────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Total Windows: 87</span></span>
+<span><span class="co">#&gt; Total Windows: 84</span></span>
 <span><span class="co">#&gt; Total Lags Tested: 151</span></span>
 <span><span class="co">#&gt; Window Size: 150</span></span>
 <span><span class="co">#&gt; Max Lag: 75</span></span>
-<span><span class="co">#&gt; Overall Fisher's Z: 1.065</span></span>
+<span><span class="co">#&gt; Overall Fisher's Z: 1.0706</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── Cross-Correlation Value Distribution ──</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;      0%     25%     50%     75%    100% </span></span>
-<span><span class="co">#&gt; -0.9984 -0.6770  0.0410  0.7185  0.9986</span></span>
-<span><span class="co">#&gt; ! 78 missing values (NA) detected.</span></span></code></pre></div>
+<span><span class="co">#&gt; -0.9984 -0.6821  0.0345  0.7156  0.9986</span></span></code></pre></div>
 <p>Once the cross-correlations are calculated, we extract the specific lags that represent the optimal association within each time window. Summarizing the optima object displays the extraction metadata alongside an overview of results.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Step 3: Extract the Optima (Local Maxima)</span></span>
@@ -135,25 +134,24 @@
 <span></span>
 <span><span class="co"># View the optima results</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">optima</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── WCC Optima Summary ──────────────────────────────────────────────────────────</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── Completeness ──</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; • Total time windows: 87</span></span>
-<span><span class="co">#&gt; • Valid optima retained: 87 (100%)</span></span>
+<span><span class="co">#&gt; • Total time windows: 84</span></span>
+<span><span class="co">#&gt; • Valid optima retained: 84 (100%)</span></span>
 <span><span class="co">#&gt; • Optima dropped (NA): 0 (0%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── Lag Directionality (Leadership) ──</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; • Positive Lags (x leads y): 41 (47.1%)</span></span>
-<span><span class="co">#&gt; • Negative Lags (y leads x): 43 (49.4%)</span></span>
-<span><span class="co">#&gt; • Zero Lags (Simultaneous): 3 (3.4%)</span></span>
+<span><span class="co">#&gt; • Positive Lags (x leads y): 41 (48.8%)</span></span>
+<span><span class="co">#&gt; • Negative Lags (y leads x): 40 (47.6%)</span></span>
+<span><span class="co">#&gt; • Zero Lags (Simultaneous): 3 (3.6%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── Optimum Value Distribution ──</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;     0%    25%    50%    75%   100% </span></span>
-<span><span class="co">#&gt; 0.9710 0.9947 0.9970 0.9976 0.9986</span></span></code></pre></div>
+<span><span class="co">#&gt; 0.9742 0.9951 0.9971 0.9976 0.9986</span></span></code></pre></div>
 <p>Finally, we visualize the resulting correlation landscape. The underlying heatmap represents the cross-correlation values at each lag and elapsed time window. The overlaid points and connecting lines demonstrate the algorithm successfully tracking the shifting lag of optimum association over the course of the interaction.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Step 4: Plot the correlation landscape and overlay the shifting optima</span></span>
@@ -183,7 +181,7 @@
 <span><span class="va">surrogate_results</span></span>
 <span><span class="co">#&gt; ── WCC Surrogate Analysis (Pseudo-Synchrony) ───────────────────────────────────</span></span>
 <span><span class="co">#&gt; Permutations: 100</span></span>
-<span><span class="co">#&gt; Observed Fisher's Z: 1.065</span></span>
+<span><span class="co">#&gt; Observed Fisher's Z: 1.0706</span></span>
 <span><span class="co">#&gt; Average Null Z: 0.9894</span></span>
 <span><span class="co">#&gt; Empirical p-value: &lt; 0.01</span></span>
 <span><span class="co">#&gt; ✔ Observed synchrony is significantly greater than chance.</span></span>

@@ -84,17 +84,16 @@ wcc_results <- wcc(
 summary(wcc_results)
 #> 
 #> ── Windowed Cross-Correlation Analysis ─────────────────────────────────────────
-#> Total Windows: 87
+#> Total Windows: 84
 #> Total Lags Tested: 151
 #> Window Size: 150
 #> Max Lag: 75
-#> Overall Fisher's Z: 1.065
+#> Overall Fisher's Z: 1.0706
 #> 
 #> ── Cross-Correlation Value Distribution ──
 #> 
 #>      0%     25%     50%     75%    100% 
-#> -0.9984 -0.6770  0.0410  0.7185  0.9986
-#> ! 78 missing values (NA) detected.
+#> -0.9984 -0.6821  0.0345  0.7156  0.9986
 ```
 
 Once the cross-correlations are calculated, we extract the specific lags
@@ -114,25 +113,24 @@ optima <- pick_optima(
 
 # View the optima results
 summary(optima)
-#> 
 #> ── WCC Optima Summary ──────────────────────────────────────────────────────────
 #> 
 #> ── Completeness ──
 #> 
-#> • Total time windows: 87
-#> • Valid optima retained: 87 (100%)
+#> • Total time windows: 84
+#> • Valid optima retained: 84 (100%)
 #> • Optima dropped (NA): 0 (0%)
 #> 
 #> ── Lag Directionality (Leadership) ──
 #> 
-#> • Positive Lags (x leads y): 41 (47.1%)
-#> • Negative Lags (y leads x): 43 (49.4%)
-#> • Zero Lags (Simultaneous): 3 (3.4%)
+#> • Positive Lags (x leads y): 41 (48.8%)
+#> • Negative Lags (y leads x): 40 (47.6%)
+#> • Zero Lags (Simultaneous): 3 (3.6%)
 #> 
 #> ── Optimum Value Distribution ──
 #> 
 #>     0%    25%    50%    75%   100% 
-#> 0.9710 0.9947 0.9970 0.9976 0.9986
+#> 0.9742 0.9951 0.9971 0.9976 0.9986
 ```
 
 Finally, we visualize the resulting correlation landscape. The
@@ -183,7 +181,7 @@ surrogate_results <- wcc_surrogate(
 surrogate_results
 #> ── WCC Surrogate Analysis (Pseudo-Synchrony) ───────────────────────────────────
 #> Permutations: 100
-#> Observed Fisher's Z: 1.065
+#> Observed Fisher's Z: 1.0706
 #> Average Null Z: 0.9894
 #> Empirical p-value: < 0.01
 #> ✔ Observed synchrony is significantly greater than chance.
