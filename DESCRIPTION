@@ -3,7 +3,13 @@ Package: bsync
 Title: Behavioral Synchrony Analyses
 Version: 0.0.0.9000
 Authors@R:
-    person("Jeffrey", "Girard", , "me@jmgirard.com", role = c("aut", "cre"))
+    person(
+        given = c("Jeffrey", "M."),
+        family = "Girard",
+        email = "me@jmgirard.com",
+        role = c("aut", "cre"),
+        comment = c(ORCID = "0000-0002-7359-3746")
+    )
 Description: A comprehensive toolkit for analyzing interpersonal and
     behavioral synchrony in continuous time series data. Provides highly
     efficient, C++ backed implementations of windowed cross-correlation

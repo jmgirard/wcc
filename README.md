@@ -201,8 +201,8 @@ If you use **bsync** in your research, please cite the package:
 citation("bsync")
 #> To cite package 'bsync' in publications use:
 #> 
-#>   Girard J (2026). _bsync: Behavioral Synchrony Analyses_. R package
-#>   version 0.0.0.9000, <https://github.com/jmgirard/bsync>.
+#>   Girard JM (2026). _bsync: Behavioral Synchrony Analyses_. R package
+#>   version 0.0.0.9000, <https://jmgirard.github.io/bsync/>.
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
@@ -211,7 +211,7 @@ citation("bsync")
 #>     author = {Jeffrey M. Girard},
 #>     year = {2026},
 #>     note = {R package version 0.0.0.9000},
-#>     url = {https://github.com/jmgirard/bsync},
+#>     url = {https://jmgirard.github.io/bsync/},
 #>   }
 ```
 
