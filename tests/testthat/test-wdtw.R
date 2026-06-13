@@ -69,20 +69,29 @@ test_that("S3 methods for wdtw_res work without error", {
   expect_s3_class(p, "ggplot")
 })
 
-test_that("pick_peaks handles wdtw_res using find_min = TRUE", {
+test_that("pick_optima handles wdtw_res correctly across search methods", {
   res <- wdtw(sig1, sig1, window_size = 15, lag_max = 5, scale_data = FALSE)
 
-  # Extract local minima
-  peaks <- pick_peaks(res, L_size = 3, strict_monotonic = FALSE, find_min = TRUE)
+  # 1. Test default global search for wdtw
+  # It should automatically infer search_method = "global" and find_min = TRUE
+  optima_global <- pick_optima(res)
 
-  expect_s3_class(peaks, "wcc_peaks")
-  # For perfectly aligned identical signals, the minimum should consistently be at lag 0
-  expect_true(all(peaks$peak_lag == 0, na.rm = TRUE))
+  expect_s3_class(optima_global, "wdtw_optima")
+  expect_equal(attr(optima_global, "search_method"), "global")
+  expect_true(attr(optima_global, "find_min"))
 
-  # Test strict monotonicity with valleys
-  peaks_strict <- pick_peaks(res, L_size = 3, strict_monotonic = TRUE, find_min = TRUE)
-  expect_s3_class(peaks_strict, "wcc_peaks")
-  expect_true(attr(peaks_strict, "find_min"))
+  # For perfectly aligned identical signals, the absolute minimum must be at lag 0
+  expect_true(all(optima_global$optimum_lag == 0, na.rm = TRUE))
+
+  # 2. Test explicit local search with strict monotonicity
+  optima_local <- pick_optima(res, search_method = "local", L_size = 3, strict_monotonic = TRUE)
+
+  expect_s3_class(optima_local, "wdtw_optima")
+  expect_equal(attr(optima_local, "search_method"), "local")
+  expect_true(attr(optima_local, "find_min"))
+
+  # The local valley search should also successfully identify lag 0
+  expect_true(all(optima_local$optimum_lag == 0, na.rm = TRUE))
 })
 
 test_that("wdtw handles out-of-bounds cleanly by returning NA", {

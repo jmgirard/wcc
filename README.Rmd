@@ -37,7 +37,9 @@ pak::pak("jmgirard/bsync")
 
 ## Example Workflow
 
-The following example demonstrates the complete `bsync` pipeline. We will use the included `sim_dyad` dataset, which contains 30 seconds of simulated 3D motion tracking data for two individuals. In this simulation, Person A begins by leading a rhythmic movement, they synchronize in the middle, and Person B takes the lead by the end.
+The following example demonstrates a Quick Start WCC pipeline. For a deeper dive into WCC or to learn about Windowed Dynamic Time Warping (WDTW), please see the included package vignettes.
+
+We will use the included `sim_dyad` dataset, which contains 30 seconds of simulated 3D motion tracking data for two individuals. In this simulation, Person A begins by leading a rhythmic movement, they synchronize in the middle, and Person B takes the lead by the end.
 
 First, we load the package and prepare the data. We highly recommend smoothing positional data before calculating velocities to prevent high-frequency noise from amplifying and skewing the cross-correlations. Here we apply a Savitzky-Golay filter and then calculate the 1D directional velocity on the Z-axis.
 
@@ -75,25 +77,29 @@ wcc_results <- wcc(
 summary(wcc_results)
 ```
 
-Once the cross-correlations are calculated, we extract the specific lags that represent the peak association within each time window. Printing the peak object displays the peak-picking metadata alongside the first few results.
+Once the cross-correlations are calculated, we extract the specific lags that represent the optimal association within each time window. Printing the optima object displays the extraction metadata alongside the first few results.
 
-```{r example-peaks}
-# Step 3: Extract the Peaks
-peaks <- pick_peaks(
-  wcc_obj = wcc_results,
+```{r example-optima}
+# Step 3: Extract the Optima (Local Maxima)
+optima <- pick_optima(
+  obj = wcc_results,
   L_size = 5,
-  strict_monotonic = FALSE
+  strict_monotonic = FALSE,
+  search_method = "local"
 )
 
-# View the peak results
-peaks
+# View the optima results
+optima
 ```
 
-Finally, we visualize the resulting correlation landscape. The underlying heatmap represents the cross-correlation values at each lag and elapsed time window. The overlaid black dots and lines demonstrate the algorithm successfully tracking the shifting lag of maximum association over the course of the interaction.
+Finally, we visualize the resulting correlation landscape. The underlying heatmap represents the cross-correlation values at each lag and elapsed time window. The overlaid points and connecting lines demonstrate the algorithm successfully tracking the shifting lag of optimum association over the course of the interaction.
 
 ```{r example-plot}
-# Step 4: Plot the correlation landscape and overlay the shifting peaks
-plot_peaks_overlay(wcc_results, peaks)
+# Step 4: Plot the correlation landscape and overlay the shifting optima
+plot_optima_overlay(
+  surface_obj = wcc_results,
+  optima_df = optima
+)
 ```
 
 ### Surrogate Testing for Significance
@@ -132,6 +138,11 @@ This package builds upon foundational methodology and modern best practices in b
 The core WCC algorithm and peak-picking logic are based on:
 
 *	Boker, S. M., Rotondo, J. L., Xu, M., & King, K. (2002). Windowed cross-correlation and peak picking for the analysis of variability in the association between behavioral time series. *Psychological Methods, 7*(3), 338.
+
+### Dynamic Time Warping
+The core DTW alignment algorithm is based on foundational work by:
+
+* Sakoe, H., & Chiba, S. (1978). Dynamic programming algorithm optimization for spoken word recognition. *IEEE Transactions on Acoustics, Speech, and Signal Processing, 26*(1), 43-49.
 
 ### Pseudo-Synchrony & Surrogate Testing
 The use of circular-shifted surrogate data to establish a statistical baseline for true interpersonal synchrony was popularized in behavioral research by:

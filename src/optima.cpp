@@ -2,13 +2,13 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-DataFrame pick_peaks_cpp(List wcc_list, NumericVector i_vals, int tau_max, int L_size, bool strict_monotonic = false, bool find_min = false) {
+DataFrame pick_optima_cpp(List metric_list, NumericVector i_vals, int tau_max, int L_size, bool strict_monotonic = false, bool find_min = false) {
 
   if (L_size % 2 == 0) {
     stop("L_size must be an odd integer to possess a true center element.");
   }
 
-  int n = wcc_list.size();
+  int n = metric_list.size();
   NumericVector out_lag(n, NA_REAL);
   NumericVector out_val(n, NA_REAL);
 
@@ -20,10 +20,10 @@ DataFrame pick_peaks_cpp(List wcc_list, NumericVector i_vals, int tau_max, int L
   int max_distance = tau_max - half_L;
 
   for (int k = 0; k < n; ++k) {
-    NumericVector rvec = wcc_list[k];
+    NumericVector rvec = metric_list[k];
 
     if (rvec.size() != expected_length) {
-      stop("A correlation vector does not match the expected length for tau_max.");
+      stop("A metric vector does not match the expected length for tau_max.");
     }
 
     // Helper lambda to evaluate a local region of length L_size
@@ -111,6 +111,6 @@ DataFrame pick_peaks_cpp(List wcc_list, NumericVector i_vals, int tau_max, int L
   }
 
   return DataFrame::create(Named("i") = i_vals,
-                           Named("peak_lag") = out_lag,
-                           Named("peak_value") = out_val);
+                           Named("optimum_lag") = out_lag,
+                           Named("optimum_value") = out_val);
 }

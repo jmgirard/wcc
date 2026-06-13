@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 
 This vignette walks through a complete Windowed Cross-Correlation (WCC) analysis using the `bsync` package. WCC is highly effective for quantifying interpersonal synchrony because it accommodates non-stationary relationships. Unlike global cross-correlation, WCC captures how synchronization ebbs and flows over time.
 
-We will cover data simulation, calculating WCC, surrogate testing for statistical significance, peak picking, and visualization. For guidance on selecting the appropriate window sizes and lag parameters, please see the `suggest_wcc_params()` vignette.
+We will cover data simulation, calculating WCC, surrogate testing for statistical significance, optima extraction, and visualization. For guidance on selecting the appropriate window sizes and lag parameters, please see the `suggest_wcc_params()` vignette.
 
 ## 1. Simulating Realistic Dyadic Data
 
@@ -85,7 +85,7 @@ wcc_results <- wcc(
 summary(wcc_results)
 ```
 
-The wcc() function returns a list object of class wcc_res containing the results data frame, the overall Fisher's Z score, and the input settings. The summary output shows that the sliding window analyzed 55 distinct time windows across 91 different lags. The overall Fisher's Z score of 0.3851 indicates a positive global correlation, and the quantile distribution gives us a quick look at the spread of the correlation values across the entire interaction.
+The `wcc()` function returns a list object of class `wcc_res` containing the results data frame, the overall Fisher's Z score, and the input settings. The summary output shows that the sliding window analyzed 55 distinct time windows across 91 different lags. The overall Fisher's Z score of 0.3851 indicates a positive global correlation, and the quantile distribution gives us a quick look at the spread of the correlation values across the entire interaction.
 
 ## 3. Surrogate Testing for Significance
 
@@ -107,36 +107,36 @@ surrogate_results <- wcc_surrogate(
 print(surrogate_results)
 ```
 
-The output gives us an empirical p-value by calculating the proportion of surrogate Fisher's Z scores that meet or exceed our observed Fisher's Z. Here, our observed Z (0.3851) is higher than the average null Z (0.3015) produced by the shifted data. Because the observed value was higher than all 100 permutations, the empirical p-value is reported as < 0.01. This allows us to confidently assert that the observed synchrony is significantly greater than what we would expect by random chance. You will also notice a helpful console note pointing out that 100 permutations are generally too few for stable calculations. We use n_surrogates = 100 here for speed during exploratory analysis, but to achieve reliable p-values for publication, it is highly recommended to run at least 1,000 to 10,000 permutations.
+The output gives us an empirical p-value by calculating the proportion of surrogate Fisher's Z scores that meet or exceed our observed Fisher's Z. Here, our observed Z (0.3851) is higher than the average null Z (0.3015) produced by the shifted data. Because the observed value was higher than all 100 permutations, the empirical p-value is reported as < 0.01. This allows us to confidently assert that the observed synchrony is significantly greater than what we would expect by random chance. You will also notice a helpful console note pointing out that 100 permutations are generally too few for stable calculations. We use `n_surrogates = 100` here for speed during exploratory analysis, but to achieve reliable p-values for publication, it is highly recommended to run at least 1,000 to 10,000 permutations.
 
-## 4. Peak Picking
+## 4. Optima Extraction
 
-While the heatmap is visually informative, we often want to extract the precise lags where coordination is strongest within each time window. The `pick_peaks()` function identifies local maximums within the WCC grid.
+While the heatmap is visually informative, we often want to extract the precise lags where coordination is strongest within each time window. The `pick_optima()` function identifies local maximums within the WCC grid.
 
-We specify the `L_size` argument to set the local search region.
+We specify the `L_size` argument to set the local search region. (Since we are feeding it a `wcc_res` object, the function automatically defaults to a local search for maxima).
 
-```{r peak-picking}
-# Extract peaks using a local search size of 5
-wcc_peaks_df <- pick_peaks(wcc_results, L_size = 5)
+```{r optima-extraction}
+# Extract optima using a local search size of 5
+wcc_optima_df <- pick_optima(wcc_results, L_size = 5)
 
-print(wcc_peaks_df)
+print(wcc_optima_df)
 ```
 
-This returns a wcc_peaks data frame containing the elapsed time indices, the peak lags, and the corresponding correlation values. The summary confirms that the algorithm successfully identified 55 peaks, mapping perfectly to our 55 total time windows. It also displays the first five local maximums identified using our specified local search size.
+This returns a `wcc_optima` data frame containing the elapsed time indices, the optimum lags, and the corresponding correlation values. The summary confirms that the algorithm successfully identified 55 optima, mapping perfectly to our 55 total time windows. It also displays the first five local maximums identified using our specified local search size.
 
 ## 5. Visualizing the Results
 
-Finally, we can visualize the shifting synchronization landscape. The `plot_peaks_overlay()` function generates a heatmap of the correlations and plots the extracted peaks directly on top.
+Finally, we can visualize the shifting synchronization landscape. The `plot_optima_overlay()` function generates a heatmap of the correlations and plots the extracted optima directly on top.
 
 By passing the `time_step` argument, the axes are automatically converted from raw frame indices to seconds.
 
 ```{r visualization, fig.width=7, fig.height=5}
-plot_peaks_overlay(
-  wcc_obj = wcc_results,
-  peaks_df = wcc_peaks_df,
+plot_optima_overlay(
+  surface_obj = wcc_results,
+  optima_df = wcc_optima_df,
   time_step = 1 / fs,
   show_zero_lag = TRUE
 )
 ```
 
-In the resulting plot, you should clearly see a diagonal track of peaks. At the start, the peak synchrony sits securely at a positive lag (indicating Person A leads). As time elapses, the peak smoothly drifts across the zero-lag line until it settles at a negative lag (indicating Person B is now leading).
+In the resulting plot, you should clearly see a diagonal track of optima. At the start, the optimum synchrony sits securely at a positive lag (indicating Person A leads). As time elapses, the optimum smoothly drifts across the zero-lag line until it settles at a negative lag (indicating Person B is now leading).

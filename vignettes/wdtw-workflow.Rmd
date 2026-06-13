@@ -83,33 +83,35 @@ wdtw_results <- wdtw(
 print(wdtw_results)
 ```
 
+
 The `wdtw()` function returns a list object of class `wdtw_res` containing the results data frame, the overall mean distance, and the input settings.
 
-## 3. Valley Picking (Extracting the Minima)
+## 3. Optima Extraction (Finding the Minima)
 
-While the full distance matrix is informative, we often want to extract the precise lags where the alignment is optimal within each time window. For correlation (WCC), we look for peaks. For distance metrics (WDTW), we look for valleys.
+While the full distance matrix is informative, we often want to extract the precise lags where the alignment is optimal within each time window. For correlation (WCC), optimal alignment means the highest value (peaks). For distance metrics (WDTW), optimal alignment means the lowest cost (valleys).
 
-The `pick_peaks()` function handles this by setting the `find_min` argument to `TRUE`.
+The `pick_optima()` function handles this seamlessly. Because we are providing a `wdtw_res` object, the function automatically infers that it should execute a global search across the window to find the absolute minimum distance (`search_method = "global"` and `find_min = TRUE`).
 
-```{r peak-picking}
-# Extract optimal alignment lags (valleys) using a local search size of 5
-wdtw_valleys_df <- pick_peaks(wdtw_results, L_size = 5, find_min = TRUE)
+```{r optima-extraction}
+# Extract optimal alignment lags (valleys) using the default global search
+wdtw_optima_df <- pick_optima(wdtw_results)
 
-print(wdtw_valleys_df)
+print(wdtw_optima_df)
 ```
 
-This returns a `wcc_peaks` data frame containing the elapsed time indices, the optimal lags, and the corresponding DTW distance values. The console output confirms that the search mode was successfully set to "Valleys (Minima)".
+
+This returns a `wdtw_optima` data frame containing the elapsed time indices, the optimal lags, and the corresponding DTW distance values. The console output confirms that the search mode was successfully set to "Valleys (Minima)" using a "global" search method.
 
 ## 4. Visualizing the Results
 
-Finally, we can visualize the shifting synchronization landscape. The `plot_peaks_overlay()` function detects that it is working with a `wdtw_res` object and automatically applies a sequential color palette to map the distances.
+Finally, we can visualize the shifting synchronization landscape. The `plot_optima_overlay()` function detects that it is working with a `wdtw_res` object and automatically applies a sequential viridis color palette to map the distances, while plotting the global minima points on top.
 
 By passing the `time_step` argument, the axes are automatically converted from raw frame indices to seconds.
 
 ```{r visualization, fig.width=7, fig.height=5}
-plot_peaks_overlay(
-  wcc_obj = wdtw_results,
-  peaks_df = wdtw_valleys_df,
+plot_optima_overlay(
+  surface_obj = wdtw_results,
+  optima_df = wdtw_optima_df,
   time_step = 1 / fs,
   show_zero_lag = TRUE
 )
