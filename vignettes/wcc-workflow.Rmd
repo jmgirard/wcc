@@ -117,7 +117,7 @@ We specify the `L_size` argument to set the local search region. (Since we are f
 
 ```{r optima-extraction}
 # Extract optima using a local search size of 9
-wcc_optima_df <- pick_optima(wcc_results, L_size = 9)
+wcc_optima_df <- pick_optima(wcc_results, search_method = "global")
 
 print(wcc_optima_df)
 ```
