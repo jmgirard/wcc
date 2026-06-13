@@ -193,3 +193,23 @@ test_that("calc_speed_3d handles forward and backward methods", {
   s_bwd <- calc_speed_3d(t, x, y, z, method = "backward")
   expect_equal(s_bwd, c(NA, 10, 10, 10, 10))
 })
+
+test_that("wdtw handles NA values correctly and safely skips windows", {
+  sig1_na <- sig1
+  sig1_na[15] <- NA
+
+  sig2_na <- sig2
+  sig2_na[20] <- NA
+
+  # Test NA in the 'x' vector
+  res_x_na <- wdtw(sig1_na, sig2, window_size = 10, lag_max = 5, scale_data = FALSE)
+  expect_true(any(is.na(res_x_na$results_df$dtw_dist)))
+
+  # Test NA in the 'y' vector
+  res_y_na <- wdtw(sig1, sig2_na, window_size = 10, lag_max = 5, scale_data = FALSE)
+  expect_true(any(is.na(res_y_na$results_df$dtw_dist)))
+
+  # Test NA in both vectors (with scale_data = TRUE to ensure base::scale handles it)
+  res_both_na <- wdtw(sig1_na, sig2_na, window_size = 10, lag_max = 5, scale_data = TRUE)
+  expect_true(any(is.na(res_both_na$results_df$dtw_dist)))
+})
