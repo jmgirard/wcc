@@ -142,17 +142,16 @@ wcc_results <- wcc(
 summary(wcc_results)
 #> 
 #> ── Windowed Cross-Correlation Analysis ─────────────────────────────────────────
-#> Total Windows: 54
+#> Total Windows: 53
 #> Total Lags Tested: 91
 #> Window Size: 90
 #> Max Lag: 45
-#> Overall Fisher's Z: 0.4526
+#> Overall Fisher's Z: 0.4534
 #> 
 #> ── Cross-Correlation Value Distribution ──
 #> 
 #>      0%     25%     50%     75%    100% 
-#> -0.8224 -0.2753  0.0178  0.3833  0.9975
-#> ! 1 missing value (NA) detected.
+#> -0.8224 -0.2776  0.0129  0.3826  0.9975
 ```
 
 The [`wcc()`](https://jmgirard.github.io/bsync/reference/wcc.md)
@@ -198,10 +197,9 @@ surrogate_results <- wcc_surrogate(
 )
 
 print(surrogate_results)
-#> 
 #> ── WCC Surrogate Analysis (Pseudo-Synchrony) ───────────────────────────────────
 #> Permutations: 1000
-#> Observed Fisher's Z: 0.4526
+#> Observed Fisher's Z: 0.4534
 #> Average Null Z: 0.3167
 #> Empirical p-value: < 0.001
 #> ✔ Observed synchrony is significantly greater than chance.
@@ -241,20 +239,20 @@ summary(wcc_optima_df)
 #> 
 #> ── Completeness ──
 #> 
-#> • Total time windows: 54
-#> • Valid optima retained: 49 (90.7%)
-#> • Optima dropped (NA): 5 (9.3%)
+#> • Total time windows: 53
+#> • Valid optima retained: 48 (90.6%)
+#> • Optima dropped (NA): 5 (9.4%)
 #> 
 #> ── Lag Directionality (Leadership) ──
 #> 
-#> • Positive Lags (x leads y): 39 (79.6%)
-#> • Negative Lags (y leads x): 9 (18.4%)
-#> • Zero Lags (Simultaneous): 1 (2%)
+#> • Positive Lags (x leads y): 38 (79.2%)
+#> • Negative Lags (y leads x): 9 (18.8%)
+#> • Zero Lags (Simultaneous): 1 (2.1%)
 #> 
 #> ── Optimum Value Distribution ──
 #> 
 #>      0%     25%     50%     75%    100% 
-#> -0.3739  0.9532  0.9923  0.9959  0.9975
+#> -0.3739  0.9433  0.9926  0.9959  0.9975
 ```
 
 #### 4.1 Interpreting the Optima Summary

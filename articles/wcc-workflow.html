@@ -208,17 +208,16 @@ frames (1 second) to allow for overlap and smooth transitions.</p>
 <span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">wcc_results</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Windowed Cross-Correlation Analysis</span> <span style="color: #00BBBB;">─────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; Total Windows: 54</span></span>
+<span><span class="co">#&gt; Total Windows: 53</span></span>
 <span><span class="co">#&gt; Total Lags Tested: 91</span></span>
 <span><span class="co">#&gt; Window Size: 90</span></span>
 <span><span class="co">#&gt; Max Lag: 45</span></span>
-<span><span class="co">#&gt; Overall Fisher's Z: 0.4526</span></span>
+<span><span class="co">#&gt; Overall Fisher's Z: 0.4534</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── <span style="font-weight: bold;">Cross-Correlation Value Distribution</span> ──</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;      0%     25%     50%     75%    100% </span></span>
-<span><span class="co">#&gt; -0.8224 -0.2753  0.0178  0.3833  0.9975</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> 1 missing value (NA) detected.</span></span></code></pre></div>
+<span><span class="co">#&gt; -0.8224 -0.2776  0.0129  0.3826  0.9975</span></span></code></pre></div>
 <p>The <code><a href="../reference/wcc.html">wcc()</a></code> function returns a list object of class
 <code>wcc_res</code> containing the results data frame, the overall
 Fisher’s Z score, and the input settings.</p>
@@ -255,10 +254,9 @@ distribution using the circular shift method.</p>
 <span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">surrogate_results</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">WCC Surrogate Analysis (Pseudo-Synchrony)</span> <span style="color: #00BBBB;">───────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; Permutations: 1000</span></span>
-<span><span class="co">#&gt; Observed Fisher's Z: 0.4526</span></span>
+<span><span class="co">#&gt; Observed Fisher's Z: 0.4534</span></span>
 <span><span class="co">#&gt; Average Null Z: 0.3167</span></span>
 <span><span class="co">#&gt; Empirical p-value: &lt; 0.001</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Observed synchrony is significantly greater than chance.</span></span></code></pre></div>
@@ -293,20 +291,20 @@ an absolute correlation weaker than <span class="math inline">\(r =
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── <span style="font-weight: bold;">Completeness</span> ──</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Total time windows: 54</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Valid optima retained: 49 (90.7%)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Optima dropped (NA): 5 (9.3%)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Total time windows: 53</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Valid optima retained: 48 (90.6%)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Optima dropped (NA): 5 (9.4%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── <span style="font-weight: bold;">Lag Directionality (Leadership)</span> ──</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Positive Lags (x leads y): 39 (79.6%)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Negative Lags (y leads x): 9 (18.4%)</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Zero Lags (Simultaneous): 1 (2%)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Positive Lags (x leads y): 38 (79.2%)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Negative Lags (y leads x): 9 (18.8%)</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">•</span> Zero Lags (Simultaneous): 1 (2.1%)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── <span style="font-weight: bold;">Optimum Value Distribution</span> ──</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;      0%     25%     50%     75%    100% </span></span>
-<span><span class="co">#&gt; -0.3739  0.9532  0.9923  0.9959  0.9975</span></span></code></pre></div>
+<span><span class="co">#&gt; -0.3739  0.9433  0.9926  0.9959  0.9975</span></span></code></pre></div>
 <div class="section level4">
 <h4 id="interpreting-the-optima-summary">4.1 Interpreting the Optima Summary<a class="anchor" aria-label="anchor" href="#interpreting-the-optima-summary"></a>
 </h4>
