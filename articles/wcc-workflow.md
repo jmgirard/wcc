@@ -19,7 +19,8 @@ vignette.
 
 To demonstrate the workflow, we will simulate a realistic interaction
 between two participants (Person A and Person B) captured at 30 Hz. We
-will generate smooth continuous data to simulate bodily motion.
+will generate smooth continuous data to simulate bodily motion and then
+add random measurement noise.
 
 In this scenario, Person A leads the interaction by 15 frames (0.5
 seconds) at the start. Over the course of the 60 seconds, the dynamic
@@ -28,6 +29,15 @@ smoothly transitions until Person B leads by 15 frames at the end.
 ``` r
 
 library(bsync)
+library(dplyr)
+#> 
+#> Attaching package: 'dplyr'
+#> The following objects are masked from 'package:stats':
+#> 
+#>     filter, lag
+#> The following objects are masked from 'package:base':
+#> 
+#>     intersect, setdiff, setequal, union
 
 set.seed(2026)
 
@@ -41,8 +51,8 @@ raw_noise <- rnorm(n_frames + 300)
 base_signal <- stats::filter(raw_noise, rep(1/30, 30), circular = TRUE)
 base_signal <- as.numeric(base_signal)
 
-person_A <- numeric(n_frames)
-person_B <- numeric(n_frames)
+person_A_raw <- numeric(n_frames)
+person_B_raw <- numeric(n_frames)
 
 # Continuous lag shift: Person A leads by 15 frames, smoothly transitioning to B leading
 lag_shifts <- round(seq(15, -15, length.out = n_frames))
@@ -52,19 +62,21 @@ for (i in 1:n_frames) {
   idx_B <- 150 + i - lag_shifts[i]
 
   # Add slight independent noise to mimic realistic measurement error
-  person_A[i] <- base_signal[idx_A] + rnorm(1, sd = 0.05)
-  person_B[i] <- base_signal[idx_B] + rnorm(1, sd = 0.05)
+  person_A_raw[i] <- base_signal[idx_A] + rnorm(1, sd = 0.05)
+  person_B_raw[i] <- base_signal[idx_B] + rnorm(1, sd = 0.05)
 }
 
+# Create the data frame and apply a Savitzky-Golay filter to smooth the raw noise
 dyad_data <- data.frame(
   time = seq(0, by = 1/fs, length.out = n_frames),
-  person_A = person_A,
-  person_B = person_B
-)
+  person_A_raw = person_A_raw,
+  person_B_raw = person_B_raw
+) |>
+  mutate(
+    person_A = smooth_signal(person_A_raw, method = "sgolay", window = 15),
+    person_B = smooth_signal(person_B_raw, method = "sgolay", window = 15)
+  )
 ```
-
-By adding a custom simulation here, we avoid relying on highly
-simplified data provided in the package’s raw data files.
 
 ### 2. Calculating Windowed Cross-Correlation
 
@@ -96,12 +108,12 @@ summary(wcc_results)
 #> Total Lags Tested: 91
 #> Window Size: 90
 #> Max Lag: 45
-#> Overall Fisher's Z: 0.3851
+#> Overall Fisher's Z: 0.5478
 #> 
 #> ── Cross-Correlation Value Distribution ──
 #> 
 #>      0%     25%     50%     75%    100% 
-#> -0.8028 -0.2108  0.0746  0.3734  0.9576
+#> -0.9010 -0.2846  0.1028  0.4775  0.9966
 #> ! 1 missing value (NA) detected.
 ```
 
@@ -144,8 +156,8 @@ print(surrogate_results)
 #> 
 #> ── WCC Surrogate Analysis (Pseudo-Synchrony) ───────────────────────────────────
 #> Permutations: 100
-#> Observed Fisher's Z: 0.3851
-#> Average Null Z: 0.3015
+#> Observed Fisher's Z: 0.5478
+#> Average Null Z: 0.4045
 #> Empirical p-value: < 0.01
 #> ✔ Observed synchrony is significantly greater than chance.
 #> ℹ Note: 100 permutations may be too few for stable p-values.
@@ -180,21 +192,23 @@ defaults to a local search for maxima).
 ``` r
 
 # Extract optima using a local search size of 9
-wcc_optima_df <- pick_optima(wcc_results, search_method = "global")
+wcc_optima_df <- pick_optima(wcc_results, L_size = 9)
 
 print(wcc_optima_df)
 #> 
 #> ── WCC Optima Results ──────────────────────────────────────────────────────────
 #> Total Optima Found: 55
-#> Search Method: global
+#> Search Method: local
 #> Search Mode: Peaks (Maxima)
+#> Local Search Size: 9
+#> Strict Monotonic: FALSE
 #> Showing the first 5 results:
 #>    i optimum_lag optimum_value
-#>   46          13     0.6418111
-#>   76          13     0.7422777
-#>  106          12     0.7315478
-#>  136          12     0.7599735
-#>  166          12     0.7707248
+#>   46         -10   -0.42170539
+#>   76          12    0.93132414
+#>  106          -7    0.31058561
+#>  136         -10   -0.01589672
+#>  166          -9    0.23363822
 #> # ... with 50 more rows
 ```
 

@@ -91,12 +91,22 @@ please see the <code><a href="../reference/suggest_wcc_params.html">suggest_wcc_
 </h3>
 <p>To demonstrate the workflow, we will simulate a realistic interaction
 between two participants (Person A and Person B) captured at 30 Hz. We
-will generate smooth continuous data to simulate bodily motion.</p>
+will generate smooth continuous data to simulate bodily motion and then
+add random measurement noise.</p>
 <p>In this scenario, Person A leads the interaction by 15 frames (0.5
 seconds) at the start. Over the course of the 60 seconds, the dynamic
 smoothly transitions until Person B leads by 15 frames at the end.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jmgirard.github.io/bsync/">bsync</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://dplyr.tidyverse.org" class="external-link">dplyr</a></span><span class="op">)</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt; Attaching package: 'dplyr'</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:stats':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     filter, lag</span></span>
+<span><span class="co">#&gt; The following objects are masked from 'package:base':</span></span>
+<span><span class="co">#&gt; </span></span>
+<span><span class="co">#&gt;     intersect, setdiff, setequal, union</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">2026</span><span class="op">)</span></span>
 <span></span>
@@ -110,8 +120,8 @@ smoothly transitions until Person B leads by 15 frames at the end.</p>
 <span><span class="va">base_signal</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">raw_noise</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">30</span>, <span class="fl">30</span><span class="op">)</span>, circular <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">base_signal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">base_signal</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">person_A</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="va">n_frames</span><span class="op">)</span></span>
-<span><span class="va">person_B</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="va">n_frames</span><span class="op">)</span></span>
+<span><span class="va">person_A_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="va">n_frames</span><span class="op">)</span></span>
+<span><span class="va">person_B_raw</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">numeric</a></span><span class="op">(</span><span class="va">n_frames</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Continuous lag shift: Person A leads by 15 frames, smoothly transitioning to B leading</span></span>
 <span><span class="va">lag_shifts</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/Round.html" class="external-link">round</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">15</span>, <span class="op">-</span><span class="fl">15</span>, length.out <span class="op">=</span> <span class="va">n_frames</span><span class="op">)</span><span class="op">)</span></span>
@@ -121,17 +131,20 @@ smoothly transitions until Person B leads by 15 frames at the end.</p>
 <span>  <span class="va">idx_B</span> <span class="op">&lt;-</span> <span class="fl">150</span> <span class="op">+</span> <span class="va">i</span> <span class="op">-</span> <span class="va">lag_shifts</span><span class="op">[</span><span class="va">i</span><span class="op">]</span></span>
 <span></span>
 <span>  <span class="co"># Add slight independent noise to mimic realistic measurement error</span></span>
-<span>  <span class="va">person_A</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">base_signal</span><span class="op">[</span><span class="va">idx_A</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, sd <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
-<span>  <span class="va">person_B</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">base_signal</span><span class="op">[</span><span class="va">idx_B</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, sd <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
+<span>  <span class="va">person_A_raw</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">base_signal</span><span class="op">[</span><span class="va">idx_A</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, sd <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
+<span>  <span class="va">person_B_raw</span><span class="op">[</span><span class="va">i</span><span class="op">]</span> <span class="op">&lt;-</span> <span class="va">base_signal</span><span class="op">[</span><span class="va">idx_B</span><span class="op">]</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="fl">1</span>, sd <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
+<span><span class="co"># Create the data frame and apply a Savitzky-Golay filter to smooth the raw noise</span></span>
 <span><span class="va">dyad_data</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span>
 <span>  time <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/seq.html" class="external-link">seq</a></span><span class="op">(</span><span class="fl">0</span>, by <span class="op">=</span> <span class="fl">1</span><span class="op">/</span><span class="va">fs</span>, length.out <span class="op">=</span> <span class="va">n_frames</span><span class="op">)</span>,</span>
-<span>  person_A <span class="op">=</span> <span class="va">person_A</span>,</span>
-<span>  person_B <span class="op">=</span> <span class="va">person_B</span></span>
-<span><span class="op">)</span></span></code></pre></div>
-<p>By adding a custom simulation here, we avoid relying on highly
-simplified data provided in the package’s raw data files.</p>
+<span>  person_A_raw <span class="op">=</span> <span class="va">person_A_raw</span>,</span>
+<span>  person_B_raw <span class="op">=</span> <span class="va">person_B_raw</span></span>
+<span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span></span>
+<span>    person_A <span class="op">=</span> <span class="fu"><a href="../reference/smooth_signal.html">smooth_signal</a></span><span class="op">(</span><span class="va">person_A_raw</span>, method <span class="op">=</span> <span class="st">"sgolay"</span>, window <span class="op">=</span> <span class="fl">15</span><span class="op">)</span>,</span>
+<span>    person_B <span class="op">=</span> <span class="fu"><a href="../reference/smooth_signal.html">smooth_signal</a></span><span class="op">(</span><span class="va">person_B_raw</span>, method <span class="op">=</span> <span class="st">"sgolay"</span>, window <span class="op">=</span> <span class="fl">15</span><span class="op">)</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="calculating-windowed-cross-correlation">2. Calculating Windowed Cross-Correlation<a class="anchor" aria-label="anchor" href="#calculating-windowed-cross-correlation"></a>
@@ -160,12 +173,12 @@ frames (1 second) to allow for overlap and smooth transitions.</p>
 <span><span class="co">#&gt; Total Lags Tested: 91</span></span>
 <span><span class="co">#&gt; Window Size: 90</span></span>
 <span><span class="co">#&gt; Max Lag: 45</span></span>
-<span><span class="co">#&gt; Overall Fisher's Z: 0.3851</span></span>
+<span><span class="co">#&gt; Overall Fisher's Z: 0.5478</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; ── <span style="font-weight: bold;">Cross-Correlation Value Distribution</span> ──</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt;      0%     25%     50%     75%    100% </span></span>
-<span><span class="co">#&gt; -0.8028 -0.2108  0.0746  0.3734  0.9576</span></span>
+<span><span class="co">#&gt; -0.9010 -0.2846  0.1028  0.4775  0.9966</span></span>
 <span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> 1 missing value (NA) detected.</span></span></code></pre></div>
 <p>The <code><a href="../reference/wcc.html">wcc()</a></code> function returns a list object of class
 <code>wcc_res</code> containing the results data frame, the overall
@@ -202,8 +215,8 @@ signals.</p>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">WCC Surrogate Analysis (Pseudo-Synchrony)</span> <span style="color: #00BBBB;">───────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; Permutations: 100</span></span>
-<span><span class="co">#&gt; Observed Fisher's Z: 0.3851</span></span>
-<span><span class="co">#&gt; Average Null Z: 0.3015</span></span>
+<span><span class="co">#&gt; Observed Fisher's Z: 0.5478</span></span>
+<span><span class="co">#&gt; Average Null Z: 0.4045</span></span>
 <span><span class="co">#&gt; Empirical p-value: &lt; 0.01</span></span>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Observed synchrony is significantly greater than chance.</span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Note: 100 permutations may be too few for stable p-values.</span></span>
@@ -234,21 +247,23 @@ region. (Since we are feeding it a <code>wcc_res</code> object, the
 function automatically defaults to a local search for maxima).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Extract optima using a local search size of 9</span></span>
-<span><span class="va">wcc_optima_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pick_optima.html">pick_optima</a></span><span class="op">(</span><span class="va">wcc_results</span>, search_method <span class="op">=</span> <span class="st">"global"</span><span class="op">)</span></span>
+<span><span class="va">wcc_optima_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pick_optima.html">pick_optima</a></span><span class="op">(</span><span class="va">wcc_results</span>, L_size <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wcc_optima_df</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">WCC Optima Results</span> <span style="color: #00BBBB;">──────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; Total Optima Found: 55</span></span>
-<span><span class="co">#&gt; Search Method: global</span></span>
+<span><span class="co">#&gt; Search Method: local</span></span>
 <span><span class="co">#&gt; Search Mode: Peaks (Maxima)</span></span>
+<span><span class="co">#&gt; Local Search Size: 9</span></span>
+<span><span class="co">#&gt; Strict Monotonic: FALSE</span></span>
 <span><span class="co">#&gt; Showing the first 5 results:</span></span>
 <span><span class="co">#&gt;    i optimum_lag optimum_value</span></span>
-<span><span class="co">#&gt;   46          13     0.6418111</span></span>
-<span><span class="co">#&gt;   76          13     0.7422777</span></span>
-<span><span class="co">#&gt;  106          12     0.7315478</span></span>
-<span><span class="co">#&gt;  136          12     0.7599735</span></span>
-<span><span class="co">#&gt;  166          12     0.7707248</span></span>
+<span><span class="co">#&gt;   46         -10   -0.42170539</span></span>
+<span><span class="co">#&gt;   76          12    0.93132414</span></span>
+<span><span class="co">#&gt;  106          -7    0.31058561</span></span>
+<span><span class="co">#&gt;  136         -10   -0.01589672</span></span>
+<span><span class="co">#&gt;  166          -9    0.23363822</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;"># ... with 50 more rows</span></span></span></code></pre></div>
 <p>This returns a <code>wcc_optima</code> data frame containing the
 elapsed time indices, the optimum lags, and the corresponding
