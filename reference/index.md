@@ -36,8 +36,12 @@
   : Smooth a Time Series Signal
 - [`suggest_wcc_params()`](https://jmgirard.github.io/bsync/reference/suggest_wcc_params.md)
   : Suggest WCC Hyperparameters
+- [`summary(`*`<wcc_optima>`*`)`](https://jmgirard.github.io/bsync/reference/summary.wcc_optima.md)
+  : Summary method for wcc_optima objects
 - [`summary(`*`<wcc_res>`*`)`](https://jmgirard.github.io/bsync/reference/summary.wcc_res.md)
   : Summary method for wcc_res objects
+- [`summary(`*`<wdtw_optima>`*`)`](https://jmgirard.github.io/bsync/reference/summary.wdtw_optima.md)
+  : Summary method for wdtw_optima objects
 - [`trim_edges()`](https://jmgirard.github.io/bsync/reference/trim_edges.md)
   : Trim Edge Effects from Data
 - [`wcc()`](https://jmgirard.github.io/bsync/reference/wcc.md) :

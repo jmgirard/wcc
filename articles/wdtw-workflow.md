@@ -122,9 +122,11 @@ wdtw_optima_df <- pick_optima(wdtw_results)
 print(wdtw_optima_df)
 #> 
 #> ── WDTW Optima Results ─────────────────────────────────────────────────────────
-#> Total Optima Found: 55
+#> Total Windows Analyzed: 55
+#> Valid Optima Found: 55 (100%)
 #> Search Method: global
 #> Search Mode: Valleys (Minima)
+#> Threshold Applied: None
 #> Showing the first 5 results:
 #>    i optimum_lag optimum_value
 #>   46          12      19.21710

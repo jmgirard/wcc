@@ -8,15 +8,15 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/jmgirard/bsync/blob/main/DESCRIPTION)
+[`inst/CITATION`](https://github.com/jmgirard/bsync/blob/main/inst/CITATION)
 
 Girard J (2026). *bsync: Behavioral Synchrony Analyses*. R package
-version 0.0.0.9000, <https://jmgirard.github.io/bsync/>.
+version 0.0.0.9000, <https://github.com/jmgirard/bsync>.
 
     @Manual{,
       title = {bsync: Behavioral Synchrony Analyses},
-      author = {Jeffrey Girard},
+      author = {Jeffrey M. Girard},
       year = {2026},
       note = {R package version 0.0.0.9000},
-      url = {https://jmgirard.github.io/bsync/},
+      url = {https://github.com/jmgirard/bsync},
     }

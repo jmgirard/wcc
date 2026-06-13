@@ -55,7 +55,8 @@
 <span>  L_size <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  strict_monotonic <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  find_min <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  search_method <span class="op">=</span> <span class="cn">NULL</span></span>
+<span>  search_method <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  threshold <span class="op">=</span> <span class="cn">NULL</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -89,6 +90,12 @@ minima (`TRUE`) for distance metrics ("wdtw_res").</p></dd>
 "local" searches symmetrically outward from lag 0. "global" searches the
 entire window for the absolute extremum. If `NULL`, defaults to "local"
 for "wcc_res" and "global" for "wdtw_res".</p></dd>
+
+
+<dt id="arg-threshold">threshold<a class="anchor" aria-label="anchor" href="#arg-threshold"></a></dt>
+<dd><p>A numeric value. For WCC (`find_min = FALSE`), optima with an
+absolute value below this threshold are set to NA. For WDTW (`find_min = TRUE`),
+optima with a distance above this threshold are set to NA. Default is `NULL`.</p></dd>
 
 </dl></div>
     <div class="section level2">

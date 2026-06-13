@@ -10,7 +10,8 @@ pick_optima(
   L_size = NULL,
   strict_monotonic = FALSE,
   find_min = NULL,
-  search_method = NULL
+  search_method = NULL,
+  threshold = NULL
 )
 ```
 
@@ -44,6 +45,13 @@ pick_optima(
   searches symmetrically outward from lag 0. "global" searches the
   entire window for the absolute extremum. If \`NULL\`, defaults to
   "local" for "wcc_res" and "global" for "wdtw_res".
+
+- threshold:
+
+  A numeric value. For WCC (\`find_min = FALSE\`), optima with an
+  absolute value below this threshold are set to NA. For WDTW
+  (\`find_min = TRUE\`), optima with a distance above this threshold are
+  set to NA. Default is \`NULL\`.
 
 ## Value
 
