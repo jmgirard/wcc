@@ -9,7 +9,8 @@ pick_optima(
   L_size = NULL,
   strict_monotonic = FALSE,
   find_min = NULL,
-  search_method = NULL
+  search_method = NULL,
+  threshold = NULL
 )
 }
 \arguments{
@@ -30,6 +31,10 @@ minima (`TRUE`) for distance metrics ("wdtw_res").}
 "local" searches symmetrically outward from lag 0. "global" searches the
 entire window for the absolute extremum. If `NULL`, defaults to "local"
 for "wcc_res" and "global" for "wdtw_res".}
+
+\item{threshold}{A numeric value. For WCC (`find_min = FALSE`), optima with an
+absolute value below this threshold are set to NA. For WDTW (`find_min = TRUE`),
+optima with a distance above this threshold are set to NA. Default is `NULL`.}
 }
 \value{
 A data frame of class "wcc_optima" or "wdtw_optima".

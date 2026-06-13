@@ -13,9 +13,13 @@
 #'   "local" searches symmetrically outward from lag 0. "global" searches the
 #'   entire window for the absolute extremum. If `NULL`, defaults to "local"
 #'   for "wcc_res" and "global" for "wdtw_res".
+#' @param threshold A numeric value. For WCC (`find_min = FALSE`), optima with an
+#'   absolute value below this threshold are set to NA. For WDTW (`find_min = TRUE`),
+#'   optima with a distance above this threshold are set to NA. Default is `NULL`.
 #' @return A data frame of class "wcc_optima" or "wdtw_optima".
 #' @export
-pick_optima <- function(obj, L_size = NULL, strict_monotonic = FALSE, find_min = NULL, search_method = NULL) {
+pick_optima <- function(obj, L_size = NULL, strict_monotonic = FALSE,
+  find_min = NULL, search_method = NULL, threshold = NULL) {
 
   # 1. Dynamically determine metric, class, and default search parameters based on input
   if (inherits(obj, "wcc_res")) {
@@ -79,9 +83,24 @@ pick_optima <- function(obj, L_size = NULL, strict_monotonic = FALSE, find_min =
     stop("search_method must be either 'local' or 'global'.")
   }
 
-  # 4. Apply attributes and dynamic class
+  # 4. Thresholding to remove weak/meaningless optima
+  if (!is.null(threshold)) {
+    if (find_min) {
+      # DTW: drop values greater than the threshold (higher distance = weaker synchrony)
+      bad_idx <- which(out_df$optimum_value > threshold)
+    } else {
+      # WCC: drop values with an absolute correlation weaker than the threshold
+      bad_idx <- which(abs(out_df$optimum_value) < threshold)
+    }
+
+    out_df$optimum_lag[bad_idx] <- NA
+    out_df$optimum_value[bad_idx] <- NA
+  }
+
+  # 5. Apply attributes and dynamic class
   attr(out_df, "search_method") <- search_method
   attr(out_df, "find_min") <- find_min
+  attr(out_df, "threshold") <- threshold
 
   if (search_method == "local") {
     attr(out_df, "L_size") <- L_size
@@ -95,14 +114,19 @@ pick_optima <- function(obj, L_size = NULL, strict_monotonic = FALSE, find_min =
 print_optima <- function(x, n, title) {
   search_method <- attr(x, "search_method")
   find_min <- attr(x, "find_min")
+  thresh <- attr(x, "threshold")
+
   total_optima <- nrow(x)
+  valid_optima <- sum(!is.na(x$optimum_lag))
 
   cli::cli_h1(title)
 
   cli::cli_dl(c(
-    "Total Optima Found" = "{total_optima}",
+    "Total Windows Analyzed" = "{total_optima}",
+    "Valid Optima Found" = "{valid_optima} ({round(valid_optima / total_optima * 100, 1)}%)",
     "Search Method" = "{search_method}",
-    "Search Mode" = "{ifelse(find_min, 'Valleys (Minima)', 'Peaks (Maxima)')}"
+    "Search Mode" = "{ifelse(find_min, 'Valleys (Minima)', 'Peaks (Maxima)')}",
+    "Threshold Applied" = "{ifelse(is.null(thresh), 'None', thresh)}"
   ))
 
   if (search_method == "local") {
@@ -145,4 +169,61 @@ print.wcc_optima <- function(x, n = 5, ...) {
 #' @export
 print.wdtw_optima <- function(x, n = 5, ...) {
   print_optima(x, n, title = "WDTW Optima Results")
+}
+
+# Generic summary helper
+summary_optima <- function(object, title) {
+  total_optima <- nrow(object)
+  valid_idx <- !is.na(object$optimum_lag)
+  valid_optima <- sum(valid_idx)
+  missing_optima <- total_optima - valid_optima
+
+  cli::cli_h1(title)
+
+  cli::cli_h2("Completeness")
+  cli::cli_bullets(c(
+    "*" = "Total time windows: {total_optima}",
+    "*" = "Valid optima retained: {valid_optima} ({round(valid_optima / total_optima * 100, 1)}%)",
+    "*" = "Optima dropped (NA): {missing_optima} ({round(missing_optima / total_optima * 100, 1)}%)"
+  ))
+
+  if (valid_optima > 0) {
+    lags <- object$optimum_lag[valid_idx]
+    vals <- object$optimum_value[valid_idx]
+
+    pos_lags <- sum(lags > 0)
+    neg_lags <- sum(lags < 0)
+    zero_lags <- sum(lags == 0)
+
+    cli::cli_h2("Lag Directionality (Leadership)")
+    cli::cli_bullets(c(
+      "*" = "Positive Lags (x leads y): {pos_lags} ({round(pos_lags / valid_optima * 100, 1)}%)",
+      "*" = "Negative Lags (y leads x): {neg_lags} ({round(neg_lags / valid_optima * 100, 1)}%)",
+      "*" = "Zero Lags (Simultaneous):  {zero_lags} ({round(zero_lags / valid_optima * 100, 1)}%)"
+    ))
+
+    cli::cli_h2("Optimum Value Distribution")
+    q_vals <- stats::quantile(vals, probs = c(0, 0.25, 0.5, 0.75, 1))
+    print(round(q_vals, 4))
+  }
+
+  invisible(object)
+}
+
+#' Summary method for wcc_optima objects
+#'
+#' @param object An object of class "wcc_optima".
+#' @param ... Additional arguments (not used).
+#' @export
+summary.wcc_optima <- function(object, ...) {
+  summary_optima(object, title = "WCC Optima Summary")
+}
+
+#' Summary method for wdtw_optima objects
+#'
+#' @param object An object of class "wdtw_optima".
+#' @param ... Additional arguments (not used).
+#' @export
+summary.wdtw_optima <- function(object, ...) {
+  summary_optima(object, title = "WDTW Optima Summary")
 }
