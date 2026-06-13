@@ -179,8 +179,8 @@ defaults to a local search for maxima).
 
 ``` r
 
-# Extract optima using a local search size of 5
-wcc_optima_df <- pick_optima(wcc_results, L_size = 5)
+# Extract optima using a local search size of 9
+wcc_optima_df <- pick_optima(wcc_results, L_size = 9)
 
 print(wcc_optima_df)
 #> 
@@ -188,15 +188,15 @@ print(wcc_optima_df)
 #> Total Optima Found: 55
 #> Search Method: local
 #> Search Mode: Peaks (Maxima)
-#> Local Search Size: 5
+#> Local Search Size: 9
 #> Strict Monotonic: FALSE
 #> Showing the first 5 results:
 #>    i optimum_lag optimum_value
 #>   46         -11   -0.06534940
-#>   76           1    0.36200916
+#>   76         -11    0.19838680
 #>  106          -5    0.30862731
 #>  136          -7    0.04783838
-#>  166          -7    0.18667881
+#>  166         -11    0.19508163
 #> # ... with 50 more rows
 ```
 
