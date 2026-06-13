@@ -131,7 +131,7 @@ trim_edges <- function(x, trim_length) {
       cli::cli_abort("{.arg trim_length} is too large; it would remove all rows from the data.")
     }
     return(x[(trim_length + 1):(n_rows - trim_length), , drop = FALSE])
-  } else if (is.vector(x)) {
+  } else if (is.atomic(x) && is.vector(x)) {
     n_len <- length(x)
     if (n_len <= 2 * trim_length) {
       cli::cli_abort("{.arg trim_length} is too large; it would remove all elements from the vector.")
