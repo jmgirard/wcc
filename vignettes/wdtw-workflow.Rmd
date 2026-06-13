@@ -117,4 +117,4 @@ plot_optima_overlay(
 )
 ```
 
-In the resulting plot, darker colors represent smaller distances (stronger synchrony). You will see a clear, dark diagonal track corresponding to the simulated shift in the dyad's interaction. The overlaid points map exactly to the lowest alignment costs, smoothly tracing the transition from Person A leading to Person B leading.
+In the resulting plot, lighter colors represent smaller distances (stronger synchrony). You will see a diagonal track corresponding to the simulated shift in the dyad's interaction. The overlaid points map exactly to the lowest alignment costs, smoothly tracing the transition from Person A leading to Person B leading.

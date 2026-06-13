@@ -116,8 +116,8 @@ While the heatmap is visually informative, we often want to extract the precise 
 We specify the `L_size` argument to set the local search region. (Since we are feeding it a `wcc_res` object, the function automatically defaults to a local search for maxima).
 
 ```{r optima-extraction}
-# Extract optima using a local search size of 5
-wcc_optima_df <- pick_optima(wcc_results, L_size = 5)
+# Extract optima using a local search size of 10
+wcc_optima_df <- pick_optima(wcc_results, L_size = 10)
 
 print(wcc_optima_df)
 ```
