@@ -77,7 +77,7 @@ wcc_results <- wcc(
 summary(wcc_results)
 ```
 
-Once the cross-correlations are calculated, we extract the specific lags that represent the optimal association within each time window. Printing the optima object displays the extraction metadata alongside the first few results.
+Once the cross-correlations are calculated, we extract the specific lags that represent the optimal association within each time window. Summarizing the optima object displays the extraction metadata alongside an overview of results.
 
 ```{r example-optima}
 # Step 3: Extract the Optima (Local Maxima)
@@ -89,7 +89,7 @@ optima <- pick_optima(
 )
 
 # View the optima results
-optima
+summary(optima)
 ```
 
 Finally, we visualize the resulting correlation landscape. The underlying heatmap represents the cross-correlation values at each lag and elapsed time window. The overlaid points and connecting lines demonstrate the algorithm successfully tracking the shifting lag of optimum association over the course of the interaction.

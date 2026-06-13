@@ -105,9 +105,9 @@ summary(wcc_results)
 ```
 
 Once the cross-correlations are calculated, we extract the specific lags
-that represent the optimal association within each time window. Printing
-the optima object displays the extraction metadata alongside the first
-few results.
+that represent the optimal association within each time window.
+Summarizing the optima object displays the extraction metadata alongside
+an overview of results.
 
 ``` r
 # Step 3: Extract the Optima (Local Maxima)
@@ -119,22 +119,26 @@ optima <- pick_optima(
 )
 
 # View the optima results
-optima
+summary(optima)
 #> 
-#> ── WCC Optima Results ──────────────────────────────────────────────────────────
-#> Total Optima Found: 87
-#> Search Method: local
-#> Search Mode: Peaks (Maxima)
-#> Local Search Size: 5
-#> Strict Monotonic: FALSE
-#> Showing the first 5 results:
-#>    i optimum_lag optimum_value
-#>   76          30     0.9742437
-#>  101          30     0.9811713
-#>  126          30     0.9839800
-#>  151          30     0.9846598
-#>  176          29     0.9900110
-#> # ... with 82 more rows
+#> ── WCC Optima Summary ──────────────────────────────────────────────────────────
+#> 
+#> ── Completeness ──
+#> 
+#> • Total time windows: 87
+#> • Valid optima retained: 87 (100%)
+#> • Optima dropped (NA): 0 (0%)
+#> 
+#> ── Lag Directionality (Leadership) ──
+#> 
+#> • Positive Lags (x leads y): 41 (47.1%)
+#> • Negative Lags (y leads x): 43 (49.4%)
+#> • Zero Lags (Simultaneous): 3 (3.4%)
+#> 
+#> ── Optimum Value Distribution ──
+#> 
+#>     0%    25%    50%    75%   100% 
+#> 0.9710 0.9947 0.9970 0.9976 0.9986
 ```
 
 Finally, we visualize the resulting correlation landscape. The
@@ -179,7 +183,6 @@ surrogate_results <- wcc_surrogate(
 )
 
 surrogate_results
-#> 
 #> ── WCC Surrogate Analysis (Pseudo-Synchrony) ───────────────────────────────────
 #> Permutations: 100
 #> Observed Fisher's Z: 1.065
@@ -196,20 +199,19 @@ If you use **bsync** in your research, please cite the package:
 
 ``` r
 citation("bsync")
-#> Warning in citation("bsync"): could not determine year for 'bsync' from package
-#> DESCRIPTION file
 #> To cite package 'bsync' in publications use:
 #> 
-#>   Girard J (????). _bsync: Behavioral Synchrony Analyses_. R package
-#>   version 0.0.0.9000, <https://jmgirard.github.io/bsync/>.
+#>   Girard J (2026). _bsync: Behavioral Synchrony Analyses_. R package
+#>   version 0.0.0.9000, <https://github.com/jmgirard/bsync>.
 #> 
 #> A BibTeX entry for LaTeX users is
 #> 
 #>   @Manual{,
 #>     title = {bsync: Behavioral Synchrony Analyses},
-#>     author = {Jeffrey Girard},
+#>     author = {Jeffrey M. Girard},
+#>     year = {2026},
 #>     note = {R package version 0.0.0.9000},
-#>     url = {https://jmgirard.github.io/bsync/},
+#>     url = {https://github.com/jmgirard/bsync},
 #>   }
 ```
 

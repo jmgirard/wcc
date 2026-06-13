@@ -30,7 +30,7 @@ Unlike a perfectly stationary interaction, this scenario mimics natural turn-tak
 3. **Phase 3 (30 to 46s):** Person B takes over and leads by 12 frames (0.40 seconds).
 4. **Phase 4 (46 to 60s):** Person A interjects and leads by 8 frames (0.26 seconds).
 
-```{r setup-data}
+```{r setup-data, message=FALSE}
 library(bsync)
 library(dplyr)
 
