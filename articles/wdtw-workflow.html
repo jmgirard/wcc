@@ -5,7 +5,7 @@
 <meta charset="utf-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-<title>WCC Workflow • bsync</title>
+<title>WDTW Workflow • bsync</title>
 <!-- mathjax math --><script src="https://cdn.jsdelivr.net/npm/mathjax@3.2.2/es5/tex-mml-chtml.js" integrity="sha256-MASABpB4tYktI2Oitl4t+78w/lyA+D7b/s9GEP0JOGI=" crossorigin="anonymous"></script><script>
   window.MathJax = {
     chtml: {
@@ -16,7 +16,7 @@
 <link href="../deps/bootstrap-5.3.8/bootstrap.min.css" rel="stylesheet">
 <script src="../deps/bootstrap-5.3.8/bootstrap.bundle.min.js"></script><link href="../deps/font-awesome-6.5.2/css/all.min.css" rel="stylesheet">
 <link href="../deps/font-awesome-6.5.2/css/v4-shims.min.css" rel="stylesheet">
-<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="WCC Workflow">
+<script src="../deps/headroom-0.11.0/headroom.min.js"></script><script src="../deps/headroom-0.11.0/jQuery.headroom.min.js"></script><script src="../deps/bootstrap-toc-1.0.1/bootstrap-toc.min.js"></script><script src="../deps/clipboard.js-2.0.11/clipboard.min.js"></script><script src="../deps/search-1.0.0/autocomplete.jquery.min.js"></script><script src="../deps/search-1.0.0/fuse.min.js"></script><script src="../deps/search-1.0.0/mark.min.js"></script><!-- pkgdown --><script src="../pkgdown.js"></script><meta property="og:title" content="WDTW Workflow">
 </head>
 <body>
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
@@ -63,35 +63,33 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
 
-      <h1>WCC Workflow</h1>
+      <h1>WDTW Workflow</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/jmgirard/bsync/blob/main/vignettes/wcc-workflow.Rmd" class="external-link"><code>vignettes/wcc-workflow.Rmd</code></a></small>
-      <div class="d-none name"><code>wcc-workflow.Rmd</code></div>
+      <small class="dont-index">Source: <a href="https://github.com/jmgirard/bsync/blob/main/vignettes/wdtw-workflow.Rmd" class="external-link"><code>vignettes/wdtw-workflow.Rmd</code></a></small>
+      <div class="d-none name"><code>wdtw-workflow.Rmd</code></div>
     </div>
 
     
     
 <div class="section level2">
-<h2 id="analyzing-interpersonal-synchrony-with-windowed-cross-correlation">Analyzing Interpersonal Synchrony with Windowed
-Cross-Correlation<a class="anchor" aria-label="anchor" href="#analyzing-interpersonal-synchrony-with-windowed-cross-correlation"></a>
+<h2 id="analyzing-interpersonal-synchrony-with-windowed-dynamic-time-warping">Analyzing Interpersonal Synchrony with Windowed Dynamic Time
+Warping<a class="anchor" aria-label="anchor" href="#analyzing-interpersonal-synchrony-with-windowed-dynamic-time-warping"></a>
 </h2>
-<p>This vignette walks through a complete Windowed Cross-Correlation
-(WCC) analysis using the <code>bsync</code> package. WCC is highly
-effective for quantifying interpersonal synchrony because it
-accommodates non-stationary relationships. Unlike global
-cross-correlation, WCC captures how synchronization ebbs and flows over
-time.</p>
-<p>We will cover data simulation, calculating WCC, surrogate testing for
-statistical significance, peak picking, and visualization. For guidance
-on selecting the appropriate window sizes and lag parameters, please see
-the <code><a href="../reference/suggest_wcc_params.html">suggest_wcc_params()</a></code> vignette.</p>
+<p>This vignette walks through a complete Windowed Dynamic Time Warping
+(WDTW) analysis using the <code>bsync</code> package. While Windowed
+Cross-Correlation (WCC) is excellent for capturing linear relationships,
+WDTW excels at finding similarities in signals that might be distorted,
+stretched, or compressed in time.</p>
+<p>It is important to remember that WDTW calculates a distance metric
+rather than a correlation. This means that lower values indicate
+stronger synchronization (a smaller distance between the signals).</p>
 <div class="section level3">
 <h3 id="simulating-realistic-dyadic-data">1. Simulating Realistic Dyadic Data<a class="anchor" aria-label="anchor" href="#simulating-realistic-dyadic-data"></a>
 </h3>
-<p>To demonstrate the workflow, we will simulate a realistic interaction
-between two participants (Person A and Person B) captured at 30 Hz. We
-will generate smooth continuous data to simulate bodily motion.</p>
+<p>To demonstrate the workflow, we will simulate an interaction between
+two participants (Person A and Person B) captured at 30 Hz. We will
+generate smooth continuous data to simulate bodily motion.</p>
 <p>In this scenario, Person A leads the interaction by 15 frames (0.5
 seconds) at the start. Over the course of the 60 seconds, the dynamic
 smoothly transitions until Person B leads by 15 frames at the end.</p>
@@ -105,7 +103,6 @@ smoothly transitions until Person B leads by 15 frames at the end.</p>
 <span><span class="va">n_frames</span> <span class="op">&lt;-</span> <span class="fl">1800</span> <span class="co"># 60 seconds of data</span></span>
 <span></span>
 <span><span class="co"># Generate a smooth base signal using a 30-frame moving average.</span></span>
-<span><span class="co"># This provides enough structure to form a distinct peak within a 90-frame WCC window.</span></span>
 <span><span class="va">raw_noise</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_frames</span> <span class="op">+</span> <span class="fl">300</span><span class="op">)</span></span>
 <span><span class="va">base_signal</span> <span class="op">&lt;-</span> <span class="fu">stats</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">raw_noise</span>, <span class="fu"><a href="https://rdrr.io/r/base/rep.html" class="external-link">rep</a></span><span class="op">(</span><span class="fl">1</span><span class="op">/</span><span class="fl">30</span>, <span class="fl">30</span><span class="op">)</span>, circular <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span><span class="va">base_signal</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/numeric.html" class="external-link">as.numeric</a></span><span class="op">(</span><span class="va">base_signal</span><span class="op">)</span></span>
@@ -130,154 +127,98 @@ smoothly transitions until Person B leads by 15 frames at the end.</p>
 <span>  person_A <span class="op">=</span> <span class="va">person_A</span>,</span>
 <span>  person_B <span class="op">=</span> <span class="va">person_B</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p>By adding a custom simulation here, we avoid relying on highly
-simplified data provided in the package’s raw data files.</p>
 </div>
 <div class="section level3">
-<h3 id="calculating-windowed-cross-correlation">2. Calculating Windowed Cross-Correlation<a class="anchor" aria-label="anchor" href="#calculating-windowed-cross-correlation"></a>
+<h3 id="calculating-windowed-dynamic-time-warping">2. Calculating Windowed Dynamic Time Warping<a class="anchor" aria-label="anchor" href="#calculating-windowed-dynamic-time-warping"></a>
 </h3>
-<p>With our data ready, we can run the primary <code><a href="../reference/wcc.html">wcc()</a></code>
+<p>With our data ready, we can run the primary <code><a href="../reference/wdtw.html">wdtw()</a></code>
 function. This function slides a window across the time series and
-calculates the cross-correlation at various lags within each window.</p>
-<p>We will use a window size of 90 frames (3 seconds) and a maximum lag
-of 45 frames (1.5 seconds). We will also increment the window by 30
-frames (1 second) to allow for overlap and smooth transitions.</p>
+calculates the DTW alignment distance at various lags within each
+window.</p>
+<p>We strongly recommend leaving <code>scale_data = TRUE</code> (the
+default). DTW distances are highly sensitive to the scale of the input
+variables, and z-score standardizing the data ensures that the resulting
+cost matrix is driven by the structural shape of the behaviors rather
+than arbitrary measurement units.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">wcc_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wcc.html">wcc</a></span><span class="op">(</span></span>
-<span>  x <span class="op">=</span> <span class="va">dyad_data</span><span class="op">$</span><span class="va">person_A</span>,</span>
-<span>  y <span class="op">=</span> <span class="va">dyad_data</span><span class="op">$</span><span class="va">person_B</span>,</span>
-<span>  window_size <span class="op">=</span> <span class="fl">90</span>,</span>
-<span>  lag_max <span class="op">=</span> <span class="fl">45</span>,</span>
-<span>  window_increment <span class="op">=</span> <span class="fl">30</span>,</span>
-<span>  lag_increment <span class="op">=</span> <span class="fl">1</span></span>
-<span><span class="op">)</span></span>
-<span></span>
-<span><span class="co"># View a summary of the results</span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">wcc_results</span><span class="op">)</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Windowed Cross-Correlation Analysis</span> <span style="color: #00BBBB;">─────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; Total Windows: 55</span></span>
-<span><span class="co">#&gt; Total Lags Tested: 91</span></span>
-<span><span class="co">#&gt; Window Size: 90</span></span>
-<span><span class="co">#&gt; Max Lag: 45</span></span>
-<span><span class="co">#&gt; Overall Fisher's Z: 0.3851</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── <span style="font-weight: bold;">Cross-Correlation Value Distribution</span> ──</span></span>
-<span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt;      0%     25%     50%     75%    100% </span></span>
-<span><span class="co">#&gt; -0.8028 -0.2108  0.0746  0.3734  0.9576</span></span>
-<span><span class="co">#&gt; <span style="color: #BBBB00;">!</span> 1 missing value (NA) detected.</span></span></code></pre></div>
-<p>The wcc() function returns a list object of class wcc_res containing
-the results data frame, the overall Fisher’s Z score, and the input
-settings. The summary output shows that the sliding window analyzed 55
-distinct time windows across 91 different lags. The overall Fisher’s Z
-score of 0.3851 indicates a positive global correlation, and the
-quantile distribution gives us a quick look at the spread of the
-correlation values across the entire interaction.</p>
-</div>
-<div class="section level3">
-<h3 id="surrogate-testing-for-significance">3. Surrogate Testing for Significance<a class="anchor" aria-label="anchor" href="#surrogate-testing-for-significance"></a>
-</h3>
-<p>Time series data are inherently autocorrelated. Because of this
-autocorrelation, high cross-correlation values can sometimes occur
-purely by chance. To test if the synchronization we observed is
-meaningful, we generate a null distribution using the circular shift
-method.</p>
-<p>The <code><a href="../reference/wcc_surrogate.html">wcc_surrogate()</a></code> function handles this by shifting
-one time series relative to the other, destroying the true synchronous
-relationship while preserving the autocorrelation of the individual
-signals.</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">surrogate_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wcc_surrogate.html">wcc_surrogate</a></span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">wdtw_results</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/wdtw.html">wdtw</a></span><span class="op">(</span></span>
 <span>  x <span class="op">=</span> <span class="va">dyad_data</span><span class="op">$</span><span class="va">person_A</span>,</span>
 <span>  y <span class="op">=</span> <span class="va">dyad_data</span><span class="op">$</span><span class="va">person_B</span>,</span>
 <span>  window_size <span class="op">=</span> <span class="fl">90</span>,</span>
 <span>  lag_max <span class="op">=</span> <span class="fl">45</span>,</span>
 <span>  window_increment <span class="op">=</span> <span class="fl">30</span>,</span>
 <span>  lag_increment <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  n_surrogates <span class="op">=</span> <span class="fl">100</span></span>
+<span>  scale_data <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">surrogate_results</span><span class="op">)</span></span>
+<span><span class="co"># View a summary of the results</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wdtw_results</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">WCC Surrogate Analysis (Pseudo-Synchrony)</span> <span style="color: #00BBBB;">───────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; Permutations: 100</span></span>
-<span><span class="co">#&gt; Observed Fisher's Z: 0.3851</span></span>
-<span><span class="co">#&gt; Average Null Z: 0.3015</span></span>
-<span><span class="co">#&gt; Empirical p-value: &lt; 0.01</span></span>
-<span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Observed synchrony is significantly greater than chance.</span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">ℹ</span> Note: 100 permutations may be too few for stable p-values.</span></span>
-<span><span class="co">#&gt; Consider setting `n_surrogates &gt;= 1000` for final reporting.</span></span></code></pre></div>
-<p>The output gives us an empirical p-value by calculating the
-proportion of surrogate Fisher’s Z scores that meet or exceed our
-observed Fisher’s Z. Here, our observed Z (0.3851) is higher than the
-average null Z (0.3015) produced by the shifted data. Because the
-observed value was higher than all 100 permutations, the empirical
-p-value is reported as &lt; 0.01. This allows us to confidently assert
-that the observed synchrony is significantly greater than what we would
-expect by random chance. You will also notice a helpful console note
-pointing out that 100 permutations are generally too few for stable
-calculations. We use n_surrogates = 100 here for speed during
-exploratory analysis, but to achieve reliable p-values for publication,
-it is highly recommended to run at least 1,000 to 10,000
-permutations.</p>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">Windowed Dynamic Time Warping Analysis</span> <span style="color: #00BBBB;">──────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; Total Windows: 55</span></span>
+<span><span class="co">#&gt; Total Lags Tested: 91</span></span>
+<span><span class="co">#&gt; Window Size: 90</span></span>
+<span><span class="co">#&gt; Max Lag: 45</span></span>
+<span><span class="co">#&gt; Overall Mean Distance: 36.6055</span></span></code></pre></div>
+<p>The <code><a href="../reference/wdtw.html">wdtw()</a></code> function returns a list object of class
+<code>wdtw_res</code> containing the results data frame, the overall
+mean distance, and the input settings.</p>
 </div>
 <div class="section level3">
-<h3 id="peak-picking">4. Peak Picking<a class="anchor" aria-label="anchor" href="#peak-picking"></a>
+<h3 id="valley-picking-extracting-the-minima">3. Valley Picking (Extracting the Minima)<a class="anchor" aria-label="anchor" href="#valley-picking-extracting-the-minima"></a>
 </h3>
-<p>While the heatmap is visually informative, we often want to extract
-the precise lags where coordination is strongest within each time
-window. The <code><a href="../reference/pick_peaks.html">pick_peaks()</a></code> function identifies local maximums
-within the WCC grid.</p>
-<p>We specify the <code>L_size</code> argument to set the local search
-region.</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Extract peaks using a local search size of 5</span></span>
-<span><span class="va">wcc_peaks_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pick_peaks.html">pick_peaks</a></span><span class="op">(</span><span class="va">wcc_results</span>, L_size <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span>
+<p>While the full distance matrix is informative, we often want to
+extract the precise lags where the alignment is optimal within each time
+window. For correlation (WCC), we look for peaks. For distance metrics
+(WDTW), we look for valleys.</p>
+<p>The <code><a href="../reference/pick_peaks.html">pick_peaks()</a></code> function handles this by setting the
+<code>find_min</code> argument to <code>TRUE</code>.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Extract optimal alignment lags (valleys) using a local search size of 5</span></span>
+<span><span class="va">wdtw_valleys_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pick_peaks.html">pick_peaks</a></span><span class="op">(</span><span class="va">wdtw_results</span>, L_size <span class="op">=</span> <span class="fl">5</span>, find_min <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wcc_peaks_df</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wdtw_valleys_df</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">WCC Peak Picking Results</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; Total Extremes Found: 55</span></span>
 <span><span class="co">#&gt; Local Search Size: 5</span></span>
 <span><span class="co">#&gt; Strict Monotonic: FALSE</span></span>
-<span><span class="co">#&gt; Search Mode: Peaks (Maxima)</span></span>
+<span><span class="co">#&gt; Search Mode: Valleys (Minima)</span></span>
 <span><span class="co">#&gt; Showing the first 5 results:</span></span>
-<span><span class="co">#&gt;    i peak_lag  peak_value</span></span>
-<span><span class="co">#&gt;   46      -11 -0.06534940</span></span>
-<span><span class="co">#&gt;   76        1  0.36200916</span></span>
-<span><span class="co">#&gt;  106       -5  0.30862731</span></span>
-<span><span class="co">#&gt;  136       -7  0.04783838</span></span>
-<span><span class="co">#&gt;  166       -7  0.18667881</span></span>
+<span><span class="co">#&gt;    i peak_lag peak_value</span></span>
+<span><span class="co">#&gt;   46       -5   22.53230</span></span>
+<span><span class="co">#&gt;   76       -8   26.66298</span></span>
+<span><span class="co">#&gt;  106       -3   28.71353</span></span>
+<span><span class="co">#&gt;  136        1   23.02804</span></span>
+<span><span class="co">#&gt;  166       -6   25.28022</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;"># ... with 50 more rows</span></span></span></code></pre></div>
-<p>This returns a wcc_peaks data frame containing the elapsed time
-indices, the peak lags, and the corresponding correlation values. The
-summary confirms that the algorithm successfully identified 55 peaks,
-mapping perfectly to our 55 total time windows. It also displays the
-first five local maximums identified using our specified local search
-size.</p>
+<p>This returns a <code>wcc_peaks</code> data frame containing the
+elapsed time indices, the optimal lags, and the corresponding DTW
+distance values. The console output confirms that the search mode was
+successfully set to “Valleys (Minima)”.</p>
 </div>
 <div class="section level3">
-<h3 id="visualizing-the-results">5. Visualizing the Results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
+<h3 id="visualizing-the-results">4. Visualizing the Results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
 </h3>
 <p>Finally, we can visualize the shifting synchronization landscape. The
-<code><a href="../reference/plot_peaks_overlay.html">plot_peaks_overlay()</a></code> function generates a heatmap of the
-correlations and plots the extracted peaks directly on top.</p>
+<code><a href="../reference/plot_peaks_overlay.html">plot_peaks_overlay()</a></code> function detects that it is working
+with a <code>wdtw_res</code> object and automatically applies a
+sequential color palette to map the distances.</p>
 <p>By passing the <code>time_step</code> argument, the axes are
 automatically converted from raw frame indices to seconds.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_peaks_overlay.html">plot_peaks_overlay</a></span><span class="op">(</span></span>
-<span>  wcc_obj <span class="op">=</span> <span class="va">wcc_results</span>,</span>
-<span>  peaks_df <span class="op">=</span> <span class="va">wcc_peaks_df</span>,</span>
+<span>  wcc_obj <span class="op">=</span> <span class="va">wdtw_results</span>,</span>
+<span>  peaks_df <span class="op">=</span> <span class="va">wdtw_valleys_df</span>,</span>
 <span>  time_step <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="va">fs</span>,</span>
 <span>  show_zero_lag <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
-<p><img src="wcc-workflow_files/figure-html/visualization-1.png" class="r-plt" alt="" width="672"></p>
-<p>In the resulting plot, you should clearly see a diagonal track of
-peaks. At the start, the peak synchrony sits securely at a positive lag
-(indicating Person A leads). As time elapses, the peak smoothly drifts
-across the zero-lag line until it settles at a negative lag (indicating
-Person B is now leading).</p>
+<p><img src="wdtw-workflow_files/figure-html/visualization-1.png" class="r-plt" alt="" width="672"></p>
+<p>In the resulting plot, darker colors represent smaller distances
+(stronger synchrony). You will see a clear, dark diagonal track
+corresponding to the simulated shift in the dyad’s interaction. The
+overlaid points map exactly to the lowest alignment costs, smoothly
+tracing the transition from Person A leading to Person B leading.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

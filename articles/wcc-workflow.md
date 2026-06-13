@@ -182,10 +182,11 @@ wcc_peaks_df <- pick_peaks(wcc_results, L_size = 5)
 print(wcc_peaks_df)
 #> 
 #> ── WCC Peak Picking Results ────────────────────────────────────────────────────
-#> Total Peaks Found: 55
+#> Total Extremes Found: 55
 #> Local Search Size: 5
 #> Strict Monotonic: FALSE
-#> Showing the first 5 peaks:
+#> Search Mode: Peaks (Maxima)
+#> Showing the first 5 results:
 #>    i peak_lag  peak_value
 #>   46      -11 -0.06534940
 #>   76        1  0.36200916

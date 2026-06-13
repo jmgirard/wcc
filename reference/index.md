@@ -13,9 +13,11 @@
 - [`calc_velocity_1d()`](https://jmgirard.github.io/bsync/reference/calc_velocity_1d.md)
   : Calculate 1D Velocity
 - [`pick_peaks()`](https://jmgirard.github.io/bsync/reference/pick_peaks.md)
-  : Find Peak Windowed Cross-Correlations
+  : Find Peak (or Valley) Windowed Cross-Correlations
 - [`plot(`*`<wcc_res>`*`)`](https://jmgirard.github.io/bsync/reference/plot.wcc_res.md)
   : Plot wcc_res object
+- [`plot(`*`<wdtw_res>`*`)`](https://jmgirard.github.io/bsync/reference/plot.wdtw_res.md)
+  : Plot wdtw_res object
 - [`plot_peaks_overlay()`](https://jmgirard.github.io/bsync/reference/plot_peaks_overlay.md)
   : Plot Windowed Cross-Correlation with Peak Overlay
 - [`print(`*`<wcc_peaks>`*`)`](https://jmgirard.github.io/bsync/reference/print.wcc_peaks.md)
@@ -24,6 +26,8 @@
   : Print method for wcc_res objects
 - [`print(`*`<wcc_surr>`*`)`](https://jmgirard.github.io/bsync/reference/print.wcc_surr.md)
   : Print method for wcc_surr objects
+- [`print(`*`<wdtw_res>`*`)`](https://jmgirard.github.io/bsync/reference/print.wdtw_res.md)
+  : Print method for wdtw_res objects
 - [`sim_dyad`](https://jmgirard.github.io/bsync/reference/sim_dyad.md) :
   Simulated Dyadic 3D Positional Data
 - [`smooth_signal()`](https://jmgirard.github.io/bsync/reference/smooth_signal.md)
@@ -36,3 +40,5 @@
   Windowed Cross-Correlation
 - [`wcc_surrogate()`](https://jmgirard.github.io/bsync/reference/wcc_surrogate.md)
   : Calculate Surrogate Windowed Cross-Correlations
+- [`wdtw()`](https://jmgirard.github.io/bsync/reference/wdtw.md) :
+  Windowed Dynamic Time Warping

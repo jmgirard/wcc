@@ -1,18 +1,18 @@
-# Find Peak Windowed Cross-Correlations
+# Find Peak (or Valley) Windowed Cross-Correlations
 
-Find Peak Windowed Cross-Correlations
+Find Peak (or Valley) Windowed Cross-Correlations
 
 ## Usage
 
 ``` r
-pick_peaks(wcc_obj, L_size, strict_monotonic = FALSE)
+pick_peaks(wcc_obj, L_size, strict_monotonic = FALSE, find_min = FALSE)
 ```
 
 ## Arguments
 
 - wcc_obj:
 
-  An object of class "wcc_res" returned by \`wcc()\`.
+  An object of class "wcc_res" or "wdtw_res".
 
 - L_size:
 
@@ -20,10 +20,14 @@ pick_peaks(wcc_obj, L_size, strict_monotonic = FALSE)
 
 - strict_monotonic:
 
-  Logical indicating whether to strictly enforce decreasing values on
-  the flanks of the peak. (default = FALSE)
+  Logical indicating whether to strictly enforce monotonic flanks around
+  the extremum. (default = FALSE)
+
+- find_min:
+
+  Logical indicating whether to search for local minima instead of local
+  maxima. Required for distance metrics like DTW. (default = FALSE)
 
 ## Value
 
-A data frame of class "wcc_peaks" containing the elapsed time indices,
-the peak lags, and the peak correlation values.
+A data frame of class "wcc_peaks".

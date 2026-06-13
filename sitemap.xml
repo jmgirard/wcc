@@ -8,6 +8,7 @@
 <url><loc>https://jmgirard.github.io/bsync/articles/index.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/articles/wcc-params.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/articles/wcc-workflow.html</loc></url>
+<url><loc>https://jmgirard.github.io/bsync/articles/wdtw-workflow.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/authors.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/index.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/aggregate_by_time.html</loc></url>
@@ -19,15 +20,18 @@
 <url><loc>https://jmgirard.github.io/bsync/reference/index.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/pick_peaks.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/plot.wcc_res.html</loc></url>
+<url><loc>https://jmgirard.github.io/bsync/reference/plot.wdtw_res.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/plot_peaks_overlay.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/print.wcc_peaks.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/print.wcc_res.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/print.wcc_surr.html</loc></url>
+<url><loc>https://jmgirard.github.io/bsync/reference/print.wdtw_res.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/sim_dyad.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/smooth_signal.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/suggest_wcc_params.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/summary.wcc_res.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/wcc.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/wcc_surrogate.html</loc></url>
+<url><loc>https://jmgirard.github.io/bsync/reference/wdtw.html</loc></url>
 </urlset>
 
