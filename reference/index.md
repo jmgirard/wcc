@@ -12,20 +12,22 @@
   : Calculate 3D Speed
 - [`calc_velocity_1d()`](https://jmgirard.github.io/bsync/reference/calc_velocity_1d.md)
   : Calculate 1D Velocity
-- [`pick_peaks()`](https://jmgirard.github.io/bsync/reference/pick_peaks.md)
-  : Find Peak (or Valley) Windowed Cross-Correlations
+- [`pick_optima()`](https://jmgirard.github.io/bsync/reference/pick_optima.md)
+  : Find Optimum (Peak or Valley) in Windowed Analyses
 - [`plot(`*`<wcc_res>`*`)`](https://jmgirard.github.io/bsync/reference/plot.wcc_res.md)
   : Plot wcc_res object
 - [`plot(`*`<wdtw_res>`*`)`](https://jmgirard.github.io/bsync/reference/plot.wdtw_res.md)
   : Plot wdtw_res object
-- [`plot_peaks_overlay()`](https://jmgirard.github.io/bsync/reference/plot_peaks_overlay.md)
-  : Plot Windowed Cross-Correlation with Peak Overlay
-- [`print(`*`<wcc_peaks>`*`)`](https://jmgirard.github.io/bsync/reference/print.wcc_peaks.md)
-  : Print method for wcc_peaks objects
+- [`plot_optima_overlay()`](https://jmgirard.github.io/bsync/reference/plot_optima_overlay.md)
+  : Plot Surface with Optima Overlay
+- [`print(`*`<wcc_optima>`*`)`](https://jmgirard.github.io/bsync/reference/print.wcc_optima.md)
+  : Print method for wcc_optima objects
 - [`print(`*`<wcc_res>`*`)`](https://jmgirard.github.io/bsync/reference/print.wcc_res.md)
   : Print method for wcc_res objects
 - [`print(`*`<wcc_surr>`*`)`](https://jmgirard.github.io/bsync/reference/print.wcc_surr.md)
   : Print method for wcc_surr objects
+- [`print(`*`<wdtw_optima>`*`)`](https://jmgirard.github.io/bsync/reference/print.wdtw_optima.md)
+  : Print method for wdtw_optima objects
 - [`print(`*`<wdtw_res>`*`)`](https://jmgirard.github.io/bsync/reference/print.wdtw_res.md)
   : Print method for wdtw_res objects
 - [`sim_dyad`](https://jmgirard.github.io/bsync/reference/sim_dyad.md) :

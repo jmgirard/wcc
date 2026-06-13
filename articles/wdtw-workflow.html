@@ -165,51 +165,57 @@ than arbitrary measurement units.</p>
 mean distance, and the input settings.</p>
 </div>
 <div class="section level3">
-<h3 id="valley-picking-extracting-the-minima">3. Valley Picking (Extracting the Minima)<a class="anchor" aria-label="anchor" href="#valley-picking-extracting-the-minima"></a>
+<h3 id="optima-extraction-finding-the-minima">3. Optima Extraction (Finding the Minima)<a class="anchor" aria-label="anchor" href="#optima-extraction-finding-the-minima"></a>
 </h3>
 <p>While the full distance matrix is informative, we often want to
 extract the precise lags where the alignment is optimal within each time
-window. For correlation (WCC), we look for peaks. For distance metrics
-(WDTW), we look for valleys.</p>
-<p>The <code><a href="../reference/pick_peaks.html">pick_peaks()</a></code> function handles this by setting the
-<code>find_min</code> argument to <code>TRUE</code>.</p>
+window. For correlation (WCC), optimal alignment means the highest value
+(peaks). For distance metrics (WDTW), optimal alignment means the lowest
+cost (valleys).</p>
+<p>The <code><a href="../reference/pick_optima.html">pick_optima()</a></code> function handles this seamlessly.
+Because we are providing a <code>wdtw_res</code> object, the function
+automatically infers that it should execute a global search across the
+window to find the absolute minimum distance
+(<code>search_method = "global"</code> and
+<code>find_min = TRUE</code>).</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Extract optimal alignment lags (valleys) using a local search size of 5</span></span>
-<span><span class="va">wdtw_valleys_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pick_peaks.html">pick_peaks</a></span><span class="op">(</span><span class="va">wdtw_results</span>, L_size <span class="op">=</span> <span class="fl">5</span>, find_min <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="co"># Extract optimal alignment lags (valleys) using the default global search</span></span>
+<span><span class="va">wdtw_optima_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pick_optima.html">pick_optima</a></span><span class="op">(</span><span class="va">wdtw_results</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wdtw_valleys_df</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wdtw_optima_df</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">WCC Peak Picking Results</span> <span style="color: #00BBBB;">────────────────────────────────────────────────────</span></span></span>
-<span><span class="co">#&gt; Total Extremes Found: 55</span></span>
-<span><span class="co">#&gt; Local Search Size: 5</span></span>
-<span><span class="co">#&gt; Strict Monotonic: FALSE</span></span>
+<span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">WDTW Optima Results</span> <span style="color: #00BBBB;">─────────────────────────────────────────────────────────</span></span></span>
+<span><span class="co">#&gt; Total Optima Found: 55</span></span>
+<span><span class="co">#&gt; Search Method: global</span></span>
 <span><span class="co">#&gt; Search Mode: Valleys (Minima)</span></span>
 <span><span class="co">#&gt; Showing the first 5 results:</span></span>
-<span><span class="co">#&gt;    i peak_lag peak_value</span></span>
-<span><span class="co">#&gt;   46       -5   22.53230</span></span>
-<span><span class="co">#&gt;   76       -8   26.66298</span></span>
-<span><span class="co">#&gt;  106       -3   28.71353</span></span>
-<span><span class="co">#&gt;  136        1   23.02804</span></span>
-<span><span class="co">#&gt;  166       -6   25.28022</span></span>
+<span><span class="co">#&gt;    i optimum_lag optimum_value</span></span>
+<span><span class="co">#&gt;   46          12      19.21710</span></span>
+<span><span class="co">#&gt;   76          11      19.71480</span></span>
+<span><span class="co">#&gt;  106          11      19.48473</span></span>
+<span><span class="co">#&gt;  136          12      20.30806</span></span>
+<span><span class="co">#&gt;  166          12      19.16016</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;"># ... with 50 more rows</span></span></span></code></pre></div>
-<p>This returns a <code>wcc_peaks</code> data frame containing the
+<p>This returns a <code>wdtw_optima</code> data frame containing the
 elapsed time indices, the optimal lags, and the corresponding DTW
 distance values. The console output confirms that the search mode was
-successfully set to “Valleys (Minima)”.</p>
+successfully set to “Valleys (Minima)” using a “global” search
+method.</p>
 </div>
 <div class="section level3">
 <h3 id="visualizing-the-results">4. Visualizing the Results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
 </h3>
 <p>Finally, we can visualize the shifting synchronization landscape. The
-<code><a href="../reference/plot_peaks_overlay.html">plot_peaks_overlay()</a></code> function detects that it is working
+<code><a href="../reference/plot_optima_overlay.html">plot_optima_overlay()</a></code> function detects that it is working
 with a <code>wdtw_res</code> object and automatically applies a
-sequential color palette to map the distances.</p>
+sequential viridis color palette to map the distances, while plotting
+the global minima points on top.</p>
 <p>By passing the <code>time_step</code> argument, the axes are
 automatically converted from raw frame indices to seconds.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_peaks_overlay.html">plot_peaks_overlay</a></span><span class="op">(</span></span>
-<span>  wcc_obj <span class="op">=</span> <span class="va">wdtw_results</span>,</span>
-<span>  peaks_df <span class="op">=</span> <span class="va">wdtw_valleys_df</span>,</span>
+<code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_optima_overlay.html">plot_optima_overlay</a></span><span class="op">(</span></span>
+<span>  surface_obj <span class="op">=</span> <span class="va">wdtw_results</span>,</span>
+<span>  optima_df <span class="op">=</span> <span class="va">wdtw_optima_df</span>,</span>
 <span>  time_step <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="va">fs</span>,</span>
 <span>  show_zero_lag <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span><span class="op">)</span></span></code></pre></div>

@@ -9,9 +9,9 @@ non-stationary relationships. Unlike global cross-correlation, WCC
 captures how synchronization ebbs and flows over time.
 
 We will cover data simulation, calculating WCC, surrogate testing for
-statistical significance, peak picking, and visualization. For guidance
-on selecting the appropriate window sizes and lag parameters, please see
-the
+statistical significance, optima extraction, and visualization. For
+guidance on selecting the appropriate window sizes and lag parameters,
+please see the
 [`suggest_wcc_params()`](https://jmgirard.github.io/bsync/reference/suggest_wcc_params.md)
 vignette.
 
@@ -105,13 +105,14 @@ summary(wcc_results)
 #> ! 1 missing value (NA) detected.
 ```
 
-The wcc() function returns a list object of class wcc_res containing the
-results data frame, the overall Fisher’s Z score, and the input
-settings. The summary output shows that the sliding window analyzed 55
-distinct time windows across 91 different lags. The overall Fisher’s Z
-score of 0.3851 indicates a positive global correlation, and the
-quantile distribution gives us a quick look at the spread of the
-correlation values across the entire interaction.
+The [`wcc()`](https://jmgirard.github.io/bsync/reference/wcc.md)
+function returns a list object of class `wcc_res` containing the results
+data frame, the overall Fisher’s Z score, and the input settings. The
+summary output shows that the sliding window analyzed 55 distinct time
+windows across 91 different lags. The overall Fisher’s Z score of 0.3851
+indicates a positive global correlation, and the quantile distribution
+gives us a quick look at the spread of the correlation values across the
+entire interaction.
 
 ### 3. Surrogate Testing for Significance
 
@@ -160,63 +161,67 @@ higher than all 100 permutations, the empirical p-value is reported as
 synchrony is significantly greater than what we would expect by random
 chance. You will also notice a helpful console note pointing out that
 100 permutations are generally too few for stable calculations. We use
-n_surrogates = 100 here for speed during exploratory analysis, but to
+`n_surrogates = 100` here for speed during exploratory analysis, but to
 achieve reliable p-values for publication, it is highly recommended to
 run at least 1,000 to 10,000 permutations.
 
-### 4. Peak Picking
+### 4. Optima Extraction
 
 While the heatmap is visually informative, we often want to extract the
 precise lags where coordination is strongest within each time window.
 The
-[`pick_peaks()`](https://jmgirard.github.io/bsync/reference/pick_peaks.md)
+[`pick_optima()`](https://jmgirard.github.io/bsync/reference/pick_optima.md)
 function identifies local maximums within the WCC grid.
 
-We specify the `L_size` argument to set the local search region.
+We specify the `L_size` argument to set the local search region. (Since
+we are feeding it a `wcc_res` object, the function automatically
+defaults to a local search for maxima).
 
 ``` r
 
-# Extract peaks using a local search size of 5
-wcc_peaks_df <- pick_peaks(wcc_results, L_size = 5)
+# Extract optima using a local search size of 5
+wcc_optima_df <- pick_optima(wcc_results, L_size = 5)
 
-print(wcc_peaks_df)
+print(wcc_optima_df)
 #> 
-#> ── WCC Peak Picking Results ────────────────────────────────────────────────────
-#> Total Extremes Found: 55
+#> ── WCC Optima Results ──────────────────────────────────────────────────────────
+#> Total Optima Found: 55
+#> Search Method: local
+#> Search Mode: Peaks (Maxima)
 #> Local Search Size: 5
 #> Strict Monotonic: FALSE
-#> Search Mode: Peaks (Maxima)
 #> Showing the first 5 results:
-#>    i peak_lag  peak_value
-#>   46      -11 -0.06534940
-#>   76        1  0.36200916
-#>  106       -5  0.30862731
-#>  136       -7  0.04783838
-#>  166       -7  0.18667881
+#>    i optimum_lag optimum_value
+#>   46         -11   -0.06534940
+#>   76           1    0.36200916
+#>  106          -5    0.30862731
+#>  136          -7    0.04783838
+#>  166          -7    0.18667881
 #> # ... with 50 more rows
 ```
 
-This returns a wcc_peaks data frame containing the elapsed time indices,
-the peak lags, and the corresponding correlation values. The summary
-confirms that the algorithm successfully identified 55 peaks, mapping
-perfectly to our 55 total time windows. It also displays the first five
-local maximums identified using our specified local search size.
+This returns a `wcc_optima` data frame containing the elapsed time
+indices, the optimum lags, and the corresponding correlation values. The
+summary confirms that the algorithm successfully identified 55 optima,
+mapping perfectly to our 55 total time windows. It also displays the
+first five local maximums identified using our specified local search
+size.
 
 ### 5. Visualizing the Results
 
 Finally, we can visualize the shifting synchronization landscape. The
-[`plot_peaks_overlay()`](https://jmgirard.github.io/bsync/reference/plot_peaks_overlay.md)
+[`plot_optima_overlay()`](https://jmgirard.github.io/bsync/reference/plot_optima_overlay.md)
 function generates a heatmap of the correlations and plots the extracted
-peaks directly on top.
+optima directly on top.
 
 By passing the `time_step` argument, the axes are automatically
 converted from raw frame indices to seconds.
 
 ``` r
 
-plot_peaks_overlay(
-  wcc_obj = wcc_results,
-  peaks_df = wcc_peaks_df,
+plot_optima_overlay(
+  surface_obj = wcc_results,
+  optima_df = wcc_optima_df,
   time_step = 1 / fs,
   show_zero_lag = TRUE
 )
@@ -224,8 +229,8 @@ plot_peaks_overlay(
 
 ![](wcc-workflow_files/figure-html/visualization-1.png)
 
-In the resulting plot, you should clearly see a diagonal track of peaks.
-At the start, the peak synchrony sits securely at a positive lag
-(indicating Person A leads). As time elapses, the peak smoothly drifts
-across the zero-lag line until it settles at a negative lag (indicating
-Person B is now leading).
+In the resulting plot, you should clearly see a diagonal track of
+optima. At the start, the optimum synchrony sits securely at a positive
+lag (indicating Person A leads). As time elapses, the optimum smoothly
+drifts across the zero-lag line until it settles at a negative lag
+(indicating Person B is now leading).

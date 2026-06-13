@@ -78,7 +78,8 @@
 <div class="section level2">
 <h2 id="example-workflow">Example Workflow<a class="anchor" aria-label="anchor" href="#example-workflow"></a>
 </h2>
-<p>The following example demonstrates the complete <code>bsync</code> pipeline. We will use the included <code>sim_dyad</code> dataset, which contains 30 seconds of simulated 3D motion tracking data for two individuals. In this simulation, Person A begins by leading a rhythmic movement, they synchronize in the middle, and Person B takes the lead by the end.</p>
+<p>The following example demonstrates a Quick Start WCC pipeline. For a deeper dive into WCC or to learn about Windowed Dynamic Time Warping (WDTW), please see the included package vignettes.</p>
+<p>We will use the included <code>sim_dyad</code> dataset, which contains 30 seconds of simulated 3D motion tracking data for two individuals. In this simulation, Person A begins by leading a rhythmic movement, they synchronize in the middle, and Person B takes the lead by the end.</p>
 <p>First, we load the package and prepare the data. We highly recommend smoothing positional data before calculating velocities to prevent high-frequency noise from amplifying and skewing the cross-correlations. Here we apply a Savitzky-Golay filter and then calculate the 1D directional velocity on the Z-axis.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://jmgirard.github.io/bsync/">bsync</a></span><span class="op">)</span></span>
@@ -122,34 +123,40 @@
 <span><span class="co">#&gt;      0%     25%     50%     75%    100% </span></span>
 <span><span class="co">#&gt; -0.9984 -0.6770  0.0410  0.7185  0.9986</span></span>
 <span><span class="co">#&gt; ! 78 missing values (NA) detected.</span></span></code></pre></div>
-<p>Once the cross-correlations are calculated, we extract the specific lags that represent the peak association within each time window. Printing the peak object displays the peak-picking metadata alongside the first few results.</p>
+<p>Once the cross-correlations are calculated, we extract the specific lags that represent the optimal association within each time window. Printing the optima object displays the extraction metadata alongside the first few results.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Step 3: Extract the Peaks</span></span>
-<span><span class="va">peaks</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pick_peaks.html">pick_peaks</a></span><span class="op">(</span></span>
-<span>  wcc_obj <span class="op">=</span> <span class="va">wcc_results</span>,</span>
+<code class="sourceCode R"><span><span class="co"># Step 3: Extract the Optima (Local Maxima)</span></span>
+<span><span class="va">optima</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/pick_optima.html">pick_optima</a></span><span class="op">(</span></span>
+<span>  obj <span class="op">=</span> <span class="va">wcc_results</span>,</span>
 <span>  L_size <span class="op">=</span> <span class="fl">5</span>,</span>
-<span>  strict_monotonic <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  strict_monotonic <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  search_method <span class="op">=</span> <span class="st">"local"</span></span>
 <span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># View the peak results</span></span>
-<span><span class="va">peaks</span></span>
+<span><span class="co"># View the optima results</span></span>
+<span><span class="va">optima</span></span>
 <span><span class="co">#&gt; </span></span>
-<span><span class="co">#&gt; ── WCC Peak Picking Results ────────────────────────────────────────────────────</span></span>
-<span><span class="co">#&gt; Total Peaks Found: 87</span></span>
+<span><span class="co">#&gt; ── WCC Optima Results ──────────────────────────────────────────────────────────</span></span>
+<span><span class="co">#&gt; Total Optima Found: 87</span></span>
+<span><span class="co">#&gt; Search Method: local</span></span>
+<span><span class="co">#&gt; Search Mode: Peaks (Maxima)</span></span>
 <span><span class="co">#&gt; Local Search Size: 5</span></span>
 <span><span class="co">#&gt; Strict Monotonic: FALSE</span></span>
-<span><span class="co">#&gt; Showing the first 5 peaks:</span></span>
-<span><span class="co">#&gt;    i peak_lag peak_value</span></span>
-<span><span class="co">#&gt;   76       30  0.9742437</span></span>
-<span><span class="co">#&gt;  101       30  0.9811713</span></span>
-<span><span class="co">#&gt;  126       30  0.9839800</span></span>
-<span><span class="co">#&gt;  151       30  0.9846598</span></span>
-<span><span class="co">#&gt;  176       29  0.9900110</span></span>
+<span><span class="co">#&gt; Showing the first 5 results:</span></span>
+<span><span class="co">#&gt;    i optimum_lag optimum_value</span></span>
+<span><span class="co">#&gt;   76          30     0.9742437</span></span>
+<span><span class="co">#&gt;  101          30     0.9811713</span></span>
+<span><span class="co">#&gt;  126          30     0.9839800</span></span>
+<span><span class="co">#&gt;  151          30     0.9846598</span></span>
+<span><span class="co">#&gt;  176          29     0.9900110</span></span>
 <span><span class="co">#&gt; # ... with 82 more rows</span></span></code></pre></div>
-<p>Finally, we visualize the resulting correlation landscape. The underlying heatmap represents the cross-correlation values at each lag and elapsed time window. The overlaid black dots and lines demonstrate the algorithm successfully tracking the shifting lag of maximum association over the course of the interaction.</p>
+<p>Finally, we visualize the resulting correlation landscape. The underlying heatmap represents the cross-correlation values at each lag and elapsed time window. The overlaid points and connecting lines demonstrate the algorithm successfully tracking the shifting lag of optimum association over the course of the interaction.</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Step 4: Plot the correlation landscape and overlay the shifting peaks</span></span>
-<span><span class="fu"><a href="reference/plot_peaks_overlay.html">plot_peaks_overlay</a></span><span class="op">(</span><span class="va">wcc_results</span>, <span class="va">peaks</span><span class="op">)</span></span></code></pre></div>
+<code class="sourceCode R"><span><span class="co"># Step 4: Plot the correlation landscape and overlay the shifting optima</span></span>
+<span><span class="fu"><a href="reference/plot_optima_overlay.html">plot_optima_overlay</a></span><span class="op">(</span></span>
+<span>  surface_obj <span class="op">=</span> <span class="va">wcc_results</span>,</span>
+<span>  optima_df <span class="op">=</span> <span class="va">optima</span></span>
+<span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/README-example-plot-1.png" alt="" width="100%"></p>
 <div class="section level3">
 <h3 id="surrogate-testing-for-significance">Surrogate Testing for Significance<a class="anchor" aria-label="anchor" href="#surrogate-testing-for-significance"></a>
@@ -175,8 +182,10 @@
 <span><span class="co">#&gt; Permutations: 100</span></span>
 <span><span class="co">#&gt; Observed Fisher's Z: 1.065</span></span>
 <span><span class="co">#&gt; Average Null Z: 0.9894</span></span>
-<span><span class="co">#&gt; Empirical p-value: 0</span></span>
-<span><span class="co">#&gt; ✔ Observed synchrony is significantly greater than chance.</span></span></code></pre></div>
+<span><span class="co">#&gt; Empirical p-value: &lt; 0.01</span></span>
+<span><span class="co">#&gt; ✔ Observed synchrony is significantly greater than chance.</span></span>
+<span><span class="co">#&gt; ℹ Note: 100 permutations may be too few for stable p-values.</span></span>
+<span><span class="co">#&gt; Consider setting `n_surrogates &gt;= 1000` for final reporting.</span></span></code></pre></div>
 </div>
 </div>
 <div class="section level2">
@@ -192,6 +201,14 @@
 <p>The core WCC algorithm and peak-picking logic are based on:</p>
 <ul>
 <li>Boker, S. M., Rotondo, J. L., Xu, M., &amp; King, K. (2002). Windowed cross-correlation and peak picking for the analysis of variability in the association between behavioral time series. <em>Psychological Methods, 7</em>(3), 338.</li>
+</ul>
+</div>
+<div class="section level3">
+<h3 id="dynamic-time-warping">Dynamic Time Warping<a class="anchor" aria-label="anchor" href="#dynamic-time-warping"></a>
+</h3>
+<p>The core DTW alignment algorithm is based on foundational work by:</p>
+<ul>
+<li>Sakoe, H., &amp; Chiba, S. (1978). Dynamic programming algorithm optimization for spoken word recognition. <em>IEEE Transactions on Acoustics, Speech, and Signal Processing, 26</em>(1), 43-49.</li>
 </ul>
 </div>
 <div class="section level3">

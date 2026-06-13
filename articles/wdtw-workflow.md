@@ -99,59 +99,63 @@ The [`wdtw()`](https://jmgirard.github.io/bsync/reference/wdtw.md)
 function returns a list object of class `wdtw_res` containing the
 results data frame, the overall mean distance, and the input settings.
 
-### 3. Valley Picking (Extracting the Minima)
+### 3. Optima Extraction (Finding the Minima)
 
 While the full distance matrix is informative, we often want to extract
 the precise lags where the alignment is optimal within each time window.
-For correlation (WCC), we look for peaks. For distance metrics (WDTW),
-we look for valleys.
+For correlation (WCC), optimal alignment means the highest value
+(peaks). For distance metrics (WDTW), optimal alignment means the lowest
+cost (valleys).
 
 The
-[`pick_peaks()`](https://jmgirard.github.io/bsync/reference/pick_peaks.md)
-function handles this by setting the `find_min` argument to `TRUE`.
+[`pick_optima()`](https://jmgirard.github.io/bsync/reference/pick_optima.md)
+function handles this seamlessly. Because we are providing a `wdtw_res`
+object, the function automatically infers that it should execute a
+global search across the window to find the absolute minimum distance
+(`search_method = "global"` and `find_min = TRUE`).
 
 ``` r
 
-# Extract optimal alignment lags (valleys) using a local search size of 5
-wdtw_valleys_df <- pick_peaks(wdtw_results, L_size = 5, find_min = TRUE)
+# Extract optimal alignment lags (valleys) using the default global search
+wdtw_optima_df <- pick_optima(wdtw_results)
 
-print(wdtw_valleys_df)
+print(wdtw_optima_df)
 #> 
-#> ── WCC Peak Picking Results ────────────────────────────────────────────────────
-#> Total Extremes Found: 55
-#> Local Search Size: 5
-#> Strict Monotonic: FALSE
+#> ── WDTW Optima Results ─────────────────────────────────────────────────────────
+#> Total Optima Found: 55
+#> Search Method: global
 #> Search Mode: Valleys (Minima)
 #> Showing the first 5 results:
-#>    i peak_lag peak_value
-#>   46       -5   22.53230
-#>   76       -8   26.66298
-#>  106       -3   28.71353
-#>  136        1   23.02804
-#>  166       -6   25.28022
+#>    i optimum_lag optimum_value
+#>   46          12      19.21710
+#>   76          11      19.71480
+#>  106          11      19.48473
+#>  136          12      20.30806
+#>  166          12      19.16016
 #> # ... with 50 more rows
 ```
 
-This returns a `wcc_peaks` data frame containing the elapsed time
+This returns a `wdtw_optima` data frame containing the elapsed time
 indices, the optimal lags, and the corresponding DTW distance values.
 The console output confirms that the search mode was successfully set to
-“Valleys (Minima)”.
+“Valleys (Minima)” using a “global” search method.
 
 ### 4. Visualizing the Results
 
 Finally, we can visualize the shifting synchronization landscape. The
-[`plot_peaks_overlay()`](https://jmgirard.github.io/bsync/reference/plot_peaks_overlay.md)
+[`plot_optima_overlay()`](https://jmgirard.github.io/bsync/reference/plot_optima_overlay.md)
 function detects that it is working with a `wdtw_res` object and
-automatically applies a sequential color palette to map the distances.
+automatically applies a sequential viridis color palette to map the
+distances, while plotting the global minima points on top.
 
 By passing the `time_step` argument, the axes are automatically
 converted from raw frame indices to seconds.
 
 ``` r
 
-plot_peaks_overlay(
-  wcc_obj = wdtw_results,
-  peaks_df = wdtw_valleys_df,
+plot_optima_overlay(
+  surface_obj = wdtw_results,
+  optima_df = wdtw_optima_df,
   time_step = 1 / fs,
   show_zero_lag = TRUE
 )

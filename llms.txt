@@ -30,9 +30,12 @@ pak::pak("jmgirard/bsync")
 
 ## Example Workflow
 
-The following example demonstrates the complete `bsync` pipeline. We
-will use the included `sim_dyad` dataset, which contains 30 seconds of
-simulated 3D motion tracking data for two individuals. In this
+The following example demonstrates a Quick Start WCC pipeline. For a
+deeper dive into WCC or to learn about Windowed Dynamic Time Warping
+(WDTW), please see the included package vignettes.
+
+We will use the included `sim_dyad` dataset, which contains 30 seconds
+of simulated 3D motion tracking data for two individuals. In this
 simulation, Person A begins by leading a rhythmic movement, they
 synchronize in the middle, and Person B takes the lead by the end.
 
@@ -95,46 +98,52 @@ summary(wcc_results)
 ```
 
 Once the cross-correlations are calculated, we extract the specific lags
-that represent the peak association within each time window. Printing
-the peak object displays the peak-picking metadata alongside the first
+that represent the optimal association within each time window. Printing
+the optima object displays the extraction metadata alongside the first
 few results.
 
 ``` r
 
-# Step 3: Extract the Peaks
-peaks <- pick_peaks(
-  wcc_obj = wcc_results,
+# Step 3: Extract the Optima (Local Maxima)
+optima <- pick_optima(
+  obj = wcc_results,
   L_size = 5,
-  strict_monotonic = FALSE
+  strict_monotonic = FALSE,
+  search_method = "local"
 )
 
-# View the peak results
-peaks
+# View the optima results
+optima
 #> 
-#> ── WCC Peak Picking Results ────────────────────────────────────────────────────
-#> Total Peaks Found: 87
+#> ── WCC Optima Results ──────────────────────────────────────────────────────────
+#> Total Optima Found: 87
+#> Search Method: local
+#> Search Mode: Peaks (Maxima)
 #> Local Search Size: 5
 #> Strict Monotonic: FALSE
-#> Showing the first 5 peaks:
-#>    i peak_lag peak_value
-#>   76       30  0.9742437
-#>  101       30  0.9811713
-#>  126       30  0.9839800
-#>  151       30  0.9846598
-#>  176       29  0.9900110
+#> Showing the first 5 results:
+#>    i optimum_lag optimum_value
+#>   76          30     0.9742437
+#>  101          30     0.9811713
+#>  126          30     0.9839800
+#>  151          30     0.9846598
+#>  176          29     0.9900110
 #> # ... with 82 more rows
 ```
 
 Finally, we visualize the resulting correlation landscape. The
 underlying heatmap represents the cross-correlation values at each lag
-and elapsed time window. The overlaid black dots and lines demonstrate
-the algorithm successfully tracking the shifting lag of maximum
-association over the course of the interaction.
+and elapsed time window. The overlaid points and connecting lines
+demonstrate the algorithm successfully tracking the shifting lag of
+optimum association over the course of the interaction.
 
 ``` r
 
-# Step 4: Plot the correlation landscape and overlay the shifting peaks
-plot_peaks_overlay(wcc_results, peaks)
+# Step 4: Plot the correlation landscape and overlay the shifting optima
+plot_optima_overlay(
+  surface_obj = wcc_results,
+  optima_df = optima
+)
 ```
 
 ![](reference/figures/README-example-plot-1.png)
@@ -173,8 +182,10 @@ surrogate_results
 #> Permutations: 100
 #> Observed Fisher's Z: 1.065
 #> Average Null Z: 0.9894
-#> Empirical p-value: 0
+#> Empirical p-value: < 0.01
 #> ✔ Observed synchrony is significantly greater than chance.
+#> ℹ Note: 100 permutations may be too few for stable p-values.
+#> Consider setting `n_surrogates >= 1000` for final reporting.
 ```
 
 ## Citation
@@ -199,6 +210,14 @@ The core WCC algorithm and peak-picking logic are based on:
   cross-correlation and peak picking for the analysis of variability in
   the association between behavioral time series. *Psychological
   Methods, 7*(3), 338.
+
+### Dynamic Time Warping
+
+The core DTW alignment algorithm is based on foundational work by:
+
+- Sakoe, H., & Chiba, S. (1978). Dynamic programming algorithm
+  optimization for spoken word recognition. *IEEE Transactions on
+  Acoustics, Speech, and Signal Processing, 26*(1), 43-49.
 
 ### Pseudo-Synchrony & Surrogate Testing
 
@@ -234,20 +253,22 @@ polynomial filtering techniques originally developed by:
   : Calculate 3D Speed
 - [`calc_velocity_1d()`](https://jmgirard.github.io/bsync/reference/calc_velocity_1d.md)
   : Calculate 1D Velocity
-- [`pick_peaks()`](https://jmgirard.github.io/bsync/reference/pick_peaks.md)
-  : Find Peak (or Valley) Windowed Cross-Correlations
+- [`pick_optima()`](https://jmgirard.github.io/bsync/reference/pick_optima.md)
+  : Find Optimum (Peak or Valley) in Windowed Analyses
 - [`plot(`*`<wcc_res>`*`)`](https://jmgirard.github.io/bsync/reference/plot.wcc_res.md)
   : Plot wcc_res object
 - [`plot(`*`<wdtw_res>`*`)`](https://jmgirard.github.io/bsync/reference/plot.wdtw_res.md)
   : Plot wdtw_res object
-- [`plot_peaks_overlay()`](https://jmgirard.github.io/bsync/reference/plot_peaks_overlay.md)
-  : Plot Windowed Cross-Correlation with Peak Overlay
-- [`print(`*`<wcc_peaks>`*`)`](https://jmgirard.github.io/bsync/reference/print.wcc_peaks.md)
-  : Print method for wcc_peaks objects
+- [`plot_optima_overlay()`](https://jmgirard.github.io/bsync/reference/plot_optima_overlay.md)
+  : Plot Surface with Optima Overlay
+- [`print(`*`<wcc_optima>`*`)`](https://jmgirard.github.io/bsync/reference/print.wcc_optima.md)
+  : Print method for wcc_optima objects
 - [`print(`*`<wcc_res>`*`)`](https://jmgirard.github.io/bsync/reference/print.wcc_res.md)
   : Print method for wcc_res objects
 - [`print(`*`<wcc_surr>`*`)`](https://jmgirard.github.io/bsync/reference/print.wcc_surr.md)
   : Print method for wcc_surr objects
+- [`print(`*`<wdtw_optima>`*`)`](https://jmgirard.github.io/bsync/reference/print.wdtw_optima.md)
+  : Print method for wdtw_optima objects
 - [`print(`*`<wdtw_res>`*`)`](https://jmgirard.github.io/bsync/reference/print.wdtw_res.md)
   : Print method for wdtw_res objects
 - [`sim_dyad`](https://jmgirard.github.io/bsync/reference/sim_dyad.md) :
