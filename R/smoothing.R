@@ -86,3 +86,36 @@ aggregate_by_time <- function(data, time_var, bin_width, na.rm = TRUE) {
     dplyr::mutate({{ time_var }} := .bin_center) |>
     dplyr::select(-.bin_center)
 }
+
+#' Trim Edge Effects from Data
+#'
+#' Removes a specified number of observations from the beginning and end of a
+#' vector or data frame. This is highly recommended after applying zero-phase or
+#' polynomial smoothing filters (e.g., Savitzky-Golay) to remove boundary artifacts.
+#'
+#' @param x A numeric vector, matrix, or data frame.
+#' @param trim_length An integer specifying the number of observations to remove
+#'   from both ends. A standard rule of thumb is to set this equal to the window
+#'   size used for smoothing.
+#' @return An object of the same class as `x` with the edges removed.
+#' @export
+trim_edges <- function(x, trim_length) {
+  assertthat::assert_that(rlang::is_integerish(trim_length, n = 1))
+  assertthat::assert_that(trim_length > 0)
+
+  if (is.data.frame(x) || is.matrix(x)) {
+    n_rows <- nrow(x)
+    if (n_rows <= 2 * trim_length) {
+      stop("trim_length is too large; it would remove all rows from the data.")
+    }
+    return(x[(trim_length + 1):(n_rows - trim_length), , drop = FALSE])
+  } else if (is.vector(x)) {
+    n_len <- length(x)
+    if (n_len <= 2 * trim_length) {
+      stop("trim_length is too large; it would remove all elements from the vector.")
+    }
+    return(x[(trim_length + 1):(n_len - trim_length)])
+  } else {
+    stop("Input must be a vector, matrix, or data frame.")
+  }
+}
