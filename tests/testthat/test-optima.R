@@ -274,3 +274,38 @@ test_that("print_optima handles exactly 1 remaining row for pluralization logic"
   # This snapshot should capture the singular "... with 1 more row" string
   expect_snapshot(print(res_six))
 })
+
+test_that("pick_optima correctly assigns default search methods when NULL", {
+  # WCC defaults to 'local' but still requires L_size
+  mock_wcc <- create_mock_wcc(c(0.1, 0.5, 0.9, 0.5, 0.1), tau_max = 2)
+  res_wcc_default <- pick_optima(mock_wcc, L_size = 3)
+
+  expect_equal(attr(res_wcc_default, "search_method"), "local")
+  expect_equal(res_wcc_default$optimum_lag, 0)
+
+  # WDTW defaults to 'global'
+  mock_wdtw <- create_mock_wdtw(c(10.0, 5.0, 1.1, 5.0, 10.0), tau_max = 2)
+  res_wdtw_default <- pick_optima(mock_wdtw)
+
+  expect_equal(attr(res_wdtw_default, "search_method"), "global")
+  expect_equal(res_wdtw_default$optimum_lag, 0)
+})
+
+test_that("pick_optima_cpp catches length mismatches", {
+  df_corrupted <- data.frame(
+    i = rep(100, 4),
+    tau = -2:1,
+    wcc = c(0.1, 0.5, 0.9, 0.5)
+  )
+
+  mock_corrupted <- list(
+    results_df = df_corrupted,
+    settings = list(lag_max = 2)
+  )
+  class(mock_corrupted) <- c("wcc_res", "list")
+
+  expect_error(
+    pick_optima(mock_corrupted, L_size = 3, search_method = "local"),
+    "does not match the expected length"
+  )
+})
