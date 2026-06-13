@@ -147,7 +147,8 @@ print(surrogate_results)
 #> Average Null Z: 0.3015
 #> Empirical p-value: < 0.01
 #> ✔ Observed synchrony is significantly greater than chance.
-#> ℹ Note: 100 permutations may be too few for stable p-values. Consider setting `n_surrogates >= 1000` for final reporting.
+#> ℹ Note: 100 permutations may be too few for stable p-values.
+#> Consider setting `n_surrogates >= 1000` for final reporting.
 ```
 
 The output gives us an empirical p-value by calculating the proportion
