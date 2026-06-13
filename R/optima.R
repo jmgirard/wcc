@@ -21,7 +21,7 @@
 pick_optima <- function(obj, L_size = NULL, strict_monotonic = FALSE,
   find_min = NULL, search_method = NULL, threshold = NULL) {
 
-  # 1. Dynamically determine metric, class, and default search parameters based on input
+  # Dynamically determine metric, class, and default search parameters based on input
   if (inherits(obj, "wcc_res")) {
     metric_col <- "wcc"
     out_class <- "wcc_optima"
@@ -39,19 +39,19 @@ pick_optima <- function(obj, L_size = NULL, strict_monotonic = FALSE,
   tau_max <- obj$settings$lag_max
   df <- obj$results_df
 
-  # 2. Order data chronologically and by lag
+  # Order data chronologically and by lag
   df <- df[order(df$i, df$tau), ]
 
-  # 3. Branch routing based on chosen search method
   if (search_method == "local") {
 
     if (is.null(L_size)) {
       stop("An L_size must be provided when using search_method = 'local'.")
     }
 
-    i_factor <- factor(df$i, levels = unique(df$i))
+    # Extract unique 'i' values directly to avoid string-conversion precision loss
+    i_vals <- unique(df$i)
+    i_factor <- factor(df$i, levels = i_vals)
     metric_list <- split(df[[metric_col]], i_factor)
-    i_vals <- as.numeric(names(metric_list))
 
     out_df <- pick_optima_cpp(
       metric_list = metric_list,
@@ -83,7 +83,7 @@ pick_optima <- function(obj, L_size = NULL, strict_monotonic = FALSE,
     stop("search_method must be either 'local' or 'global'.")
   }
 
-  # 4. Thresholding to remove weak/meaningless optima
+  # Thresholding to remove weak/meaningless optima
   if (!is.null(threshold)) {
     if (find_min) {
       # DTW: drop values greater than the threshold (higher distance = weaker synchrony)
@@ -97,7 +97,7 @@ pick_optima <- function(obj, L_size = NULL, strict_monotonic = FALSE,
     out_df$optimum_value[bad_idx] <- NA
   }
 
-  # 5. Apply attributes and dynamic class
+  # Apply attributes and dynamic class
   attr(out_df, "search_method") <- search_method
   attr(out_df, "find_min") <- find_min
   attr(out_df, "threshold") <- threshold

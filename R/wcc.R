@@ -1,6 +1,6 @@
 # Create wcc results df ---------------------------------------------------
 
-create_wcc_df <- function(x, y, settings) {
+create_wcc_df <- function(x, y, time = NULL, settings) {
 
   n_x <- length(x)
   w_max <- settings$window_size
@@ -24,6 +24,11 @@ create_wcc_df <- function(x, y, settings) {
         w_max = w_max
       )
     )
+
+  # Map the raw index to the actual timestamp if provided
+  if (!is.null(time)) {
+    results_df$i <- time[results_df$i]
+  }
 
   results_df
 }
@@ -70,6 +75,11 @@ fisher_z <- function(results_df) {
 #'
 #' @param x A numeric vector containing a time series (same length as `y`).
 #' @param y A numeric vector containing a time series (same length as `x`).
+#' @param time An optional numeric vector representing the timestamps for the
+#'   data. Must be the same length as `x` and `y`. If provided, the rolling
+#'   window indices will be mapped directly to these timestamps in the results,
+#'   which is highly recommended to maintain accurate timelines if edge
+#'   artifacts were trimmed prior to analysis. Default is `NULL`.
 #' @param window_size A positive integer indicating the size of each window,
 #'   i.e., the number of elements in each window vector. Boker et al. suggest
 #'   setting the window small enough so that the assumption can be made of
@@ -98,11 +108,17 @@ fisher_z <- function(results_df) {
 #'   summaries of it.
 #' @export
 #'
-wcc <- function(x, y, window_size, lag_max,
+wcc <- function(x, y, time = NULL, window_size, lag_max,
                 window_increment = 1, lag_increment = 1, na.rm = TRUE) {
 
   assertthat::assert_that(is.numeric(x))
   assertthat::assert_that(is.numeric(y))
+
+  if (!is.null(time)) {
+    assertthat::assert_that(is.numeric(time))
+    assertthat::assert_that(length(time) == length(x))
+  }
+
   x <- as.double(x)
   y <- as.double(y)
   assertthat::assert_that(rlang::is_integerish(window_size, n = 1))
@@ -120,12 +136,14 @@ wcc <- function(x, y, window_size, lag_max,
     window_increment = window_increment,
     lag_max = lag_max,
     lag_increment = lag_increment,
-    na.rm = na.rm
+    na.rm = na.rm,
+    has_time = !is.null(time)
   )
 
   results_df <- create_wcc_df(
     x = x,
     y = y,
+    time = time,
     settings = settings
   )
 

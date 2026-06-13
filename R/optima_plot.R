@@ -19,15 +19,17 @@ plot_optima_overlay <- function(surface_obj, optima_df,
                                 zero_line_color = "black",
                                 ...) {
 
-  # Call the base plot method. S3 dispatch will automatically route this to
-  # plot.wcc_res or plot.wdtw_res. The ... argument passes any metric-specific
-  # options (like WCC gradient colors) downward.
   p_base <- plot(surface_obj, time_step = time_step,
                  show_zero_lag = show_zero_lag, zero_line_color = zero_line_color, ...)
+
+  has_time <- isTRUE(surface_obj$settings$has_time)
 
   # Scale optimum coordinates to match the base plot
   if (time_step != 1) {
     optima_df$optimum_lag <- optima_df$optimum_lag * time_step
+  }
+
+  if (!has_time && time_step != 1) {
     optima_df$i <- optima_df$i * time_step
   }
 

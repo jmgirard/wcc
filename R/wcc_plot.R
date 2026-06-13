@@ -18,15 +18,23 @@ plot.wcc_res <- function(x, time_step = 1,
                          zero_line_color = "black", ...) {
 
   df <- x$results_df
+  has_time <- isTRUE(x$settings$has_time)
 
-  # Scale indices to time if a step size is provided
+  # Scale lag to time if a step size is provided
   if (time_step != 1) {
     df$tau <- df$tau * time_step
-    df$i <- df$i * time_step
     x_label <- "Lag (\u03c4) in Seconds"
-    y_label <- "Elapsed Time (Seconds)"
   } else {
     x_label <- "Lag (\u03c4) Index"
+  }
+
+  # Only scale elapsed time if it was not natively provided
+  if (!has_time && time_step != 1) {
+    df$i <- df$i * time_step
+    y_label <- "Elapsed Time (Seconds)"
+  } else if (has_time) {
+    y_label <- "Elapsed Time"
+  } else {
     y_label <- "Elapsed Time Window Index"
   }
 

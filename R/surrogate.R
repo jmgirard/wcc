@@ -7,6 +7,8 @@
 #'
 #' @param x A numeric vector containing a time series.
 #' @param y A numeric vector containing a time series.
+#' @param time An optional numeric vector representing the timestamps for the data.
+#'   Must be the same length as `x` and `y`. Default is `NULL`.
 #' @param window_size A positive integer indicating the size of each window.
 #' @param lag_max A positive integer indicating the maximum lag to try.
 #' @param window_increment A positive integer indicating the window shift increment. Default is 1.
@@ -16,12 +18,22 @@
 #' @return A list object of class "wcc_surr" containing the observed Fisher's Z,
 #'   the distribution of surrogate Z scores, the empirical p-value, and settings.
 #' @export
-wcc_surrogate <- function(x, y, window_size, lag_max,
+wcc_surrogate <- function(x, y, time = NULL, window_size, lag_max,
                           window_increment = 1, lag_increment = 1,
                           na.rm = TRUE, n_surrogates = 100) {
 
-  # 1. Calculate the observed WCC score
-  obs_wcc <- wcc(x, y, window_size, lag_max, window_increment, lag_increment, na.rm)
+  # Calculate the observed WCC score using explicitly named arguments
+  obs_wcc <- wcc(
+    x = x,
+    y = y,
+    time = time,
+    window_size = window_size,
+    lag_max = lag_max,
+    window_increment = window_increment,
+    lag_increment = lag_increment,
+    na.rm = na.rm
+  )
+
   obs_z <- obs_wcc$fisher_z
 
   n_y <- length(y)

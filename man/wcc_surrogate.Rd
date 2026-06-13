@@ -7,6 +7,7 @@
 wcc_surrogate(
   x,
   y,
+  time = NULL,
   window_size,
   lag_max,
   window_increment = 1,
@@ -19,6 +20,9 @@ wcc_surrogate(
 \item{x}{A numeric vector containing a time series.}
 
 \item{y}{A numeric vector containing a time series.}
+
+\item{time}{An optional numeric vector representing the timestamps for the data.
+Must be the same length as `x` and `y`. Default is `NULL`.}
 
 \item{window_size}{A positive integer indicating the size of each window.}
 

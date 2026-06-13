@@ -72,6 +72,7 @@ We strongly recommend leaving `scale_data = TRUE` (the default). DTW distances a
 wdtw_results <- wdtw(
   x = dyad_data$person_A,
   y = dyad_data$person_B,
+  time = dyad_data$time,
   window_size = 90,
   lag_max = 45,
   window_increment = 30,
@@ -96,7 +97,7 @@ The `pick_optima()` function handles this seamlessly. Because we are providing a
 # Extract optimal alignment lags (valleys) using the default global search
 wdtw_optima_df <- pick_optima(wdtw_results)
 
-print(wdtw_optima_df)
+summary(wdtw_optima_df)
 ```
 
 

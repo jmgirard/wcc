@@ -7,6 +7,7 @@
 wcc(
   x,
   y,
+  time = NULL,
   window_size,
   lag_max,
   window_increment = 1,
@@ -18,6 +19,12 @@ wcc(
 \item{x}{A numeric vector containing a time series (same length as `y`).}
 
 \item{y}{A numeric vector containing a time series (same length as `x`).}
+
+\item{time}{An optional numeric vector representing the timestamps for the
+data. Must be the same length as `x` and `y`. If provided, the rolling
+window indices will be mapped directly to these timestamps in the results,
+which is highly recommended to maintain accurate timelines if edge
+artifacts were trimmed prior to analysis. Default is `NULL`.}
 
 \item{window_size}{A positive integer indicating the size of each window,
 i.e., the number of elements in each window vector. Boker et al. suggest

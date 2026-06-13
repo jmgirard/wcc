@@ -1,27 +1,30 @@
-Package: bsync
 Type: Package
+Package: bsync
 Title: Behavioral Synchrony Analyses
 Version: 0.0.0.9000
-Authors@R: person("Jeffrey", "Girard", email = "me@jmgirard.com",
-    role = c("aut", "cre"))
-Description: A comprehensive toolkit for analyzing interpersonal and behavioral
-    synchrony in continuous time series data. Provides highly efficient, C++ backed
-    implementations of windowed cross-correlation (WCC) and peak-picking algorithms
-    to quantify nonstationary lead-lag relationships. Includes a complete preprocessing
-    pipeline for behavioral data featuring zero-phase smoothing, time-bin aggregation,
-    and kinematic velocity and speed calculations. Additionally, the package supports
-    rigorous null-hypothesis testing through circular-shift surrogate data generation
-    (pseudo-synchrony analysis) to distinguish genuine interaction from spurious correlation.
+Authors@R:
+    person("Jeffrey", "Girard", , "me@jmgirard.com", role = c("aut", "cre"))
+Description: A comprehensive toolkit for analyzing interpersonal and
+    behavioral synchrony in continuous time series data. Provides highly
+    efficient, C++ backed implementations of windowed cross-correlation
+    (WCC) and peak-picking algorithms to quantify nonstationary lead-lag
+    relationships. Includes a complete preprocessing pipeline for
+    behavioral data featuring zero-phase smoothing, time-bin aggregation,
+    and kinematic velocity and speed calculations. Additionally, the
+    package supports rigorous null-hypothesis testing through
+    circular-shift surrogate data generation (pseudo-synchrony analysis)
+    to distinguish genuine interaction from spurious correlation.
 License: MIT + file LICENSE
-Encoding: UTF-8
-LazyData: true
+URL: https://jmgirard.github.io/bsync/, https://github.com/jmgirard/bsync
+BugReports: https://github.com/jmgirard/bsync/issues
+Depends:
+    R (>= 4.1)
 Imports:
     assertthat,
     cli,
     dplyr,
     ggplot2,
     grDevices,
-    RColorBrewer,
     Rcpp,
     rlang,
     signal,
@@ -30,12 +33,11 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0)
-Config/testthat/edition: 3
-Depends:
-    R (>= 4.1)
 LinkingTo:
     Rcpp
+VignetteBuilder:
+    knitr
 Config/roxygen2/version: 8.0.0
-VignetteBuilder: knitr
-URL: https://jmgirard.github.io/bsync/, https://github.com/jmgirard/bsync
-BugReports: https://github.com/jmgirard/bsync/issues
+Config/testthat/edition: 3
+Encoding: UTF-8
+LazyData: true
