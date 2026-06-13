@@ -38,6 +38,8 @@
   : Suggest WCC Hyperparameters
 - [`summary(`*`<wcc_res>`*`)`](https://jmgirard.github.io/bsync/reference/summary.wcc_res.md)
   : Summary method for wcc_res objects
+- [`trim_edges()`](https://jmgirard.github.io/bsync/reference/trim_edges.md)
+  : Trim Edge Effects from Data
 - [`wcc()`](https://jmgirard.github.io/bsync/reference/wcc.md) :
   Windowed Cross-Correlation
 - [`wcc_surrogate()`](https://jmgirard.github.io/bsync/reference/wcc_surrogate.md)

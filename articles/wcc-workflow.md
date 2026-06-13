@@ -15,7 +15,7 @@ please see the
 [`suggest_wcc_params()`](https://jmgirard.github.io/bsync/reference/suggest_wcc_params.md)
 vignette.
 
-### 1. Simulating Realistic Dyadic Data
+### 1. Simulating and Preparing Realistic Data
 
 To demonstrate the workflow, we will simulate a realistic interaction
 between two participants (Person A and Person B) captured at 30 Hz. We
@@ -65,8 +65,24 @@ for (i in 1:n_frames) {
   person_A_raw[i] <- base_signal[idx_A] + rnorm(1, sd = 0.05)
   person_B_raw[i] <- base_signal[idx_B] + rnorm(1, sd = 0.05)
 }
+```
 
-# Create the data frame and apply a Savitzky-Golay filter to smooth the raw noise
+#### 1.1 Smoothing and Edge Trimming
+
+Raw kinematic data almost always requires smoothing before analysis.
+Here, we apply a Savitzky-Golay filter to iron out the high-frequency
+measurement noise.
+
+However, polynomial smoothing algorithms require surrounding data to
+calculate an accurate average, which causes mathematical distortion at
+the extreme beginning and end of the recording. We use
+[`trim_edges()`](https://jmgirard.github.io/bsync/reference/trim_edges.md)
+to drop these edge artifacts, ensuring our analysis is built strictly on
+stable data. A standard rule of thumb is to trim a length equal to your
+smoothing window.
+
+``` r
+
 dyad_data <- data.frame(
   time = seq(0, by = 1/fs, length.out = n_frames),
   person_A_raw = person_A_raw,
@@ -75,7 +91,8 @@ dyad_data <- data.frame(
   mutate(
     person_A = smooth_signal(person_A_raw, method = "sgolay", window = 15),
     person_B = smooth_signal(person_B_raw, method = "sgolay", window = 15)
-  )
+  ) |>
+  trim_edges(trim_length = 15)
 ```
 
 ### 2. Calculating Windowed Cross-Correlation
@@ -104,41 +121,32 @@ wcc_results <- wcc(
 summary(wcc_results)
 #> 
 #> ── Windowed Cross-Correlation Analysis ─────────────────────────────────────────
-#> Total Windows: 55
+#> Total Windows: 54
 #> Total Lags Tested: 91
 #> Window Size: 90
 #> Max Lag: 45
-#> Overall Fisher's Z: 0.5478
+#> Overall Fisher's Z: 0.5352
 #> 
 #> ── Cross-Correlation Value Distribution ──
 #> 
 #>      0%     25%     50%     75%    100% 
-#> -0.9010 -0.2846  0.1028  0.4775  0.9966
+#> -0.9269 -0.2582  0.0906  0.4734  0.9960
 #> ! 1 missing value (NA) detected.
 ```
 
 The [`wcc()`](https://jmgirard.github.io/bsync/reference/wcc.md)
 function returns a list object of class `wcc_res` containing the results
 data frame, the overall Fisher’s Z score, and the input settings. The
-summary output shows that the sliding window analyzed 55 distinct time
-windows across 91 different lags. The overall Fisher’s Z score of 0.3851
-indicates a positive global correlation, and the quantile distribution
-gives us a quick look at the spread of the correlation values across the
-entire interaction.
+overall Fisher’s Z score indicates a positive global correlation, and
+the quantile distribution gives us a quick look at the spread of the
+correlation values across the entire interaction.
 
 ### 3. Surrogate Testing for Significance
 
-Time series data are inherently autocorrelated. Because of this
-autocorrelation, high cross-correlation values can sometimes occur
-purely by chance. To test if the synchronization we observed is
-meaningful, we generate a null distribution using the circular shift
-method.
-
-The
-[`wcc_surrogate()`](https://jmgirard.github.io/bsync/reference/wcc_surrogate.md)
-function handles this by shifting one time series relative to the other,
-destroying the true synchronous relationship while preserving the
-autocorrelation of the individual signals.
+Time series data are inherently autocorrelated. Because of this, high
+cross-correlation values can sometimes occur purely by chance. To test
+if the synchronization we observed is meaningful, we generate a null
+distribution using the circular shift method.
 
 ``` r
 
@@ -156,8 +164,8 @@ print(surrogate_results)
 #> 
 #> ── WCC Surrogate Analysis (Pseudo-Synchrony) ───────────────────────────────────
 #> Permutations: 100
-#> Observed Fisher's Z: 0.5478
-#> Average Null Z: 0.4045
+#> Observed Fisher's Z: 0.5352
+#> Average Null Z: 0.4088
 #> Empirical p-value: < 0.01
 #> ✔ Observed synchrony is significantly greater than chance.
 #> ℹ Note: 100 permutations may be too few for stable p-values.
@@ -166,13 +174,8 @@ print(surrogate_results)
 
 The output gives us an empirical p-value by calculating the proportion
 of surrogate Fisher’s Z scores that meet or exceed our observed Fisher’s
-Z. Here, our observed Z (0.3851) is higher than the average null Z
-(0.3015) produced by the shifted data. Because the observed value was
-higher than all 100 permutations, the empirical p-value is reported as
-\< 0.01. This allows us to confidently assert that the observed
-synchrony is significantly greater than what we would expect by random
-chance. You will also notice a helpful console note pointing out that
-100 permutations are generally too few for stable calculations. We use
+Z. Because the observed value was higher than all 100 permutations, the
+empirical p-value is reported as \< 0.01. **Note:** We use
 `n_surrogates = 100` here for speed during exploratory analysis, but to
 achieve reliable p-values for publication, it is highly recommended to
 run at least 1,000 to 10,000 permutations.
@@ -185,10 +188,6 @@ The
 [`pick_optima()`](https://jmgirard.github.io/bsync/reference/pick_optima.md)
 function identifies local maximums within the WCC grid.
 
-We specify the `L_size` argument to set the local search region. (Since
-we are feeding it a `wcc_res` object, the function automatically
-defaults to a local search for maxima).
-
 ``` r
 
 # Extract optima using a local search size of 9
@@ -197,37 +196,49 @@ wcc_optima_df <- pick_optima(wcc_results, L_size = 9)
 print(wcc_optima_df)
 #> 
 #> ── WCC Optima Results ──────────────────────────────────────────────────────────
-#> Total Optima Found: 55
+#> Total Optima Found: 54
 #> Search Method: local
 #> Search Mode: Peaks (Maxima)
 #> Local Search Size: 9
 #> Strict Monotonic: FALSE
 #> Showing the first 5 results:
 #>    i optimum_lag optimum_value
-#>   46         -10   -0.42170539
-#>   76          12    0.93132414
-#>  106          -7    0.31058561
-#>  136         -10   -0.01589672
-#>  166          -9    0.23363822
-#> # ... with 50 more rows
+#>   46         -10   -0.15961961
+#>   76          -2    0.68482860
+#>  106          -9    0.01674598
+#>  136          -7    0.11919598
+#>  166          11    0.97551258
+#> # ... with 49 more rows
 ```
 
-This returns a `wcc_optima` data frame containing the elapsed time
-indices, the optimum lags, and the corresponding correlation values. The
-summary confirms that the algorithm successfully identified 55 optima,
-mapping perfectly to our 55 total time windows. It also displays the
-first five local maximums identified using our specified local search
-size.
+#### 4.1 Tuning the Local Search Window (`L_size`)
+
+Choosing the right `L_size` is crucial for a successful local search.
+`L_size` must be an odd integer, and it defines the width of the
+neighborhood (in frames) that the algorithm evaluates to confirm a local
+maximum.
+
+There is a delicate balance to strike:
+
+- **If `L_size` is too small (e.g., 3):** The algorithm might get
+  trapped by tiny noise ripples near lag zero and completely miss the
+  true interactive response.
+- **If `L_size` is too large (e.g., 45):** The algorithm might skip over
+  the fast, immediate interactive response and lock onto a delayed,
+  mathematically stronger, but theoretically irrelevant rhythm.
+
+A good rule of thumb is to set `L_size` to capture roughly 0.1 to 0.5
+seconds of data. At 30 Hz, an `L_size` between 5 and 15 frames is
+usually a great starting point. Because
+[`pick_optima()`](https://jmgirard.github.io/bsync/reference/pick_optima.md)
+is computationally lightweight, we recommend experimenting with several
+values and visually comparing the plots.
 
 ### 5. Visualizing the Results
 
-Finally, we can visualize the shifting synchronization landscape. The
-[`plot_optima_overlay()`](https://jmgirard.github.io/bsync/reference/plot_optima_overlay.md)
-function generates a heatmap of the correlations and plots the extracted
-optima directly on top.
-
-By passing the `time_step` argument, the axes are automatically
-converted from raw frame indices to seconds.
+Finally, we can visualize the shifting synchronization landscape. By
+passing the `time_step` argument, the axes are automatically converted
+from raw frame indices to seconds.
 
 ``` r
 
@@ -241,8 +252,6 @@ plot_optima_overlay(
 
 ![](wcc-workflow_files/figure-html/visualization-1.png)
 
-In the resulting plot, you should clearly see a diagonal track of
-optima. At the start, the optimum synchrony sits securely at a positive
-lag (indicating Person A leads). As time elapses, the optimum smoothly
-drifts across the zero-lag line until it settles at a negative lag
-(indicating Person B is now leading).
+In the resulting plot, you should clearly see a diagonal track of optima
+securely tracing the shifting peak lag over time, cleanly avoiding edge
+artifacts thanks to our preprocessing.
