@@ -124,7 +124,7 @@ print.wcc_surr <- function(x, ...) {
   }
 
   if (x$n_surrogates < 1000) {
-    cli::cli_alert_info("Note: {x$n_surrogates} permutations may be too few for stable p-values. Consider setting `n_surrogates >= 1000` for final reporting.")
+    cli::cli_alert_info("Note: {x$n_surrogates} permutations may be too few for stable p-values.\nConsider setting `n_surrogates >= 1000` for final reporting.")
   }
 
   invisible(x)
