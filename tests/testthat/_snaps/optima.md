@@ -136,3 +136,26 @@
       * Valid optima retained: 0 (0%)
       * Optima dropped (NA): 1 (100%)
 
+# print_optima handles exactly 1 remaining row for pluralization logic
+
+    Code
+      print(res_six)
+    Message
+      
+      -- WCC Optima Results ----------------------------------------------------------
+      Total Windows Analyzed: 6
+      Valid Optima Found: 6 (100%)
+      Search Method: global
+      Search Mode: Peaks (Maxima)
+      Threshold Applied: None
+      Showing the first 5 results:
+    Output
+       i optimum_lag optimum_value
+       1           0           0.9
+       2           0           0.9
+       3           0           0.9
+       4           0           0.9
+       5           0           0.9
+    Message
+      # ... with 1 more row
+

@@ -122,3 +122,30 @@ test_that("print and summary methods work for wcc_res objects", {
   res_na$results_df$wcc[1] <- NA
   expect_message(summary(res_na), "missing value")
 })
+
+test_that("wcc.cpp handles edge cases and NA triggers", {
+  # Generate short series for easier manual edge-case construction
+  x <- c(1, 2, 3, 4, 5)
+  y <- c(1, 2, 3, 4, 5)
+
+  # 1. Trigger Bounds Safety Check (returning NA_REAL)
+  # window_size = 10, lag_max = 5 exceeds the length of the vector (5).
+  # We use lag_max = 1 to satisfy the positive integer assertion.
+  res_bounds <- wcc(x, y, window_size = 10, lag_max = 1)
+  expect_true(all(is.na(res_bounds$results_df$wcc)))
+
+  # 2. Trigger "valid_n <= 1" (Insufficient data)
+  # By setting NA in all but one index of the window.
+  # We use lag_max = 1 to satisfy the positive integer assertion.
+  x_sparse <- c(1, NA, NA, NA, NA)
+  y_sparse <- c(1, NA, NA, NA, NA)
+  res_sparse <- wcc(x_sparse, y_sparse, window_size = 4, lag_max = 1)
+  expect_true(all(is.na(res_sparse$results_df$wcc)))
+
+  # 3. Trigger "var_x <= 0" (Zero variance)
+  # A constant value window results in var = 0, triggering the division check.
+  x_const <- rep(5, 10)
+  y_const <- rep(5, 10)
+  res_const <- wcc(x_const, y_const, window_size = 5, lag_max = 1)
+  expect_true(all(is.na(res_const$results_df$wcc)))
+})

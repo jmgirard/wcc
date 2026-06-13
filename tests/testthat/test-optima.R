@@ -246,3 +246,31 @@ test_that("summary methods gracefully handle objects with zero valid optima", {
   # the value distributions since there are no valid lags to summarize
   expect_snapshot(summary(res))
 })
+
+test_that("pick_optima respects explicit find_min overrides", {
+  # WCC normally looks for peaks (FALSE). Let's force it to look for valleys (TRUE)
+  mock_wcc <- create_mock_wcc(c(0.9, 0.5, 0.1, 0.5, 0.9), tau_max = 2)
+  res_wcc_min <- pick_optima(mock_wcc, search_method = "global", find_min = TRUE)
+
+  expect_equal(res_wcc_min$optimum_value, 0.1)
+  expect_equal(res_wcc_min$optimum_lag, 0)
+
+  # WDTW normally looks for valleys (TRUE). Let's force it to look for peaks (FALSE)
+  mock_wdtw <- create_mock_wdtw(c(1.1, 5.0, 9.9, 5.0, 1.1), tau_max = 2)
+  res_wdtw_max <- pick_optima(mock_wdtw, search_method = "global", find_min = FALSE)
+
+  expect_equal(res_wdtw_max$optimum_value, 9.9)
+  expect_equal(res_wdtw_max$optimum_lag, 0)
+})
+
+test_that("print_optima handles exactly 1 remaining row for pluralization logic", {
+  # Exactly 6 rows with default print n=5 leaves exactly 1 remaining row
+  df_six <- data.frame(i = 1:6, tau = rep(0, 6), wcc = rep(0.9, 6))
+  mock_six <- list(results_df = df_six, settings = list(lag_max = 2))
+  class(mock_six) <- c("wcc_res", "list")
+
+  res_six <- pick_optima(mock_six, search_method = "global")
+
+  # This snapshot should capture the singular "... with 1 more row" string
+  expect_snapshot(print(res_six))
+})
