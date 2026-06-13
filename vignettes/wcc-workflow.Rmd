@@ -22,12 +22,13 @@ We will cover data simulation, calculating WCC, surrogate testing for statistica
 
 ## 1. Simulating Realistic Dyadic Data
 
-To demonstrate the workflow, we will simulate a realistic interaction between two participants (Person A and Person B) captured at 30 Hz. We will generate smooth continuous data to simulate bodily motion.
+To demonstrate the workflow, we will simulate a realistic interaction between two participants (Person A and Person B) captured at 30 Hz. We will generate smooth continuous data to simulate bodily motion and then add random measurement noise.
 
 In this scenario, Person A leads the interaction by 15 frames (0.5 seconds) at the start. Over the course of the 60 seconds, the dynamic smoothly transitions until Person B leads by 15 frames at the end.
 
 ```{r setup-data}
 library(bsync)
+library(dplyr)
 
 set.seed(2026)
 
@@ -41,8 +42,8 @@ raw_noise <- rnorm(n_frames + 300)
 base_signal <- stats::filter(raw_noise, rep(1/30, 30), circular = TRUE)
 base_signal <- as.numeric(base_signal)
 
-person_A <- numeric(n_frames)
-person_B <- numeric(n_frames)
+person_A_raw <- numeric(n_frames)
+person_B_raw <- numeric(n_frames)
 
 # Continuous lag shift: Person A leads by 15 frames, smoothly transitioning to B leading
 lag_shifts <- round(seq(15, -15, length.out = n_frames))
@@ -52,18 +53,22 @@ for (i in 1:n_frames) {
   idx_B <- 150 + i - lag_shifts[i]
 
   # Add slight independent noise to mimic realistic measurement error
-  person_A[i] <- base_signal[idx_A] + rnorm(1, sd = 0.05)
-  person_B[i] <- base_signal[idx_B] + rnorm(1, sd = 0.05)
+  person_A_raw[i] <- base_signal[idx_A] + rnorm(1, sd = 0.05)
+  person_B_raw[i] <- base_signal[idx_B] + rnorm(1, sd = 0.05)
 }
 
+# Create the data frame and apply a Savitzky-Golay filter to smooth the raw noise
 dyad_data <- data.frame(
   time = seq(0, by = 1/fs, length.out = n_frames),
-  person_A = person_A,
-  person_B = person_B
-)
+  person_A_raw = person_A_raw,
+  person_B_raw = person_B_raw
+) |>
+  mutate(
+    person_A = smooth_signal(person_A_raw, method = "sgolay", window = 15),
+    person_B = smooth_signal(person_B_raw, method = "sgolay", window = 15)
+  )
 ```
 
-By adding a custom simulation here, we avoid relying on highly simplified data provided in the package's raw data files.
 
 ## 2. Calculating Windowed Cross-Correlation
 
@@ -117,7 +122,7 @@ We specify the `L_size` argument to set the local search region. (Since we are f
 
 ```{r optima-extraction}
 # Extract optima using a local search size of 9
-wcc_optima_df <- pick_optima(wcc_results, search_method = "global")
+wcc_optima_df <- pick_optima(wcc_results, L_size = 9)
 
 print(wcc_optima_df)
 ```
