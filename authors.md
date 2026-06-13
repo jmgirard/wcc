@@ -2,8 +2,8 @@
 
 ## Authors
 
-- **Jeffrey M. Girard**. Author, maintainer.
-  [](https://orcid.org/0000-0002-7359-3746)
+- **[Jeffrey M. Girard](https://affcom.ku.edu/girard)**. Author,
+  maintainer. [](https://orcid.org/0000-0002-7359-3746)
 
 ## Citation
 
