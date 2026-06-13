@@ -234,23 +234,21 @@ region. (Since we are feeding it a <code>wcc_res</code> object, the
 function automatically defaults to a local search for maxima).</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Extract optima using a local search size of 9</span></span>
-<span><span class="va">wcc_optima_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pick_optima.html">pick_optima</a></span><span class="op">(</span><span class="va">wcc_results</span>, L_size <span class="op">=</span> <span class="fl">9</span><span class="op">)</span></span>
+<span><span class="va">wcc_optima_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pick_optima.html">pick_optima</a></span><span class="op">(</span><span class="va">wcc_results</span>, search_method <span class="op">=</span> <span class="st">"global"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="va">wcc_optima_df</span><span class="op">)</span></span>
 <span><span class="co">#&gt; </span></span>
 <span><span class="co">#&gt; <span style="color: #00BBBB;">──</span> <span style="font-weight: bold;">WCC Optima Results</span> <span style="color: #00BBBB;">──────────────────────────────────────────────────────────</span></span></span>
 <span><span class="co">#&gt; Total Optima Found: 55</span></span>
-<span><span class="co">#&gt; Search Method: local</span></span>
+<span><span class="co">#&gt; Search Method: global</span></span>
 <span><span class="co">#&gt; Search Mode: Peaks (Maxima)</span></span>
-<span><span class="co">#&gt; Local Search Size: 9</span></span>
-<span><span class="co">#&gt; Strict Monotonic: FALSE</span></span>
 <span><span class="co">#&gt; Showing the first 5 results:</span></span>
 <span><span class="co">#&gt;    i optimum_lag optimum_value</span></span>
-<span><span class="co">#&gt;   46         -11   -0.06534940</span></span>
-<span><span class="co">#&gt;   76         -11    0.19838680</span></span>
-<span><span class="co">#&gt;  106          -5    0.30862731</span></span>
-<span><span class="co">#&gt;  136          -7    0.04783838</span></span>
-<span><span class="co">#&gt;  166         -11    0.19508163</span></span>
+<span><span class="co">#&gt;   46          13     0.6418111</span></span>
+<span><span class="co">#&gt;   76          13     0.7422777</span></span>
+<span><span class="co">#&gt;  106          12     0.7315478</span></span>
+<span><span class="co">#&gt;  136          12     0.7599735</span></span>
+<span><span class="co">#&gt;  166          12     0.7707248</span></span>
 <span><span class="co">#&gt; <span style="color: #555555;"># ... with 50 more rows</span></span></span></code></pre></div>
 <p>This returns a <code>wcc_optima</code> data frame containing the
 elapsed time indices, the optimum lags, and the corresponding

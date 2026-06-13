@@ -180,23 +180,21 @@ defaults to a local search for maxima).
 ``` r
 
 # Extract optima using a local search size of 9
-wcc_optima_df <- pick_optima(wcc_results, L_size = 9)
+wcc_optima_df <- pick_optima(wcc_results, search_method = "global")
 
 print(wcc_optima_df)
 #> 
 #> ── WCC Optima Results ──────────────────────────────────────────────────────────
 #> Total Optima Found: 55
-#> Search Method: local
+#> Search Method: global
 #> Search Mode: Peaks (Maxima)
-#> Local Search Size: 9
-#> Strict Monotonic: FALSE
 #> Showing the first 5 results:
 #>    i optimum_lag optimum_value
-#>   46         -11   -0.06534940
-#>   76         -11    0.19838680
-#>  106          -5    0.30862731
-#>  136          -7    0.04783838
-#>  166         -11    0.19508163
+#>   46          13     0.6418111
+#>   76          13     0.7422777
+#>  106          12     0.7315478
+#>  136          12     0.7599735
+#>  166          12     0.7707248
 #> # ... with 50 more rows
 ```
 
