@@ -53,3 +53,43 @@ test_that("wcc_surrogate results are reproducible with set.seed", {
   expect_equal(res1$surrogate_z, res2$surrogate_z)
   expect_equal(res1$p_value, res2$p_value)
 })
+
+test_that("wcc_surrogate warns when sampling shifts with replacement", {
+  # Create a short time series where valid_shifts will be small
+  x <- 1:30
+  y <- 1:30
+
+  # lag_max = 5 means min_shift = 10.
+  # max_shift = 30 - 10 = 20.
+  # valid_shifts are 10:20 (only 11 available unique shifts).
+  # Requesting 20 surrogates forces the function to sample with replacement.
+
+  expect_warning(
+    wcc_surrogate(x, y, window_size = 5, lag_max = 5, n_surrogates = 20),
+    "Limited unique shifts available. Sampling with replacement."
+  )
+})
+
+test_that("print.wcc_surr evaluates all logic branches without error", {
+  # Helper function to generate mock objects to quickly test the print branches
+  # without needing to run the expensive wcc_surrogate() calculation
+  make_mock_surr <- function(p_val, n_surr) {
+    structure(
+      list(
+        observed_z = 0.8,
+        surrogate_z = runif(n_surr, 0, 0.5),
+        p_value = p_val,
+        n_surrogates = n_surr
+      ),
+      class = c("wcc_surr", "list")
+    )
+  }
+
+  # Branch Test 1: p_value == 0, p_value < 0.05, n_surrogates < 1000
+  mock_sig <- make_mock_surr(p_val = 0, n_surr = 100)
+  expect_no_error(capture.output(print(mock_sig)))
+
+  # Branch Test 2: p_value != 0, p_value >= 0.05, n_surrogates >= 1000
+  mock_nonsig <- make_mock_surr(p_val = 0.25, n_surr = 1000)
+  expect_no_error(capture.output(print(mock_nonsig)))
+})
