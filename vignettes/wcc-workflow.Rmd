@@ -212,7 +212,7 @@ In the resulting plot, the tracking line perfectly visualizes the distinct phase
 
 Visualizing the optima is helpful, but researchers ultimately need a continuous, quantifiable metric of who is driving the interaction. The `leadership_asymmetry()` function converts the extracted optima into a bounded Leadership Asymmetry Index (LAI) ranging from -1 (y entirely leads) to 1 (x entirely leads).
 
-Because `bsync` is designed around a consistent class structure, you can seamlessly chain the entire analytical process together using the native R pipe (`|>`):
+Because **bsync** is designed around a consistent class structure, you can seamlessly chain the entire analytical process together using the native R pipe (`|>`):
 
 ```{r pipeline-lai, fig.width=7, fig.height=5}
 # Run the complete pipeline from WCC results to LAI visualization

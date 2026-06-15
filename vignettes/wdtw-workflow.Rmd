@@ -121,11 +121,11 @@ plot_optima_overlay(
 
 In the resulting plot, lighter colors represent smaller distances (stronger synchrony). You will see a diagonal track corresponding to the simulated shift in the dyad's interaction. The overlaid points map exactly to the lowest alignment costs, smoothly tracing the transition from Person A leading to Person B leading.
 
-## 5. Quantifying Leadership Dynamics (The Pipeline Approach)
+## 5. Quantifying Leadership Dynamics
 
 Visualizing the optima helps to understand the general pattern, but researchers ultimately need a continuous, quantifiable metric of who is driving the interaction. The `leadership_asymmetry()` function converts the extracted optima into a bounded Leadership Asymmetry Index (LAI) ranging from -1 (y entirely leads) to 1 (x entirely leads).
 
-Because `bsync` is designed around a consistent class structure, you can seamlessly chain the entire analytical process together using the native R pipe (`|>`):
+Because **bsync** is designed around a consistent class structure, you can seamlessly chain the entire analytical process together using the native R pipe (`|>`):
 
 ```{r pipeline-lai, fig.width=7, fig.height=5}
 # Run the complete pipeline from results to LAI visualization
