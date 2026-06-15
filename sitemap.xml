@@ -23,6 +23,7 @@
 <url><loc>https://jmgirard.github.io/bsync/reference/plot.bsync_lai.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/plot.wcc_res.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/plot.wdtw_res.html</loc></url>
+<url><loc>https://jmgirard.github.io/bsync/reference/plot.wgranger_res.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/plot_optima_overlay.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/print.bsync_lai.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/print.wcc_optima.html</loc></url>
@@ -30,15 +31,18 @@
 <url><loc>https://jmgirard.github.io/bsync/reference/print.wcc_surr.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/print.wdtw_optima.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/print.wdtw_res.html</loc></url>
+<url><loc>https://jmgirard.github.io/bsync/reference/print.wgranger_res.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/sim_dyad.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/smooth_signal.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/suggest_wcc_params.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/summary.wcc_optima.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/summary.wcc_res.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/summary.wdtw_optima.html</loc></url>
+<url><loc>https://jmgirard.github.io/bsync/reference/summary.wgranger_res.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/trim_edges.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/wcc.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/wcc_surrogate.html</loc></url>
 <url><loc>https://jmgirard.github.io/bsync/reference/wdtw.html</loc></url>
+<url><loc>https://jmgirard.github.io/bsync/reference/wgranger.html</loc></url>
 </urlset>
 

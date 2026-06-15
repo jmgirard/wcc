@@ -22,6 +22,8 @@
   : Plot wcc_res object
 - [`plot(`*`<wdtw_res>`*`)`](https://jmgirard.github.io/bsync/reference/plot.wdtw_res.md)
   : Plot wdtw_res object
+- [`plot(`*`<wgranger_res>`*`)`](https://jmgirard.github.io/bsync/reference/plot.wgranger_res.md)
+  : Plot wgranger_res object
 - [`plot_optima_overlay()`](https://jmgirard.github.io/bsync/reference/plot_optima_overlay.md)
   : Plot Surface with Optima Overlay
 - [`print(`*`<bsync_lai>`*`)`](https://jmgirard.github.io/bsync/reference/print.bsync_lai.md)
@@ -36,6 +38,8 @@
   : Print method for wdtw_optima objects
 - [`print(`*`<wdtw_res>`*`)`](https://jmgirard.github.io/bsync/reference/print.wdtw_res.md)
   : Print method for wdtw_res objects
+- [`print(`*`<wgranger_res>`*`)`](https://jmgirard.github.io/bsync/reference/print.wgranger_res.md)
+  : Print method for wgranger_res objects
 - [`sim_dyad`](https://jmgirard.github.io/bsync/reference/sim_dyad.md) :
   Simulated Dyadic 3D Positional Data
 - [`smooth_signal()`](https://jmgirard.github.io/bsync/reference/smooth_signal.md)
@@ -48,6 +52,8 @@
   : Summary method for wcc_res objects
 - [`summary(`*`<wdtw_optima>`*`)`](https://jmgirard.github.io/bsync/reference/summary.wdtw_optima.md)
   : Summary method for wdtw_optima objects
+- [`summary(`*`<wgranger_res>`*`)`](https://jmgirard.github.io/bsync/reference/summary.wgranger_res.md)
+  : Summary method for wgranger_res objects
 - [`trim_edges()`](https://jmgirard.github.io/bsync/reference/trim_edges.md)
   : Trim Edge Effects from Data
 - [`wcc()`](https://jmgirard.github.io/bsync/reference/wcc.md) :
@@ -56,3 +62,5 @@
   : Calculate Surrogate Windowed Cross-Correlations
 - [`wdtw()`](https://jmgirard.github.io/bsync/reference/wdtw.md) :
   Windowed Dynamic Time Warping
+- [`wgranger()`](https://jmgirard.github.io/bsync/reference/wgranger.md)
+  : Windowed Granger Causality

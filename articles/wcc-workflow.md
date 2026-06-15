@@ -345,9 +345,9 @@ function converts the extracted optima into a bounded Leadership
 Asymmetry Index (LAI) ranging from -1 (y entirely leads) to 1 (x
 entirely leads).
 
-Because `bsync` is designed around a consistent class structure, you can
-seamlessly chain the entire analytical process together using the native
-R pipe (`|>`):
+Because **bsync** is designed around a consistent class structure, you
+can seamlessly chain the entire analytical process together using the
+native R pipe (`|>`):
 
 ``` r
 

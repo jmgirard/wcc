@@ -183,7 +183,7 @@ simulated shift in the dyad’s interaction. The overlaid points map
 exactly to the lowest alignment costs, smoothly tracing the transition
 from Person A leading to Person B leading.
 
-### 5. Quantifying Leadership Dynamics (The Pipeline Approach)
+### 5. Quantifying Leadership Dynamics
 
 Visualizing the optima helps to understand the general pattern, but
 researchers ultimately need a continuous, quantifiable metric of who is
@@ -193,9 +193,9 @@ function converts the extracted optima into a bounded Leadership
 Asymmetry Index (LAI) ranging from -1 (y entirely leads) to 1 (x
 entirely leads).
 
-Because `bsync` is designed around a consistent class structure, you can
-seamlessly chain the entire analytical process together using the native
-R pipe (`|>`):
+Because **bsync** is designed around a consistent class structure, you
+can seamlessly chain the entire analytical process together using the
+native R pipe (`|>`):
 
 ``` r
 
