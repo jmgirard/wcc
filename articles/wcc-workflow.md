@@ -349,11 +349,11 @@ R pipe (`|>`):
 
 ``` r
 
-# Run the complete pipeline from WCC results to LAI visualization
+# Run the complete pipeline from results to LAI visualization
 wcc_results |>
   pick_optima(L_size = 9, threshold = 0.25) |>
   leadership_asymmetry(epoch_size = 10, min_valid = 3) |>
-  plot(time_step = 1 / fs, smooth = TRUE)
+  plot(smooth = TRUE)
 #> `geom_smooth()` using formula = 'y ~ x'
 #> Warning: Removed 10 rows containing missing values or values outside the scale range
 #> (`geom_smooth()`).

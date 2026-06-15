@@ -199,11 +199,11 @@ R pipe (`|>`):
 
 ``` r
 
-# Run the complete pipeline from WDTW results to LAI visualization
+# Run the complete pipeline from results to LAI visualization
 wdtw_results |>
   pick_optima() |>
   leadership_asymmetry(epoch_size = 10, min_valid = 3) |>
-  plot(time_step = 1 / fs, smooth = TRUE)
+  plot(smooth = TRUE)
 #> `geom_smooth()` using formula = 'y ~ x'
 #> Warning: Removed 38 rows containing missing values or values outside the scale range
 #> (`geom_smooth()`).
