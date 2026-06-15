@@ -42,6 +42,7 @@
 <li><a class="dropdown-item" href="../articles/wcc-params.html">WCC Parameters</a></li>
     <li><a class="dropdown-item" href="../articles/wcc-workflow.html">WCC Workflow</a></li>
     <li><a class="dropdown-item" href="../articles/wdtw-workflow.html">WDTW Workflow</a></li>
+    <li><a class="dropdown-item" href="../articles/wgranger-workflow.html">Windowed Granger Causality Workflow</a></li>
   </ul>
 </li>
       </ul>
@@ -72,21 +73,17 @@
 
     
     
-<div class="section level2">
-<h2 id="analyzing-interpersonal-synchrony-with-windowed-dynamic-time-warping">Analyzing Interpersonal Synchrony with Windowed Dynamic Time
-Warping<a class="anchor" aria-label="anchor" href="#analyzing-interpersonal-synchrony-with-windowed-dynamic-time-warping"></a>
-</h2>
 <p>This vignette walks through a complete Windowed Dynamic Time Warping
-(WDTW) analysis using the <code>bsync</code> package. While Windowed
+(WDTW) analysis using the <strong>bsync</strong> package. While Windowed
 Cross-Correlation (WCC) is excellent for capturing linear relationships,
 WDTW excels at finding similarities in signals that might be distorted,
 stretched, or compressed in time.</p>
 <p>It is important to remember that WDTW calculates a distance metric
 rather than a correlation. This means that lower values indicate
 stronger synchronization (a smaller distance between the signals).</p>
-<div class="section level3">
-<h3 id="simulating-realistic-dyadic-data">1. Simulating Realistic Dyadic Data<a class="anchor" aria-label="anchor" href="#simulating-realistic-dyadic-data"></a>
-</h3>
+<div class="section level2">
+<h2 id="simulating-realistic-dyadic-data">1. Simulating Realistic Dyadic Data<a class="anchor" aria-label="anchor" href="#simulating-realistic-dyadic-data"></a>
+</h2>
 <p>To demonstrate the workflow, we will simulate an interaction between
 two participants (Person A and Person B) captured at 30 Hz. We will
 generate smooth continuous data to simulate bodily motion.</p>
@@ -128,9 +125,9 @@ smoothly transitions until Person B leads by 15 frames at the end.</p>
 <span>  person_B <span class="op">=</span> <span class="va">person_B</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
-<div class="section level3">
-<h3 id="calculating-windowed-dynamic-time-warping">2. Calculating Windowed Dynamic Time Warping<a class="anchor" aria-label="anchor" href="#calculating-windowed-dynamic-time-warping"></a>
-</h3>
+<div class="section level2">
+<h2 id="calculating-windowed-dynamic-time-warping">2. Calculating Windowed Dynamic Time Warping<a class="anchor" aria-label="anchor" href="#calculating-windowed-dynamic-time-warping"></a>
+</h2>
 <p>With our data ready, we can run the primary <code><a href="../reference/wdtw.html">wdtw()</a></code>
 function. This function slides a window across the time series and
 calculates the DTW alignment distance at various lags within each
@@ -173,9 +170,9 @@ consider using <code>"local"</code>.</p>
 <code>wdtw_res</code> containing the results data frame, the overall
 mean distance, and the input settings.</p>
 </div>
-<div class="section level3">
-<h3 id="optima-extraction-finding-the-minima">3. Optima Extraction (Finding the Minima)<a class="anchor" aria-label="anchor" href="#optima-extraction-finding-the-minima"></a>
-</h3>
+<div class="section level2">
+<h2 id="optima-extraction-finding-the-minima">3. Optima Extraction (Finding the Minima)<a class="anchor" aria-label="anchor" href="#optima-extraction-finding-the-minima"></a>
+</h2>
 <p>While the full distance matrix is informative, we often want to
 extract the precise lags where the alignment is optimal within each time
 window. For correlation (WCC), optimal alignment means the highest value
@@ -217,9 +214,9 @@ distance values. The console output confirms that the search mode was
 successfully set to “Valleys (Minima)” using a “global” search
 method.</p>
 </div>
-<div class="section level3">
-<h3 id="visualizing-the-results">4. Visualizing the Results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
-</h3>
+<div class="section level2">
+<h2 id="visualizing-the-results">4. Visualizing the Results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
+</h2>
 <p>We can visualize the shifting synchronization landscape. The
 <code><a href="../reference/plot_optima_overlay.html">plot_optima_overlay()</a></code> function detects that it is working
 with a <code>wdtw_res</code> object and automatically applies a
@@ -241,9 +238,9 @@ simulated shift in the dyad’s interaction. The overlaid points map
 exactly to the lowest alignment costs, smoothly tracing the transition
 from Person A leading to Person B leading.</p>
 </div>
-<div class="section level3">
-<h3 id="quantifying-leadership-dynamics">5. Quantifying Leadership Dynamics<a class="anchor" aria-label="anchor" href="#quantifying-leadership-dynamics"></a>
-</h3>
+<div class="section level2">
+<h2 id="quantifying-leadership-dynamics">5. Quantifying Leadership Dynamics<a class="anchor" aria-label="anchor" href="#quantifying-leadership-dynamics"></a>
+</h2>
 <p>Visualizing the optima helps to understand the general pattern, but
 researchers ultimately need a continuous, quantifiable metric of who is
 driving the interaction. The <code><a href="../reference/leadership_asymmetry.html">leadership_asymmetry()</a></code>
@@ -265,7 +262,6 @@ together using the native R pipe (<code>|&gt;</code>):</p>
 over momentary frame-by-frame jitter to reveal the broader structural
 periods of dominance. The resulting plot makes the continuous transition
 of leadership from Person A to Person B perfectly clear.</p>
-</div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside>

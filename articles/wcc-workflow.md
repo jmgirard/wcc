@@ -1,9 +1,7 @@
 # WCC Workflow
 
-## Analyzing Interpersonal Synchrony with Windowed Cross-Correlation
-
 This vignette walks through a complete Windowed Cross-Correlation (WCC)
-analysis using the `bsync` package. WCC is highly effective for
+analysis using the **bsync** package. WCC is highly effective for
 quantifying interpersonal synchrony because it accommodates
 non-stationary relationships. Unlike global cross-correlation, WCC
 captures how synchronization ebbs and flows over time.
@@ -16,7 +14,7 @@ the
 [`suggest_wcc_params()`](https://jmgirard.github.io/bsync/reference/suggest_wcc_params.md)
 vignette.
 
-### 1. Simulating and Preparing Realistic Data
+## 1. Simulating and Preparing Realistic Data
 
 To demonstrate the workflow, we will simulate a realistic interaction
 between two participants (Person A and Person B) captured at 30 Hz. We
@@ -90,7 +88,7 @@ dyad_data_raw <- data.frame(
 )
 ```
 
-#### 1.1 Smoothing and Edge Trimming
+### 1.1 Smoothing and Edge Trimming
 
 Raw kinematic data almost always requires smoothing before analysis.
 Here, we apply a Savitzky-Golay filter to iron out the high-frequency
@@ -116,7 +114,7 @@ dyad_data <-
   trim_edges(trim_length = 15)
 ```
 
-### 2. Calculating Windowed Cross-Correlation
+## 2. Calculating Windowed Cross-Correlation
 
 With our data ready, we can run the primary
 [`wcc()`](https://jmgirard.github.io/bsync/reference/wcc.md) function.
@@ -177,7 +175,7 @@ correlation. You can already see a clear track of high correlation
 shifting across the zero-lag line over time alongside a washed-out
 period of low correlation in the middle.
 
-### 3. Surrogate Testing for Significance
+## 3. Surrogate Testing for Significance
 
 Time series data are inherently autocorrelated. Because of this, high
 cross-correlation values can sometimes occur purely by chance. To test
@@ -211,7 +209,7 @@ of surrogate Fisher’s Z scores that meet or exceed our observed Fisher’s
 Z. Because the observed value was higher than all 1000 permutations, the
 empirical p-value is reported as \< .001.
 
-### 4. Optima Extraction
+## 4. Optima Extraction
 
 While the heatmap generated above is visually informative, we often want
 to extract the precise lags where coordination is strongest within each
@@ -256,7 +254,7 @@ summary(wcc_optima_df)
 #> 0.5708 0.9877 0.9936 0.9961 0.9983
 ```
 
-#### 4.1 Interpreting the Optima Summary
+### 4.1 Interpreting the Optima Summary
 
 The [`summary()`](https://rdrr.io/r/base/summary.html) method provides a
 concise breakdown of the behavioral dynamics. We can map these results
@@ -280,7 +278,7 @@ directly to the four phases we programmed into our simulation:
   confirmation that the retained peaks represent strong, structural
   synchrony rather than random noise.
 
-#### 4.2 Tuning the Local Search Window (`L_size`)
+### 4.2 Tuning the Local Search Window (`L_size`)
 
 Choosing the right `L_size` is crucial for a successful local search.
 `L_size` must be an odd integer, and it defines the width of the
@@ -303,7 +301,7 @@ usually a great starting point. Because
 is computationally lightweight, we recommend experimenting with several
 values and visually comparing the plots.
 
-### 5. Visualizing the Results
+## 5. Visualizing the Results
 
 We can visually confirm our optima extraction by overlaying the tracking
 path directly onto the WCC heatmap.
@@ -336,7 +334,7 @@ distinct phases of our simulated interaction:
   of the zero-line as Person A reclaims the lead for the final phase of
   the interaction.
 
-### 6. Quantifying Leadership Dynamics
+## 6. Quantifying Leadership Dynamics
 
 Visualizing the optima is helpful, but researchers ultimately need a
 continuous, quantifiable metric of who is driving the interaction. The

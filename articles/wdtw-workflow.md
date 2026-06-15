@@ -1,9 +1,7 @@
 # WDTW Workflow
 
-## Analyzing Interpersonal Synchrony with Windowed Dynamic Time Warping
-
 This vignette walks through a complete Windowed Dynamic Time Warping
-(WDTW) analysis using the `bsync` package. While Windowed
+(WDTW) analysis using the **bsync** package. While Windowed
 Cross-Correlation (WCC) is excellent for capturing linear relationships,
 WDTW excels at finding similarities in signals that might be distorted,
 stretched, or compressed in time.
@@ -12,7 +10,7 @@ It is important to remember that WDTW calculates a distance metric
 rather than a correlation. This means that lower values indicate
 stronger synchronization (a smaller distance between the signals).
 
-### 1. Simulating Realistic Dyadic Data
+## 1. Simulating Realistic Dyadic Data
 
 To demonstrate the workflow, we will simulate an interaction between two
 participants (Person A and Person B) captured at 30 Hz. We will generate
@@ -59,7 +57,7 @@ dyad_data <- data.frame(
 )
 ```
 
-### 2. Calculating Windowed Dynamic Time Warping
+## 2. Calculating Windowed Dynamic Time Warping
 
 With our data ready, we can run the primary
 [`wdtw()`](https://jmgirard.github.io/bsync/reference/wdtw.md) function.
@@ -107,7 +105,7 @@ The [`wdtw()`](https://jmgirard.github.io/bsync/reference/wdtw.md)
 function returns a list object of class `wdtw_res` containing the
 results data frame, the overall mean distance, and the input settings.
 
-### 3. Optima Extraction (Finding the Minima)
+## 3. Optima Extraction (Finding the Minima)
 
 While the full distance matrix is informative, we often want to extract
 the precise lags where the alignment is optimal within each time window.
@@ -154,7 +152,7 @@ indices, the optimal lags, and the corresponding DTW distance values.
 The console output confirms that the search mode was successfully set to
 “Valleys (Minima)” using a “global” search method.
 
-### 4. Visualizing the Results
+## 4. Visualizing the Results
 
 We can visualize the shifting synchronization landscape. The
 [`plot_optima_overlay()`](https://jmgirard.github.io/bsync/reference/plot_optima_overlay.md)
@@ -183,7 +181,7 @@ simulated shift in the dyad’s interaction. The overlaid points map
 exactly to the lowest alignment costs, smoothly tracing the transition
 from Person A leading to Person B leading.
 
-### 5. Quantifying Leadership Dynamics
+## 5. Quantifying Leadership Dynamics
 
 Visualizing the optima helps to understand the general pattern, but
 researchers ultimately need a continuous, quantifiable metric of who is
