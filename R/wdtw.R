@@ -8,21 +8,26 @@
 #' @param x A numeric vector containing a time series (same length as `y`).
 #' @param y A numeric vector containing a time series (same length as `x`).
 #' @param time An optional numeric vector representing the timestamps for the
-#'   data. Must be the same length as `x` and `y`. If provided, the rolling
-#'   window indices will be mapped directly to these timestamps in the results,
-#'   which is highly recommended to maintain accurate timelines if edge
-#'   artifacts were trimmed prior to analysis. Default is `NULL`.
+#'   data. Must be the same length as `x` and `y`. Default is `NULL`.
 #' @param window_size A positive integer indicating the size of each window.
 #' @param lag_max A positive integer indicating the maximum lag to try.
 #' @param window_increment A positive integer indicating the window shift increment. (default = `1`)
 #' @param lag_increment A positive integer indicating the lag shift increment. (default = `1`)
-#' @param scale_data A logical indicating whether to z-score standardize both
-#'   time series prior to calculation. Highly recommended for DTW. (default = `TRUE`)
+#' @param scale_method Character string specifying how to standardize the data.
+#'   "global" standardizes the entire time series before analysis. "local"
+#'   standardizes within each sliding window. "none" applies no scaling. (default = `"global"`)
+#' @param distance_metric Character string specifying the local cost function.
+#'   "L1" uses absolute difference (Manhattan). "L2" uses squared difference
+#'   (Euclidean). (default = `"L2"`)
 #' @return A list object of class "wdtw_res".
 #' @export
 wdtw <- function(x, y, time = NULL, window_size, lag_max,
                  window_increment = 1, lag_increment = 1,
-                 scale_data = TRUE) {
+                 scale_method = c("global", "local", "none"),
+                 distance_metric = c("L2", "L1")) {
+
+  scale_method <- match.arg(scale_method)
+  distance_metric <- match.arg(distance_metric)
 
   if (!is.numeric(x)) cli::cli_abort("{.arg x} must be a numeric vector.")
   if (!is.numeric(y)) cli::cli_abort("{.arg y} must be a numeric vector.")
@@ -33,11 +38,7 @@ wdtw <- function(x, y, time = NULL, window_size, lag_max,
     if (length(time) != length(x)) cli::cli_abort("{.arg time} must be the same length as {.arg x}.")
   }
 
-  if (!rlang::is_logical(scale_data, n = 1)) {
-    cli::cli_abort("{.arg scale_data} must be a single logical value.")
-  }
-
-  if (scale_data) {
+  if (scale_method == "global") {
     x <- as.numeric(base::scale(x))
     y <- as.numeric(base::scale(y))
   }
@@ -63,7 +64,8 @@ wdtw <- function(x, y, time = NULL, window_size, lag_max,
     window_increment = window_increment,
     lag_max = lag_max,
     lag_increment = lag_increment,
-    scale_data = scale_data,
+    scale_method = scale_method,
+    distance_metric = distance_metric,
     has_time = !is.null(time)
   )
 
@@ -105,6 +107,8 @@ print.wdtw_res <- function(x, ...) {
     "Total Lags Tested" = "{n_lags}",
     "Window Size" = "{s$window_size}",
     "Max Lag" = "{s$lag_max}",
+    "Scale Method" = "{s$scale_method}",
+    "Distance Metric" = "{s$distance_metric}",
     "Overall Mean Distance" = "{round(x$mean_distance, 4)}"
   ))
 
@@ -122,6 +126,9 @@ create_wdtw_df <- function(x, y, time = NULL, settings) {
   tau_max <- settings$lag_max
   tau_inc <- settings$lag_increment
 
+  use_l2 <- settings$distance_metric == "L2"
+  local_scale <- settings$scale_method == "local"
+
   lags <- seq(-tau_max, tau_max, by = tau_inc)
 
   n_r <- floor((n_x - w_max - 2 * tau_max) / w_inc)
@@ -136,7 +143,9 @@ create_wdtw_df <- function(x, y, time = NULL, settings) {
         y = y,
         i_vals = i,
         tau_vals = tau,
-        w_max = w_max
+        w_max = w_max,
+        use_l2 = use_l2,
+        local_scale = local_scale
       )
     )
 

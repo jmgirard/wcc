@@ -12,7 +12,8 @@ wdtw(
   lag_max,
   window_increment = 1,
   lag_increment = 1,
-  scale_data = TRUE
+  scale_method = c("global", "local", "none"),
+  distance_metric = c("L2", "L1")
 )
 }
 \arguments{
@@ -21,10 +22,7 @@ wdtw(
 \item{y}{A numeric vector containing a time series (same length as `x`).}
 
 \item{time}{An optional numeric vector representing the timestamps for the
-data. Must be the same length as `x` and `y`. If provided, the rolling
-window indices will be mapped directly to these timestamps in the results,
-which is highly recommended to maintain accurate timelines if edge
-artifacts were trimmed prior to analysis. Default is `NULL`.}
+data. Must be the same length as `x` and `y`. Default is `NULL`.}
 
 \item{window_size}{A positive integer indicating the size of each window.}
 
@@ -34,8 +32,13 @@ artifacts were trimmed prior to analysis. Default is `NULL`.}
 
 \item{lag_increment}{A positive integer indicating the lag shift increment. (default = `1`)}
 
-\item{scale_data}{A logical indicating whether to z-score standardize both
-time series prior to calculation. Highly recommended for DTW. (default = `TRUE`)}
+\item{scale_method}{Character string specifying how to standardize the data.
+"global" standardizes the entire time series before analysis. "local"
+standardizes within each sliding window. "none" applies no scaling. (default = `"global"`)}
+
+\item{distance_metric}{Character string specifying the local cost function.
+"L1" uses absolute difference (Manhattan). "L2" uses squared difference
+(Euclidean). (default = `"L2"`)}
 }
 \value{
 A list object of class "wdtw_res".

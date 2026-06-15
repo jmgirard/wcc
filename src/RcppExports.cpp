@@ -42,8 +42,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // calc_wdtw_cpp
-NumericVector calc_wdtw_cpp(NumericVector x, NumericVector y, IntegerVector i_vals, IntegerVector tau_vals, int w_max);
-RcppExport SEXP _bsync_calc_wdtw_cpp(SEXP xSEXP, SEXP ySEXP, SEXP i_valsSEXP, SEXP tau_valsSEXP, SEXP w_maxSEXP) {
+NumericVector calc_wdtw_cpp(NumericVector x, NumericVector y, IntegerVector i_vals, IntegerVector tau_vals, int w_max, bool use_l2, bool local_scale);
+RcppExport SEXP _bsync_calc_wdtw_cpp(SEXP xSEXP, SEXP ySEXP, SEXP i_valsSEXP, SEXP tau_valsSEXP, SEXP w_maxSEXP, SEXP use_l2SEXP, SEXP local_scaleSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -52,7 +52,9 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< IntegerVector >::type i_vals(i_valsSEXP);
     Rcpp::traits::input_parameter< IntegerVector >::type tau_vals(tau_valsSEXP);
     Rcpp::traits::input_parameter< int >::type w_max(w_maxSEXP);
-    rcpp_result_gen = Rcpp::wrap(calc_wdtw_cpp(x, y, i_vals, tau_vals, w_max));
+    Rcpp::traits::input_parameter< bool >::type use_l2(use_l2SEXP);
+    Rcpp::traits::input_parameter< bool >::type local_scale(local_scaleSEXP);
+    rcpp_result_gen = Rcpp::wrap(calc_wdtw_cpp(x, y, i_vals, tau_vals, w_max, use_l2, local_scale));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -60,7 +62,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_bsync_pick_optima_cpp", (DL_FUNC) &_bsync_pick_optima_cpp, 6},
     {"_bsync_calc_wcc_cpp", (DL_FUNC) &_bsync_calc_wcc_cpp, 5},
-    {"_bsync_calc_wdtw_cpp", (DL_FUNC) &_bsync_calc_wdtw_cpp, 5},
+    {"_bsync_calc_wdtw_cpp", (DL_FUNC) &_bsync_calc_wdtw_cpp, 7},
     {NULL, NULL, 0}
 };
 
