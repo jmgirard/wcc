@@ -9,9 +9,10 @@ non-stationary relationships. Unlike global cross-correlation, WCC
 captures how synchronization ebbs and flows over time.
 
 We will cover data simulation, calculating WCC, surrogate testing for
-statistical significance, optima extraction, and visualization. For
-guidance on selecting the appropriate window sizes and lag parameters,
-please see the
+statistical significance, optima extraction, and quantifying leadership
+dynamics using the package’s pipeline approach. For guidance on
+selecting the appropriate window sizes and lag parameters, please see
+the
 [`suggest_wcc_params()`](https://jmgirard.github.io/bsync/reference/suggest_wcc_params.md)
 vignette.
 
@@ -96,10 +97,10 @@ Here, we apply a Savitzky-Golay filter to iron out the high-frequency
 measurement noise.
 
 However, polynomial smoothing algorithms require surrounding data to
-calculate an accurate average, which causes mathematical distortion at
+calculate an accurate average. This causes mathematical distortion at
 the extreme beginning and end of the recording. We use
 [`trim_edges()`](https://jmgirard.github.io/bsync/reference/trim_edges.md)
-to drop these edge artifacts, ensuring our analysis is built strictly on
+to drop these edge artifacts to ensure our analysis is built strictly on
 stable data. A standard rule of thumb is to trim a length equal to your
 smoothing window.
 
@@ -173,7 +174,7 @@ plot(wcc_results, time_step = 1 / fs)
 This generates a heatmap where deep blue indicates strong positive
 correlation (synchrony) and deep red indicates strong negative
 correlation. You can already see a clear track of high correlation
-shifting across the zero-lag line over time, as well as a washed-out
+shifting across the zero-lag line over time alongside a washed-out
 period of low correlation in the middle.
 
 ### 3. Surrogate Testing for Significance
@@ -207,7 +208,7 @@ print(surrogate_results)
 
 The output gives us an empirical p-value by calculating the proportion
 of surrogate Fisher’s Z scores that meet or exceed our observed Fisher’s
-Z. Because the observed value was higher than all 100 permutations, the
+Z. Because the observed value was higher than all 1000 permutations, the
 empirical p-value is reported as \< .001.
 
 ### 4. Optima Extraction
@@ -225,7 +226,7 @@ wildly jumping around during this lull, we can pass a `threshold`
 argument.
 
 Setting `threshold = 0.25` ensures that any optimum with an absolute
-correlation weaker than \\r = 0.25\\ is overwritten with `NA`.
+correlation weaker than r = 0.25 is overwritten with `NA`.
 
 ``` r
 
@@ -267,7 +268,7 @@ directly to the four phases we programmed into our simulation:
   60-second total. The threshold successfully identified and removed
   this non-interactive period.
 - **Lag Directionality (Leadership):** Because we supplied `person_A` as
-  `x` and `person_B` as `y`, a positive lag means Person A is leading,
+  `x` and `person_B` as `y`, a positive lag means Person A is leading
   and a negative lag means Person B is leading. The summary will show
   positive lags for roughly 68% of the valid interaction (corresponding
   to the 34 total seconds Person A led in Phases 1 and 4). It will show
@@ -303,9 +304,8 @@ values and visually comparing the plots.
 
 ### 5. Visualizing the Results
 
-Finally, we can visualize the shifting synchronization landscape. By
-passing the `time_step` argument, the axes are automatically converted
-from raw frame indices to seconds.
+We can visually confirm our optima extraction by overlaying the tracking
+path directly onto the WCC heatmap.
 
 ``` r
 
@@ -334,6 +334,35 @@ distinct phases of our simulated interaction:
   to new lags, accurately capturing the transitions in leadership
   dynamics during the final two phases.
 
-By combining rigorous data preparation, thoughtful parameter tuning, and
-significance thresholding, we have successfully extracted a clean,
-interpretable behavioral signal from noisy, non-stationary data.
+### 6. Quantifying Leadership Dynamics (The Pipeline Approach)
+
+Visualizing the optima is helpful, but researchers ultimately need a
+continuous, quantifiable metric of who is driving the interaction. The
+[`leadership_asymmetry()`](https://jmgirard.github.io/bsync/reference/leadership_asymmetry.md)
+function converts the extracted optima into a bounded Leadership
+Asymmetry Index (LAI) ranging from -1 (y entirely leads) to 1 (x
+entirely leads).
+
+Because `bsync` is designed around a consistent class structure, you can
+seamlessly chain the entire analytical process together using the native
+R pipe (`|>`):
+
+``` r
+
+# Run the complete pipeline from WCC results to LAI visualization
+wcc_results |>
+  pick_optima(L_size = 9, threshold = 0.25) |>
+  leadership_asymmetry(epoch_size = 10, min_valid = 3) |>
+  plot(time_step = 1 / fs, smooth = TRUE)
+#> `geom_smooth()` using formula = 'y ~ x'
+#> Warning: Removed 10 rows containing missing values or values outside the scale range
+#> (`geom_smooth()`).
+```
+
+![](wcc-workflow_files/figure-html/pipeline-lai-1.png)
+
+By grouping the windows into local epochs (in this case, groups of 10
+windows), the LAI function smooths over momentary frame-by-frame jitter
+to reveal the broader structural periods of dominance. The resulting
+plot makes it immediately obvious when the conversation shifted from
+Person A driving the interaction to Person B taking over.

@@ -270,14 +270,20 @@ polynomial filtering techniques originally developed by:
   : Calculate 3D Speed
 - [`calc_velocity_1d()`](https://jmgirard.github.io/bsync/reference/calc_velocity_1d.md)
   : Calculate 1D Velocity
+- [`leadership_asymmetry()`](https://jmgirard.github.io/bsync/reference/leadership_asymmetry.md)
+  : Calculate Leadership Asymmetry Index
 - [`pick_optima()`](https://jmgirard.github.io/bsync/reference/pick_optima.md)
   : Find Optimum (Peak or Valley) in Windowed Analyses
+- [`plot(`*`<bsync_lai>`*`)`](https://jmgirard.github.io/bsync/reference/plot.bsync_lai.md)
+  : Plot bsync_lai object
 - [`plot(`*`<wcc_res>`*`)`](https://jmgirard.github.io/bsync/reference/plot.wcc_res.md)
   : Plot wcc_res object
 - [`plot(`*`<wdtw_res>`*`)`](https://jmgirard.github.io/bsync/reference/plot.wdtw_res.md)
   : Plot wdtw_res object
 - [`plot_optima_overlay()`](https://jmgirard.github.io/bsync/reference/plot_optima_overlay.md)
   : Plot Surface with Optima Overlay
+- [`print(`*`<bsync_lai>`*`)`](https://jmgirard.github.io/bsync/reference/print.bsync_lai.md)
+  : Print method for bsync_lai objects
 - [`print(`*`<wcc_optima>`*`)`](https://jmgirard.github.io/bsync/reference/print.wcc_optima.md)
   : Print method for wcc_optima objects
 - [`print(`*`<wcc_res>`*`)`](https://jmgirard.github.io/bsync/reference/print.wcc_res.md)

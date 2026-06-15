@@ -66,11 +66,15 @@ With our data ready, we can run the primary
 This function slides a window across the time series and calculates the
 DTW alignment distance at various lags within each window.
 
-We strongly recommend leaving `scale_data = TRUE` (the default). DTW
-distances are highly sensitive to the scale of the input variables, and
-z-score standardizing the data ensures that the resulting cost matrix is
-driven by the structural shape of the behaviors rather than arbitrary
-measurement units.
+We strongly recommend setting `scale_method` to either `"global"` or
+`"local"`. DTW distances are highly sensitive to the scale of the input
+variables. Standardizing the data ensures that the resulting cost matrix
+is driven by the structural shape of the behaviors rather than arbitrary
+measurement units. For highly non-stationary data where baselines drift
+significantly over time, consider using `"local"`.
+
+The `distance_metric` defaults to `"L2"` (squared Euclidean distance),
+which is standard for DTW, but `"L1"` (Manhattan) is also available.
 
 ``` r
 
@@ -82,7 +86,8 @@ wdtw_results <- wdtw(
   lag_max = 45,
   window_increment = 30,
   lag_increment = 1,
-  scale_data = TRUE
+  scale_method = "global",
+  distance_metric = "L2"
 )
 
 # View a summary of the results
@@ -93,7 +98,9 @@ print(wdtw_results)
 #> Total Lags Tested: 91
 #> Window Size: 90
 #> Max Lag: 45
-#> Overall Mean Distance: 36.5766
+#> Scale Method: global
+#> Distance Metric: L2
+#> Overall Mean Distance: 27.1612
 ```
 
 The [`wdtw()`](https://jmgirard.github.io/bsync/reference/wdtw.md)
@@ -133,13 +140,13 @@ summary(wdtw_optima_df)
 #> ── Lag Directionality (Leadership) ──
 #> 
 #> • Positive Lags (x leads y): 24 (44.4%)
-#> • Negative Lags (y leads x): 28 (51.9%)
-#> • Zero Lags (Simultaneous): 2 (3.7%)
+#> • Negative Lags (y leads x): 29 (53.7%)
+#> • Zero Lags (Simultaneous): 1 (1.9%)
 #> 
 #> ── Optimum Value Distribution ──
 #> 
-#>      0%     25%     50%     75%    100% 
-#> 17.0898 19.0350 19.8222 20.5789 23.3458
+#>     0%    25%    50%    75%   100% 
+#> 4.1667 5.1867 5.5318 5.8954 6.8954
 ```
 
 This returns a `wdtw_optima` data frame containing the elapsed time
@@ -149,7 +156,7 @@ The console output confirms that the search mode was successfully set to
 
 ### 4. Visualizing the Results
 
-Finally, we can visualize the shifting synchronization landscape. The
+We can visualize the shifting synchronization landscape. The
 [`plot_optima_overlay()`](https://jmgirard.github.io/bsync/reference/plot_optima_overlay.md)
 function detects that it is working with a `wdtw_res` object and
 automatically applies a sequential viridis color palette to map the
@@ -175,3 +182,36 @@ In the resulting plot, lighter colors represent smaller distances
 simulated shift in the dyad’s interaction. The overlaid points map
 exactly to the lowest alignment costs, smoothly tracing the transition
 from Person A leading to Person B leading.
+
+### 5. Quantifying Leadership Dynamics (The Pipeline Approach)
+
+Visualizing the optima helps to understand the general pattern, but
+researchers ultimately need a continuous, quantifiable metric of who is
+driving the interaction. The
+[`leadership_asymmetry()`](https://jmgirard.github.io/bsync/reference/leadership_asymmetry.md)
+function converts the extracted optima into a bounded Leadership
+Asymmetry Index (LAI) ranging from -1 (y entirely leads) to 1 (x
+entirely leads).
+
+Because `bsync` is designed around a consistent class structure, you can
+seamlessly chain the entire analytical process together using the native
+R pipe (`|>`):
+
+``` r
+
+# Run the complete pipeline from WDTW results to LAI visualization
+wdtw_results |>
+  pick_optima() |>
+  leadership_asymmetry(epoch_size = 10, min_valid = 3) |>
+  plot(time_step = 1 / fs, smooth = TRUE)
+#> `geom_smooth()` using formula = 'y ~ x'
+#> Warning: Removed 38 rows containing missing values or values outside the scale range
+#> (`geom_smooth()`).
+```
+
+![](wdtw-workflow_files/figure-html/pipeline-lai-1.png)
+
+By grouping the windows into local epochs, the LAI function smooths over
+momentary frame-by-frame jitter to reveal the broader structural periods
+of dominance. The resulting plot makes the continuous transition of
+leadership from Person A to Person B perfectly clear.

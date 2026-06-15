@@ -83,9 +83,10 @@ accommodates non-stationary relationships. Unlike global
 cross-correlation, WCC captures how synchronization ebbs and flows over
 time.</p>
 <p>We will cover data simulation, calculating WCC, surrogate testing for
-statistical significance, optima extraction, and visualization. For
-guidance on selecting the appropriate window sizes and lag parameters,
-please see the <code><a href="../reference/suggest_wcc_params.html">suggest_wcc_params()</a></code> vignette.</p>
+statistical significance, optima extraction, and quantifying leadership
+dynamics using the package’s pipeline approach. For guidance on
+selecting the appropriate window sizes and lag parameters, please see
+the <code><a href="../reference/suggest_wcc_params.html">suggest_wcc_params()</a></code> vignette.</p>
 <div class="section level3">
 <h3 id="simulating-and-preparing-realistic-data">1. Simulating and Preparing Realistic Data<a class="anchor" aria-label="anchor" href="#simulating-and-preparing-realistic-data"></a>
 </h3>
@@ -168,9 +169,9 @@ by 8 frames (0.26 seconds).</li>
 Here, we apply a Savitzky-Golay filter to iron out the high-frequency
 measurement noise.</p>
 <p>However, polynomial smoothing algorithms require surrounding data to
-calculate an accurate average, which causes mathematical distortion at
+calculate an accurate average. This causes mathematical distortion at
 the extreme beginning and end of the recording. We use
-<code><a href="../reference/trim_edges.html">trim_edges()</a></code> to drop these edge artifacts, ensuring our
+<code><a href="../reference/trim_edges.html">trim_edges()</a></code> to drop these edge artifacts to ensure our
 analysis is built strictly on stable data. A standard rule of thumb is
 to trim a length equal to your smoothing window.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
@@ -231,7 +232,7 @@ seconds.</p>
 <p>This generates a heatmap where deep blue indicates strong positive
 correlation (synchrony) and deep red indicates strong negative
 correlation. You can already see a clear track of high correlation
-shifting across the zero-lag line over time, as well as a washed-out
+shifting across the zero-lag line over time alongside a washed-out
 period of low correlation in the middle.</p>
 </div>
 <div class="section level3">
@@ -262,7 +263,7 @@ distribution using the circular shift method.</p>
 <span><span class="co">#&gt; <span style="color: #00BB00;">✔</span> Observed synchrony is significantly greater than chance.</span></span></code></pre></div>
 <p>The output gives us an empirical p-value by calculating the
 proportion of surrogate Fisher’s Z scores that meet or exceed our
-observed Fisher’s Z. Because the observed value was higher than all 100
+observed Fisher’s Z. Because the observed value was higher than all 1000
 permutations, the empirical p-value is reported as &lt; .001.</p>
 </div>
 <div class="section level3">
@@ -278,8 +279,8 @@ meaningless “noise peaks” during that period. To prevent the tracking
 line from wildly jumping around during this lull, we can pass a
 <code>threshold</code> argument.</p>
 <p>Setting <code>threshold = 0.25</code> ensures that any optimum with
-an absolute correlation weaker than <span class="math inline">\(r =
-0.25\)</span> is overwritten with <code>NA</code>.</p>
+an absolute correlation weaker than r = 0.25 is overwritten with
+<code>NA</code>.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Extract optima using a local search size of 9 and a threshold of 0.25</span></span>
 <span><span class="va">wcc_optima_df</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/pick_optima.html">pick_optima</a></span><span class="op">(</span><span class="va">wcc_results</span>, L_size <span class="op">=</span> <span class="fl">9</span>, threshold <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span></span>
@@ -322,7 +323,7 @@ identified and removed this non-interactive period.</li>
 <strong>Lag Directionality (Leadership):</strong> Because we
 supplied <code>person_A</code> as <code>x</code> and
 <code>person_B</code> as <code>y</code>, a positive lag means Person A
-is leading, and a negative lag means Person B is leading. The summary
+is leading and a negative lag means Person B is leading. The summary
 will show positive lags for roughly 68% of the valid interaction
 (corresponding to the 34 total seconds Person A led in Phases 1 and 4).
 It will show negative lags for the remaining 32% (corresponding to the
@@ -363,9 +364,8 @@ experimenting with several values and visually comparing the plots.</p>
 <div class="section level3">
 <h3 id="visualizing-the-results">5. Visualizing the Results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
 </h3>
-<p>Finally, we can visualize the shifting synchronization landscape. By
-passing the <code>time_step</code> argument, the axes are automatically
-converted from raw frame indices to seconds.</p>
+<p>We can visually confirm our optima extraction by overlaying the
+tracking path directly onto the WCC heatmap.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/plot_optima_overlay.html">plot_optima_overlay</a></span><span class="op">(</span></span>
 <span>  surface_obj <span class="op">=</span> <span class="va">wcc_results</span>,</span>
@@ -394,9 +394,33 @@ blank.</li>
 cleanly shifts to new lags, accurately capturing the transitions in
 leadership dynamics during the final two phases.</li>
 </ul>
-<p>By combining rigorous data preparation, thoughtful parameter tuning,
-and significance thresholding, we have successfully extracted a clean,
-interpretable behavioral signal from noisy, non-stationary data.</p>
+</div>
+<div class="section level3">
+<h3 id="quantifying-leadership-dynamics-the-pipeline-approach">6. Quantifying Leadership Dynamics (The Pipeline Approach)<a class="anchor" aria-label="anchor" href="#quantifying-leadership-dynamics-the-pipeline-approach"></a>
+</h3>
+<p>Visualizing the optima is helpful, but researchers ultimately need a
+continuous, quantifiable metric of who is driving the interaction. The
+<code><a href="../reference/leadership_asymmetry.html">leadership_asymmetry()</a></code> function converts the extracted
+optima into a bounded Leadership Asymmetry Index (LAI) ranging from -1
+(y entirely leads) to 1 (x entirely leads).</p>
+<p>Because <code>bsync</code> is designed around a consistent class
+structure, you can seamlessly chain the entire analytical process
+together using the native R pipe (<code>|&gt;</code>):</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Run the complete pipeline from WCC results to LAI visualization</span></span>
+<span><span class="va">wcc_results</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/pick_optima.html">pick_optima</a></span><span class="op">(</span>L_size <span class="op">=</span> <span class="fl">9</span>, threshold <span class="op">=</span> <span class="fl">0.25</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="../reference/leadership_asymmetry.html">leadership_asymmetry</a></span><span class="op">(</span>epoch_size <span class="op">=</span> <span class="fl">10</span>, min_valid <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>time_step <span class="op">=</span> <span class="fl">1</span> <span class="op">/</span> <span class="va">fs</span>, smooth <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="co">#&gt; `geom_smooth()` using formula = 'y ~ x'</span></span>
+<span><span class="co">#&gt; Warning: Removed 10 rows containing missing values or values outside the scale range</span></span>
+<span><span class="co">#&gt; (`geom_smooth()`).</span></span></code></pre></div>
+<p><img src="wcc-workflow_files/figure-html/pipeline-lai-1.png" class="r-plt" alt="" width="672"></p>
+<p>By grouping the windows into local epochs (in this case, groups of 10
+windows), the LAI function smooths over momentary frame-by-frame jitter
+to reveal the broader structural periods of dominance. The resulting
+plot makes it immediately obvious when the conversation shifted from
+Person A driving the interaction to Person B taking over.</p>
 </div>
 </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
