@@ -259,9 +259,7 @@ together using the native R pipe (<code>|&gt;</code>):</p>
 <span>  <span class="fu"><a href="../reference/pick_optima.html">pick_optima</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="../reference/leadership_asymmetry.html">leadership_asymmetry</a></span><span class="op">(</span>epoch_size <span class="op">=</span> <span class="fl">10</span>, min_valid <span class="op">=</span> <span class="fl">3</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>smooth <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `geom_smooth()` using formula = 'y ~ x'</span></span>
-<span><span class="co">#&gt; Warning: Removed 38 rows containing missing values or values outside the scale range</span></span>
-<span><span class="co">#&gt; (`geom_smooth()`).</span></span></code></pre></div>
+<span><span class="co">#&gt; `geom_smooth()` using formula = 'y ~ x'</span></span></code></pre></div>
 <p><img src="wdtw-workflow_files/figure-html/pipeline-lai-1.png" class="r-plt" alt="" width="672"></p>
 <p>By grouping the windows into local epochs, the LAI function smooths
 over momentary frame-by-frame jitter to reveal the broader structural

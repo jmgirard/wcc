@@ -205,8 +205,6 @@ wdtw_results |>
   leadership_asymmetry(epoch_size = 10, min_valid = 3) |>
   plot(smooth = TRUE)
 #> `geom_smooth()` using formula = 'y ~ x'
-#> Warning: Removed 38 rows containing missing values or values outside the scale range
-#> (`geom_smooth()`).
 ```
 
 ![](wdtw-workflow_files/figure-html/pipeline-lai-1.png)
