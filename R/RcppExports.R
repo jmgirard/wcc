@@ -13,3 +13,7 @@ calc_wdtw_cpp <- function(x, y, i_vals, tau_vals, w_max, use_l2, local_scale) {
     .Call(`_bsync_calc_wdtw_cpp`, x, y, i_vals, tau_vals, w_max, use_l2, local_scale)
 }
 
+calc_wgranger_cpp <- function(x, y, i_vals, w_max, p) {
+    .Call(`_bsync_calc_wgranger_cpp`, x, y, i_vals, w_max, p)
+}
+

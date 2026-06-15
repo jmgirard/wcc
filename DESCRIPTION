@@ -31,6 +31,7 @@ Imports:
     ggplot2,
     grDevices,
     Rcpp,
+    RcppArmadillo,
     rlang,
     signal,
     utils
@@ -40,7 +41,8 @@ Suggests:
     testthat (>= 3.0.0),
     vdiffr
 LinkingTo:
-    Rcpp
+    Rcpp,
+    RcppArmadillo
 VignetteBuilder:
     knitr
 Config/roxygen2/version: 8.0.0
