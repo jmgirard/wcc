@@ -95,6 +95,7 @@ pick_optima <- function(obj, L_size = NULL, strict_monotonic = FALSE,
   attr(out_df, "search_method") <- search_method
   attr(out_df, "find_min") <- find_min
   attr(out_df, "threshold") <- threshold
+  attr(out_df, "has_time") <- isTRUE(obj$settings$has_time)
 
   if (search_method == "local") {
     attr(out_df, "L_size") <- L_size

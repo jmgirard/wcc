@@ -62,8 +62,10 @@ leadership_asymmetry <- function(optima_obj, epoch_size = 10, min_valid = 3) {
     y_leads_n = y_leads_count,
     asymmetry_index = asymmetry_index
   )
+  out <- structure(out_df, class = c("bsync_lai", "data.frame"))
+  attr(out, "has_time") <- isTRUE(attr(optima_obj, "has_time"))
 
-  structure(out_df, class = c("bsync_lai", "data.frame"))
+  return(out)
 }
 
 # S3 Methods for bsync_lai ------------------------------------------------
@@ -114,37 +116,27 @@ print.bsync_lai <- function(x, n = 5, ...) {
 #'
 #' @param x An object of class "bsync_lai".
 #' @param time_step A numeric value specifying the duration of each index. Default is 1.
-#' @param x_label An optional character string to override the default x-axis label.
-#' @param line_color Character string specifying the color of the LAI line. Default is "#2166AC".
+#' @param line_color Character string specifying the color of the LAI line. Default is "black".
 #' @param smooth Logical indicating whether to add a loess smoothing line. Default is `FALSE`.
-#' @param smooth_color Character string specifying the color of the smoothing line. Default is "#B2182B".
 #' @param ... Additional arguments (not used).
 #' @export
-plot.bsync_lai <- function(
-  x,
-  time_step = 1,
-  x_label = NULL,
-  line_color = "#2166AC",
-  smooth = FALSE,
-  smooth_color = "#B2182B",
-  ...
-) {
+plot.bsync_lai <- function(x, time_step = 1, line_color = "#2166AC", smooth = FALSE, ...) {
 
   df <- as.data.frame(x)
+  has_time <- isTRUE(attr(x, "has_time"))
 
-  if (time_step != 1) {
+  # Only scale elapsed time if it was not natively provided
+  if (!has_time && time_step != 1) {
     df$i <- df$i * time_step
-    default_x_label <- "Elapsed Time (Seconds)"
+    x_label <- "Elapsed Time (Seconds)"
+  } else if (has_time) {
+    x_label <- "Elapsed Time"
   } else {
-    default_x_label <- "Elapsed Time Window Index"
+    x_label <- "Elapsed Time Window Index"
   }
 
-  final_x_label <- if (!is.null(x_label)) x_label else default_x_label
-
   p <- ggplot2::ggplot(data = df, ggplot2::aes(x = i, y = asymmetry_index)) +
-    # Add a baseline for perfectly balanced dynamics
     ggplot2::geom_hline(yintercept = 0, color = "black", linetype = "dashed", alpha = 0.6) +
-    # Draw the main LAI path
     ggplot2::geom_step(color = line_color, alpha = 0.8, linewidth = 0.8) +
     ggplot2::scale_y_continuous(limits = c(-1, 1), breaks = c(-1, -0.5, 0, 0.5, 1)) +
     ggplot2::theme_minimal() +
@@ -154,12 +146,17 @@ plot.bsync_lai <- function(
     ggplot2::labs(
       title = "Dynamic Leadership Asymmetry",
       subtitle = "Values > 0 indicate 'x' leads; Values < 0 indicate 'y' leads",
-      x = final_x_label,
+      x = x_label,
       y = "Asymmetry Index"
     )
 
   if (smooth) {
-    p <- p + ggplot2::geom_smooth(method = "loess", se = FALSE, color = smooth_color, linewidth = 1)
+    p <- p + ggplot2::geom_smooth(
+      method = "loess",
+      se = FALSE,
+      color = "#B2182B",
+      linewidth = 1
+    )
   }
 
   p

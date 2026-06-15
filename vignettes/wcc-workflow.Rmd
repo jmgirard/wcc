@@ -216,7 +216,7 @@ Because `bsync` is designed around a consistent class structure, you can seamles
 ```{r pipeline-lai, fig.width=7, fig.height=5}
 # Run the complete pipeline from results to LAI visualization
 wcc_results |>
-  pick_optima() |>
+  pick_optima(L_size = 9, threshold = 0.25) |>
   leadership_asymmetry(epoch_size = 10, min_valid = 3) |>
   plot(smooth = TRUE)
 ```
