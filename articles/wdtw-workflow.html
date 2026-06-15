@@ -73,16 +73,66 @@
 
     
     
-<p>This vignette walks through a complete Windowed Dynamic Time Warping
-(WDTW) analysis using the <strong>bsync</strong> package. While Windowed
-Cross-Correlation (WCC) is excellent for capturing linear relationships,
-WDTW excels at finding similarities in signals that might be distorted,
-stretched, or compressed in time.</p>
+<p>While Windowed Cross-Correlation (WCC) is excellent for capturing
+linear relationships, it forces the data into a rigid temporal grid. If
+two participants are performing the same behavior but at slightly
+different speeds, standard correlation methods will fail to recognize
+the synchrony.</p>
+<p>Windowed Dynamic Time Warping (WDTW) solves this problem. It excels
+at finding similarities in signals that might be distorted, stretched,
+or compressed in time.</p>
 <p>It is important to remember that WDTW calculates a distance metric
 rather than a correlation. This means that lower values indicate
 stronger synchronization (a smaller distance between the signals).</p>
 <div class="section level2">
-<h2 id="simulating-realistic-dyadic-data">1. Simulating Realistic Dyadic Data<a class="anchor" aria-label="anchor" href="#simulating-realistic-dyadic-data"></a>
+<h2 id="what-is-windowed-dynamic-time-warping">1. What is Windowed Dynamic Time Warping?<a class="anchor" aria-label="anchor" href="#what-is-windowed-dynamic-time-warping"></a>
+</h2>
+<p>Dynamic Time Warping finds the optimal alignment between two time
+series by non-linearly warping the time axis. It creates a local cost
+matrix and finds the lowest-cost path to map the points of Person A’s
+signal onto the points of Person B’s signal, allowing for one-to-many
+and many-to-one matches.</p>
+<p>By calculating DTW over a rolling window, <strong>bsync</strong>
+allows you to track how this shape-matching distance changes over the
+course of an interaction.</p>
+<div class="section level3">
+<h3 id="assumptions-and-applicability">1.1 Assumptions and Applicability<a class="anchor" aria-label="anchor" href="#assumptions-and-applicability"></a>
+</h3>
+<p><strong>When is WDTW useful?</strong></p>
+<ul>
+<li>
+<strong>Variable Execution Speeds:</strong> It is ideal for complex
+behavioral mimicry where participants perform matching actions at
+different paces (e.g., one person smiles quickly while the other
+produces a slow, drawn-out smile).</li>
+<li>
+<strong>Shape over Timing:</strong> When the structural pattern of
+the behavior is more theoretically important than the rigid
+frame-by-frame timing.</li>
+</ul>
+<p><strong>When should you avoid WDTW?</strong></p>
+<ul>
+<li>
+<strong>When Exact Duration Matters:</strong> Because WDTW achieves
+alignment by stretching and compressing the time axis, it inherently
+distorts the temporal reality of the interaction. If you need to know
+exactly how many milliseconds separate two behaviors, WCC is a safer
+choice.</li>
+<li>
+<strong>Highly Noisy Data:</strong> WDTW is highly sensitive to
+extreme outliers and high-frequency noise. If data is not properly
+smoothed, the algorithm may aggressively warp the time axis to match
+random noise spikes rather than the underlying behavioral signal.</li>
+<li>
+<strong>Strict Causal Inference:</strong> Like WCC, WDTW measures
+alignment and similarity. It cannot statistically prove that one signal
+is causing the other, which requires predictive methods like Windowed
+Granger Causality.</li>
+</ul>
+</div>
+</div>
+<div class="section level2">
+<h2 id="simulating-realistic-dyadic-data">2. Simulating Realistic Dyadic Data<a class="anchor" aria-label="anchor" href="#simulating-realistic-dyadic-data"></a>
 </h2>
 <p>To demonstrate the workflow, we will simulate an interaction between
 two participants (Person A and Person B) captured at 30 Hz. We will
@@ -126,7 +176,7 @@ smoothly transitions until Person B leads by 15 frames at the end.</p>
 <span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
-<h2 id="calculating-windowed-dynamic-time-warping">2. Calculating Windowed Dynamic Time Warping<a class="anchor" aria-label="anchor" href="#calculating-windowed-dynamic-time-warping"></a>
+<h2 id="calculating-windowed-dynamic-time-warping">3. Calculating Windowed Dynamic Time Warping<a class="anchor" aria-label="anchor" href="#calculating-windowed-dynamic-time-warping"></a>
 </h2>
 <p>With our data ready, we can run the primary <code><a href="../reference/wdtw.html">wdtw()</a></code>
 function. This function slides a window across the time series and
@@ -171,7 +221,7 @@ consider using <code>"local"</code>.</p>
 mean distance, and the input settings.</p>
 </div>
 <div class="section level2">
-<h2 id="optima-extraction-finding-the-minima">3. Optima Extraction (Finding the Minima)<a class="anchor" aria-label="anchor" href="#optima-extraction-finding-the-minima"></a>
+<h2 id="optima-extraction-finding-the-minima">4. Optima Extraction (Finding the Minima)<a class="anchor" aria-label="anchor" href="#optima-extraction-finding-the-minima"></a>
 </h2>
 <p>While the full distance matrix is informative, we often want to
 extract the precise lags where the alignment is optimal within each time
@@ -215,7 +265,7 @@ successfully set to “Valleys (Minima)” using a “global” search
 method.</p>
 </div>
 <div class="section level2">
-<h2 id="visualizing-the-results">4. Visualizing the Results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
+<h2 id="visualizing-the-results">5. Visualizing the Results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
 </h2>
 <p>We can visualize the shifting synchronization landscape. The
 <code><a href="../reference/plot_optima_overlay.html">plot_optima_overlay()</a></code> function detects that it is working
@@ -239,7 +289,7 @@ exactly to the lowest alignment costs, smoothly tracing the transition
 from Person A leading to Person B leading.</p>
 </div>
 <div class="section level2">
-<h2 id="quantifying-leadership-dynamics">5. Quantifying Leadership Dynamics<a class="anchor" aria-label="anchor" href="#quantifying-leadership-dynamics"></a>
+<h2 id="quantifying-leadership-dynamics">6. Quantifying Leadership Dynamics<a class="anchor" aria-label="anchor" href="#quantifying-leadership-dynamics"></a>
 </h2>
 <p>Visualizing the optima helps to understand the general pattern, but
 researchers ultimately need a continuous, quantifiable metric of who is

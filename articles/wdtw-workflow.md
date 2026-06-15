@@ -1,16 +1,58 @@
 # WDTW Workflow
 
-This vignette walks through a complete Windowed Dynamic Time Warping
-(WDTW) analysis using the **bsync** package. While Windowed
-Cross-Correlation (WCC) is excellent for capturing linear relationships,
-WDTW excels at finding similarities in signals that might be distorted,
-stretched, or compressed in time.
+While Windowed Cross-Correlation (WCC) is excellent for capturing linear
+relationships, it forces the data into a rigid temporal grid. If two
+participants are performing the same behavior but at slightly different
+speeds, standard correlation methods will fail to recognize the
+synchrony.
+
+Windowed Dynamic Time Warping (WDTW) solves this problem. It excels at
+finding similarities in signals that might be distorted, stretched, or
+compressed in time.
 
 It is important to remember that WDTW calculates a distance metric
 rather than a correlation. This means that lower values indicate
 stronger synchronization (a smaller distance between the signals).
 
-## 1. Simulating Realistic Dyadic Data
+## 1. What is Windowed Dynamic Time Warping?
+
+Dynamic Time Warping finds the optimal alignment between two time series
+by non-linearly warping the time axis. It creates a local cost matrix
+and finds the lowest-cost path to map the points of Person A’s signal
+onto the points of Person B’s signal, allowing for one-to-many and
+many-to-one matches.
+
+By calculating DTW over a rolling window, **bsync** allows you to track
+how this shape-matching distance changes over the course of an
+interaction.
+
+### 1.1 Assumptions and Applicability
+
+**When is WDTW useful?**
+
+- **Variable Execution Speeds:** It is ideal for complex behavioral
+  mimicry where participants perform matching actions at different paces
+  (e.g., one person smiles quickly while the other produces a slow,
+  drawn-out smile).
+- **Shape over Timing:** When the structural pattern of the behavior is
+  more theoretically important than the rigid frame-by-frame timing.
+
+**When should you avoid WDTW?**
+
+- **When Exact Duration Matters:** Because WDTW achieves alignment by
+  stretching and compressing the time axis, it inherently distorts the
+  temporal reality of the interaction. If you need to know exactly how
+  many milliseconds separate two behaviors, WCC is a safer choice.
+- **Highly Noisy Data:** WDTW is highly sensitive to extreme outliers
+  and high-frequency noise. If data is not properly smoothed, the
+  algorithm may aggressively warp the time axis to match random noise
+  spikes rather than the underlying behavioral signal.
+- **Strict Causal Inference:** Like WCC, WDTW measures alignment and
+  similarity. It cannot statistically prove that one signal is causing
+  the other, which requires predictive methods like Windowed Granger
+  Causality.
+
+## 2. Simulating Realistic Dyadic Data
 
 To demonstrate the workflow, we will simulate an interaction between two
 participants (Person A and Person B) captured at 30 Hz. We will generate
@@ -57,7 +99,7 @@ dyad_data <- data.frame(
 )
 ```
 
-## 2. Calculating Windowed Dynamic Time Warping
+## 3. Calculating Windowed Dynamic Time Warping
 
 With our data ready, we can run the primary
 [`wdtw()`](https://jmgirard.github.io/bsync/reference/wdtw.md) function.
@@ -105,7 +147,7 @@ The [`wdtw()`](https://jmgirard.github.io/bsync/reference/wdtw.md)
 function returns a list object of class `wdtw_res` containing the
 results data frame, the overall mean distance, and the input settings.
 
-## 3. Optima Extraction (Finding the Minima)
+## 4. Optima Extraction (Finding the Minima)
 
 While the full distance matrix is informative, we often want to extract
 the precise lags where the alignment is optimal within each time window.
@@ -152,7 +194,7 @@ indices, the optimal lags, and the corresponding DTW distance values.
 The console output confirms that the search mode was successfully set to
 “Valleys (Minima)” using a “global” search method.
 
-## 4. Visualizing the Results
+## 5. Visualizing the Results
 
 We can visualize the shifting synchronization landscape. The
 [`plot_optima_overlay()`](https://jmgirard.github.io/bsync/reference/plot_optima_overlay.md)
@@ -181,7 +223,7 @@ simulated shift in the dyad’s interaction. The overlaid points map
 exactly to the lowest alignment costs, smoothly tracing the transition
 from Person A leading to Person B leading.
 
-## 5. Quantifying Leadership Dynamics
+## 6. Quantifying Leadership Dynamics
 
 Visualizing the optima helps to understand the general pattern, but
 researchers ultimately need a continuous, quantifiable metric of who is

@@ -1,20 +1,50 @@
 # WCC Workflow
 
-This vignette walks through a complete Windowed Cross-Correlation (WCC)
-analysis using the **bsync** package. WCC is highly effective for
-quantifying interpersonal synchrony because it accommodates
-non-stationary relationships. Unlike global cross-correlation, WCC
-captures how synchronization ebbs and flows over time.
+While the **bsync** package offers multiple methods for quantifying
+interpersonal synchrony, Windowed Cross-Correlation (WCC) is often the
+best starting point for continuous behavioral data.
 
-We will cover data simulation, calculating WCC, surrogate testing for
-statistical significance, optima extraction, and quantifying leadership
-dynamics using the package’s pipeline approach. For guidance on
-selecting the appropriate window sizes and lag parameters, please see
-the
-[`suggest_wcc_params()`](https://jmgirard.github.io/bsync/reference/suggest_wcc_params.md)
-vignette.
+Unlike global cross-correlation, which assumes a relationship remains
+constant over an entire observation, WCC captures how synchronization
+ebbs and flows by sliding a finite window across the time series. Within
+each window, the algorithm tests multiple temporal offsets (lags) to
+find the highest Pearson correlation.
 
-## 1. Simulating and Preparing Realistic Data
+## 1. What is Windowed Cross-Correlation?
+
+At its core, WCC measures linear shape and amplitude matching. It asks:
+if we shift Person B’s signal backward or forward in time by a specific
+amount, how closely does it resemble Person A’s signal?
+
+### 1.1 Assumptions and Applicability
+
+**When is WCC useful?**
+
+- **Exploratory Analysis:** If you know two people are interacting but
+  you do not know their typical reaction times, WCC searches a wide grid
+  of temporal lags to discover where the coordination actually happens.
+- **Linear Relationships:** It is highly effective for continuous
+  signals like kinematics, facial action units, or vocal pitch where the
+  proportional magnitude of a movement matters.
+- **Stable Local Delays:** It assumes that within any given short window
+  (e.g., 2 to 4 seconds), the reaction delay between the two
+  participants remains relatively constant.
+
+**When should you avoid WCC?**
+
+- **Variable Speeds (Time Warping):** If one participant performs a
+  gesture slowly and the other mimics it twice as fast, standard
+  cross-correlation will fail to align them properly. In these cases,
+  Windowed Dynamic Time Warping (WDTW) is a better choice.
+- **Categorical Data:** Pearson correlation requires continuous numeric
+  data. It is not appropriate for binary states or categorical
+  interaction coding.
+- **Strict Causal Inference:** While WCC identifies who moved first (the
+  lag direction), it only measures similarity. If you need rigorous
+  statistical proof that Person A’s movement is actively predicting
+  Person B’s movement, consider using Windowed Granger Causality (WGC).
+
+## 2. Simulating and Preparing Realistic Data
 
 To demonstrate the workflow, we will simulate a realistic interaction
 between two participants (Person A and Person B) captured at 30 Hz. We
@@ -88,7 +118,7 @@ dyad_data_raw <- data.frame(
 )
 ```
 
-### 1.1 Smoothing and Edge Trimming
+### 2.1 Smoothing and Edge Trimming
 
 Raw kinematic data almost always requires smoothing before analysis.
 Here, we apply a Savitzky-Golay filter to iron out the high-frequency
@@ -114,7 +144,7 @@ dyad_data <-
   trim_edges(trim_length = 15)
 ```
 
-## 2. Calculating Windowed Cross-Correlation
+## 3. Calculating Windowed Cross-Correlation
 
 With our data ready, we can run the primary
 [`wcc()`](https://jmgirard.github.io/bsync/reference/wcc.md) function.
@@ -175,7 +205,7 @@ correlation. You can already see a clear track of high correlation
 shifting across the zero-lag line over time alongside a washed-out
 period of low correlation in the middle.
 
-## 3. Surrogate Testing for Significance
+## 4. Surrogate Testing for Significance
 
 Time series data are inherently autocorrelated. Because of this, high
 cross-correlation values can sometimes occur purely by chance. To test
@@ -209,7 +239,7 @@ of surrogate Fisher’s Z scores that meet or exceed our observed Fisher’s
 Z. Because the observed value was higher than all 1000 permutations, the
 empirical p-value is reported as \< .001.
 
-## 4. Optima Extraction
+## 5. Optima Extraction
 
 While the heatmap generated above is visually informative, we often want
 to extract the precise lags where coordination is strongest within each
@@ -254,7 +284,7 @@ summary(wcc_optima_df)
 #> 0.5708 0.9877 0.9936 0.9961 0.9983
 ```
 
-### 4.1 Interpreting the Optima Summary
+### 5.1 Interpreting the Optima Summary
 
 The [`summary()`](https://rdrr.io/r/base/summary.html) method provides a
 concise breakdown of the behavioral dynamics. We can map these results
@@ -278,7 +308,7 @@ directly to the four phases we programmed into our simulation:
   confirmation that the retained peaks represent strong, structural
   synchrony rather than random noise.
 
-### 4.2 Tuning the Local Search Window (`L_size`)
+### 5.2 Tuning the Local Search Window (`L_size`)
 
 Choosing the right `L_size` is crucial for a successful local search.
 `L_size` must be an odd integer, and it defines the width of the
@@ -301,7 +331,7 @@ usually a great starting point. Because
 is computationally lightweight, we recommend experimenting with several
 values and visually comparing the plots.
 
-## 5. Visualizing the Results
+## 6. Visualizing the Results
 
 We can visually confirm our optima extraction by overlaying the tracking
 path directly onto the WCC heatmap.
@@ -334,7 +364,7 @@ distinct phases of our simulated interaction:
   of the zero-line as Person A reclaims the lead for the final phase of
   the interaction.
 
-## 6. Quantifying Leadership Dynamics
+## 7. Quantifying Leadership Dynamics
 
 Visualizing the optima is helpful, but researchers ultimately need a
 continuous, quantifiable metric of who is driving the interaction. The

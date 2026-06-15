@@ -73,19 +73,61 @@
 
     
     
-<p>This vignette walks through a complete Windowed Cross-Correlation
-(WCC) analysis using the <strong>bsync</strong> package. WCC is highly
-effective for quantifying interpersonal synchrony because it
-accommodates non-stationary relationships. Unlike global
-cross-correlation, WCC captures how synchronization ebbs and flows over
-time.</p>
-<p>We will cover data simulation, calculating WCC, surrogate testing for
-statistical significance, optima extraction, and quantifying leadership
-dynamics using the package’s pipeline approach. For guidance on
-selecting the appropriate window sizes and lag parameters, please see
-the <code><a href="../reference/suggest_wcc_params.html">suggest_wcc_params()</a></code> vignette.</p>
+<p>While the <strong>bsync</strong> package offers multiple methods for
+quantifying interpersonal synchrony, Windowed Cross-Correlation (WCC) is
+often the best starting point for continuous behavioral data.</p>
+<p>Unlike global cross-correlation, which assumes a relationship remains
+constant over an entire observation, WCC captures how synchronization
+ebbs and flows by sliding a finite window across the time series. Within
+each window, the algorithm tests multiple temporal offsets (lags) to
+find the highest Pearson correlation.</p>
 <div class="section level2">
-<h2 id="simulating-and-preparing-realistic-data">1. Simulating and Preparing Realistic Data<a class="anchor" aria-label="anchor" href="#simulating-and-preparing-realistic-data"></a>
+<h2 id="what-is-windowed-cross-correlation">1. What is Windowed Cross-Correlation?<a class="anchor" aria-label="anchor" href="#what-is-windowed-cross-correlation"></a>
+</h2>
+<p>At its core, WCC measures linear shape and amplitude matching. It
+asks: if we shift Person B’s signal backward or forward in time by a
+specific amount, how closely does it resemble Person A’s signal?</p>
+<div class="section level3">
+<h3 id="assumptions-and-applicability">1.1 Assumptions and Applicability<a class="anchor" aria-label="anchor" href="#assumptions-and-applicability"></a>
+</h3>
+<p><strong>When is WCC useful?</strong></p>
+<ul>
+<li>
+<strong>Exploratory Analysis:</strong> If you know two people are
+interacting but you do not know their typical reaction times, WCC
+searches a wide grid of temporal lags to discover where the coordination
+actually happens.</li>
+<li>
+<strong>Linear Relationships:</strong> It is highly effective for
+continuous signals like kinematics, facial action units, or vocal pitch
+where the proportional magnitude of a movement matters.</li>
+<li>
+<strong>Stable Local Delays:</strong> It assumes that within any
+given short window (e.g., 2 to 4 seconds), the reaction delay between
+the two participants remains relatively constant.</li>
+</ul>
+<p><strong>When should you avoid WCC?</strong></p>
+<ul>
+<li>
+<strong>Variable Speeds (Time Warping):</strong> If one participant
+performs a gesture slowly and the other mimics it twice as fast,
+standard cross-correlation will fail to align them properly. In these
+cases, Windowed Dynamic Time Warping (WDTW) is a better choice.</li>
+<li>
+<strong>Categorical Data:</strong> Pearson correlation requires
+continuous numeric data. It is not appropriate for binary states or
+categorical interaction coding.</li>
+<li>
+<strong>Strict Causal Inference:</strong> While WCC identifies who
+moved first (the lag direction), it only measures similarity. If you
+need rigorous statistical proof that Person A’s movement is actively
+predicting Person B’s movement, consider using Windowed Granger
+Causality (WGC).</li>
+</ul>
+</div>
+</div>
+<div class="section level2">
+<h2 id="simulating-and-preparing-realistic-data">2. Simulating and Preparing Realistic Data<a class="anchor" aria-label="anchor" href="#simulating-and-preparing-realistic-data"></a>
 </h2>
 <p>To demonstrate the workflow, we will simulate a realistic interaction
 between two participants (Person A and Person B) captured at 30 Hz. We
@@ -160,7 +202,7 @@ by 8 frames (0.26 seconds).</li>
 <span>  person_B_raw <span class="op">=</span> <span class="va">person_B_raw</span> <span class="op">+</span> <span class="fu"><a href="https://rdrr.io/r/stats/Normal.html" class="external-link">rnorm</a></span><span class="op">(</span><span class="va">n_frames</span>, sd <span class="op">=</span> <span class="fl">0.05</span><span class="op">)</span></span>
 <span><span class="op">)</span></span></code></pre></div>
 <div class="section level3">
-<h3 id="smoothing-and-edge-trimming">1.1 Smoothing and Edge Trimming<a class="anchor" aria-label="anchor" href="#smoothing-and-edge-trimming"></a>
+<h3 id="smoothing-and-edge-trimming">2.1 Smoothing and Edge Trimming<a class="anchor" aria-label="anchor" href="#smoothing-and-edge-trimming"></a>
 </h3>
 <p>Raw kinematic data almost always requires smoothing before analysis.
 Here, we apply a Savitzky-Golay filter to iron out the high-frequency
@@ -183,7 +225,7 @@ to trim a length equal to your smoothing window.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="calculating-windowed-cross-correlation">2. Calculating Windowed Cross-Correlation<a class="anchor" aria-label="anchor" href="#calculating-windowed-cross-correlation"></a>
+<h2 id="calculating-windowed-cross-correlation">3. Calculating Windowed Cross-Correlation<a class="anchor" aria-label="anchor" href="#calculating-windowed-cross-correlation"></a>
 </h2>
 <p>With our data ready, we can run the primary <code><a href="../reference/wcc.html">wcc()</a></code>
 function. This function slides a window across the time series and
@@ -233,7 +275,7 @@ shifting across the zero-lag line over time alongside a washed-out
 period of low correlation in the middle.</p>
 </div>
 <div class="section level2">
-<h2 id="surrogate-testing-for-significance">3. Surrogate Testing for Significance<a class="anchor" aria-label="anchor" href="#surrogate-testing-for-significance"></a>
+<h2 id="surrogate-testing-for-significance">4. Surrogate Testing for Significance<a class="anchor" aria-label="anchor" href="#surrogate-testing-for-significance"></a>
 </h2>
 <p>Time series data are inherently autocorrelated. Because of this, high
 cross-correlation values can sometimes occur purely by chance. To test
@@ -264,7 +306,7 @@ observed Fisher’s Z. Because the observed value was higher than all 1000
 permutations, the empirical p-value is reported as &lt; .001.</p>
 </div>
 <div class="section level2">
-<h2 id="optima-extraction">4. Optima Extraction<a class="anchor" aria-label="anchor" href="#optima-extraction"></a>
+<h2 id="optima-extraction">5. Optima Extraction<a class="anchor" aria-label="anchor" href="#optima-extraction"></a>
 </h2>
 <p>While the heatmap generated above is visually informative, we often
 want to extract the precise lags where coordination is strongest within
@@ -304,7 +346,7 @@ an absolute correlation weaker than r = 0.55 is overwritten with
 <span><span class="co">#&gt;     0%    25%    50%    75%   100% </span></span>
 <span><span class="co">#&gt; 0.5708 0.9877 0.9936 0.9961 0.9983</span></span></code></pre></div>
 <div class="section level3">
-<h3 id="interpreting-the-optima-summary">4.1 Interpreting the Optima Summary<a class="anchor" aria-label="anchor" href="#interpreting-the-optima-summary"></a>
+<h3 id="interpreting-the-optima-summary">5.1 Interpreting the Optima Summary<a class="anchor" aria-label="anchor" href="#interpreting-the-optima-summary"></a>
 </h3>
 <p>The <code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> method provides a concise breakdown of the
 behavioral dynamics. We can map these results directly to the four
@@ -334,7 +376,7 @@ than random noise.</li>
 </ul>
 </div>
 <div class="section level3">
-<h3 id="tuning-the-local-search-window-l_size">4.2 Tuning the Local Search Window (<code>L_size</code>)<a class="anchor" aria-label="anchor" href="#tuning-the-local-search-window-l_size"></a>
+<h3 id="tuning-the-local-search-window-l_size">5.2 Tuning the Local Search Window (<code>L_size</code>)<a class="anchor" aria-label="anchor" href="#tuning-the-local-search-window-l_size"></a>
 </h3>
 <p>Choosing the right <code>L_size</code> is crucial for a successful
 local search. <code>L_size</code> must be an odd integer, and it defines
@@ -360,7 +402,7 @@ experimenting with several values and visually comparing the plots.</p>
 </div>
 </div>
 <div class="section level2">
-<h2 id="visualizing-the-results">5. Visualizing the Results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
+<h2 id="visualizing-the-results">6. Visualizing the Results<a class="anchor" aria-label="anchor" href="#visualizing-the-results"></a>
 </h2>
 <p>We can visually confirm our optima extraction by overlaying the
 tracking path directly onto the WCC heatmap.</p>
@@ -396,7 +438,7 @@ final phase of the interaction.</li>
 </ul>
 </div>
 <div class="section level2">
-<h2 id="quantifying-leadership-dynamics">6. Quantifying Leadership Dynamics<a class="anchor" aria-label="anchor" href="#quantifying-leadership-dynamics"></a>
+<h2 id="quantifying-leadership-dynamics">7. Quantifying Leadership Dynamics<a class="anchor" aria-label="anchor" href="#quantifying-leadership-dynamics"></a>
 </h2>
 <p>Visualizing the optima is helpful, but researchers ultimately need a
 continuous, quantifiable metric of who is driving the interaction. The
