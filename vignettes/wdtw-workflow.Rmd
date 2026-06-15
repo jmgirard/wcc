@@ -14,9 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Analyzing Interpersonal Synchrony with Windowed Dynamic Time Warping
-
-This vignette walks through a complete Windowed Dynamic Time Warping (WDTW) analysis using the `bsync` package. While Windowed Cross-Correlation (WCC) is excellent for capturing linear relationships, WDTW excels at finding similarities in signals that might be distorted, stretched, or compressed in time.
+This vignette walks through a complete Windowed Dynamic Time Warping (WDTW) analysis using the **bsync** package. While Windowed Cross-Correlation (WCC) is excellent for capturing linear relationships, WDTW excels at finding similarities in signals that might be distorted, stretched, or compressed in time.
 
 It is important to remember that WDTW calculates a distance metric rather than a correlation. This means that lower values indicate stronger synchronization (a smaller distance between the signals).
 

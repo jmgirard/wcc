@@ -14,9 +14,7 @@ knitr::opts_chunk$set(
 )
 ```
 
-# Analyzing Interpersonal Synchrony with Windowed Cross-Correlation
-
-This vignette walks through a complete Windowed Cross-Correlation (WCC) analysis using the `bsync` package. WCC is highly effective for quantifying interpersonal synchrony because it accommodates non-stationary relationships.  Unlike global cross-correlation, WCC captures how synchronization ebbs and flows over time.
+This vignette walks through a complete Windowed Cross-Correlation (WCC) analysis using the **bsync** package. WCC is highly effective for quantifying interpersonal synchrony because it accommodates non-stationary relationships.  Unlike global cross-correlation, WCC captures how synchronization ebbs and flows over time.
 
 We will cover data simulation, calculating WCC, surrogate testing for statistical significance, optima extraction, and quantifying leadership dynamics using the package's pipeline approach. For guidance on selecting the appropriate window sizes and lag parameters, please see the `suggest_wcc_params()` vignette.
 
