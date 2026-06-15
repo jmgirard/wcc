@@ -171,8 +171,8 @@ test_that("wdtw accurately calculates distances for identical and shifted series
   x_ident <- master[1:30]
   y_ident <- master[1:30]
 
-  # Set scale_data = FALSE to verify the absolute raw distance logic
-  res_ident <- wdtw(x_ident, y_ident, window_size = 10, lag_max = 3, scale_data = FALSE)
+  # Set scale_method = "none" to verify the absolute raw distance logic
+  res_ident <- wdtw(x_ident, y_ident, window_size = 10, lag_max = 3, scale_method = "none")
   df_ident <- res_ident$results_df
 
   # The distance at lag 0 should be exactly 0 for all time windows
@@ -183,7 +183,7 @@ test_that("wdtw accurately calculates distances for identical and shifted series
   x_shift <- master[2:31]
   y_shift <- master[1:30]
 
-  res_shift <- wdtw(x_shift, y_shift, window_size = 10, lag_max = 3, scale_data = FALSE)
+  res_shift <- wdtw(x_shift, y_shift, window_size = 10, lag_max = 3, scale_method = "none")
   opt_shift <- pick_optima(res_shift, search_method = "global")
 
   # The global minimum distance should be exactly 0 at a lag of magnitude 1
