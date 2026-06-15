@@ -137,7 +137,7 @@ plot.bsync_lai <- function(x, time_step = 1, line_color = "#2166AC", smooth = FA
 
   p <- ggplot2::ggplot(data = df, ggplot2::aes(x = i, y = asymmetry_index)) +
     ggplot2::geom_hline(yintercept = 0, color = "black", linetype = "dashed", alpha = 0.6) +
-    ggplot2::geom_step(color = line_color, alpha = 0.8, linewidth = 0.8) +
+    ggplot2::geom_step(color = line_color, alpha = 0.8, linewidth = 0.8, na.rm = TRUE) +
     ggplot2::scale_y_continuous(limits = c(-1, 1), breaks = c(-1, -0.5, 0, 0.5, 1)) +
     ggplot2::theme_minimal() +
     ggplot2::theme(
@@ -155,7 +155,8 @@ plot.bsync_lai <- function(x, time_step = 1, line_color = "#2166AC", smooth = FA
       method = "loess",
       se = FALSE,
       color = "#B2182B",
-      linewidth = 1
+      linewidth = 1,
+      na.rm = TRUE
     )
   }
 

@@ -66,7 +66,7 @@ for (i in 1:n_frames) {
 
   } else if (i <= 1400) {
     # Phase 3 (30-46s): Person B leads by 12 frames (0.40 seconds)
-    person_A_raw[i] <- shared_base[150 + i + 12]
+    person_A_raw[i] <- shared_base[150 + i - 12]
     person_B_raw[i] <- shared_base[150 + i]
 
   } else {
@@ -159,11 +159,11 @@ While the heatmap generated above is visually informative, we often want to extr
 
 Because our simulation includes a programmed lull where the participants move independently, the algorithm will naturally find weak, meaningless "noise peaks" during that period. To prevent the tracking line from wildly jumping around during this lull, we can pass a `threshold` argument.
 
-Setting `threshold = 0.25` ensures that any optimum with an absolute correlation weaker than r = 0.25 is overwritten with `NA`.
+Setting `threshold = 0.55` ensures that any optimum with an absolute correlation weaker than r = 0.55 is overwritten with `NA`.
 
 ```{r optima-extraction}
-# Extract optima using a local search size of 9 and a threshold of 0.25
-wcc_optima_df <- pick_optima(wcc_results, L_size = 9, threshold = 0.25)
+# Extract optima using a local search size of 9 and a threshold of 0.55
+wcc_optima_df <- pick_optima(wcc_results, L_size = 9, threshold = 0.55)
 
 # View a statistical breakdown of the extracted optima
 summary(wcc_optima_df)
@@ -173,9 +173,9 @@ summary(wcc_optima_df)
 
 The `summary()` method provides a concise breakdown of the behavioral dynamics. We can map these results directly to the four phases we programmed into our simulation:
 
-* **Completeness:** The summary will show that roughly 16% of the optima were dropped (set to `NA`). This perfectly aligns with Phase 2 of our simulation, which was a 10-second uncorrelated lull out of the 60-second total. The threshold successfully identified and removed this non-interactive period.
-* **Lag Directionality (Leadership):** Because we supplied `person_A` as `x` and `person_B` as `y`, a positive lag means Person A is leading and a negative lag means Person B is leading. The summary will show positive lags for roughly 68% of the valid interaction (corresponding to the 34 total seconds Person A led in Phases 1 and 4). It will show negative lags for the remaining 32% (corresponding to the 16 seconds Person B led in Phase 3).
-* **Optimum Value Distribution:** The quantiles provide a quick look at the strength of the coordination during the valid interactive phases, confirming that the retained peaks represent strong, structural synchrony.
+* **Completeness:** The summary shows that 17% (9 windows) of the optima were dropped and set to `NA`. This aligns perfectly with Phase 2 of our simulation, which was a 10-second uncorrelated lull. Raising our threshold successfully identified and removed this non-interactive period.
+* **Lag Directionality (Leadership):** Because we supplied `person_A` as `x` and `person_B` as `y`, a positive lag means Person A is leading, and a negative lag means Person B is leading. The summary shows positive lags for 54.5% of the valid interaction, reflecting the times Person A led in Phases 1 and 4. It shows negative lags for 43.2% of the interaction, correctly identifying the middle section where Person B took over.
+* **Optimum Value Distribution:** The quantiles provide a quick look at the strength of the coordination during the valid interactive phases. With the 25th percentile sitting at $r = 0.98$, we have absolute confirmation that the retained peaks represent strong, structural synchrony rather than random noise.
 
 ### 4.2 Tuning the Local Search Window (`L_size`)
 
@@ -203,22 +203,25 @@ plot_optima_overlay(
 
 In the resulting plot, the tracking line perfectly visualizes the distinct phases of our simulated interaction:
 
-* **0 to 20 seconds:** A stable vertical line sits at a positive lag (~0.33s), correctly identifying Person A as the initial leader.
-* **20 to 30 seconds:** There is a clean break in the tracking line. Because we applied a threshold, the algorithm successfully ignored the weak, random noise peaks during the uncorrelated lull, leaving this non-interactive period appropriately blank.
-* **30 to 60 seconds:** The tracking line reappears and cleanly shifts to new lags, accurately capturing the transitions in leadership dynamics during the final two phases.
+* **0 to roughly 18 seconds:** A stable vertical line sits at a positive lag (~0.33s), correctly identifying Person A as the initial leader.
+* **18 to 30 seconds:** There is a clean break in the tracking line. Because we applied a threshold, the algorithm successfully ignored the weak, random noise peaks during the uncorrelated lull, leaving this non-interactive period appropriately blank.
+* **30 to 45 seconds:** The tracking line reappears on the left side of the zero-line at a negative lag (~ -0.40s), perfectly capturing Phase 3 where Person B takes the lead.
+* **46 seconds onward:** The tracking line jumps back to the right side of the zero-line as Person A reclaims the lead for the final phase of the interaction.
 
-## 6. Quantifying Leadership Dynamics (The Pipeline Approach)
+## 6. Quantifying Leadership Dynamics
 
-Visualizing the optima is helpful, but researchers ultimately need a continuous, quantifiable metric of who is driving the interaction.  The `leadership_asymmetry()` function converts the extracted optima into a bounded Leadership Asymmetry Index (LAI) ranging from -1 (y entirely leads) to 1 (x entirely leads).
+Visualizing the optima is helpful, but researchers ultimately need a continuous, quantifiable metric of who is driving the interaction. The `leadership_asymmetry()` function converts the extracted optima into a bounded Leadership Asymmetry Index (LAI) ranging from -1 (y entirely leads) to 1 (x entirely leads).
 
 Because `bsync` is designed around a consistent class structure, you can seamlessly chain the entire analytical process together using the native R pipe (`|>`):
 
 ```{r pipeline-lai, fig.width=7, fig.height=5}
-# Run the complete pipeline from results to LAI visualization
+# Run the complete pipeline from WCC results to LAI visualization
 wcc_results |>
-  pick_optima(L_size = 9, threshold = 0.25) |>
+  pick_optima(L_size = 9, threshold = 0.55) |>
   leadership_asymmetry(epoch_size = 10, min_valid = 3) |>
   plot(smooth = TRUE)
 ```
 
-By grouping the windows into local epochs (in this case, groups of 10 windows), the LAI function smooths over momentary frame-by-frame jitter to reveal the broader structural periods of dominance. The resulting plot makes it immediately obvious when the conversation shifted from Person A driving the interaction to Person B taking over.
+By grouping the windows into local epochs (in this case, groups of 10 windows), the LAI function smooths over momentary frame-by-frame jitter to reveal the broader structural periods of dominance.
+
+The resulting plot tells the entire story of the interaction at a glance. The metric starts firmly at `1.0` (Person A leading), smoothly transitions down through zero during the uncorrelated lull, hits `-1.0` (Person B leading) right at the 30-second mark, and finally climbs back up to `1.0` as Person A re-enters the conversation.

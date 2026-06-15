@@ -46,6 +46,7 @@ plot_optima_overlay <- function(surface_obj, optima_df,
       ggplot2::aes(x = optimum_lag, y = i),
       color = line_color,
       alpha = 0.6,
+      na.rm = TRUE,
       linewidth = 0.5,
       inherit.aes = FALSE
     ) +
@@ -58,6 +59,7 @@ plot_optima_overlay <- function(surface_obj, optima_df,
       color = point_stroke,
       size = 1.5,
       stroke = 0.4,
+      na.rm = TRUE,
       inherit.aes = FALSE
     ) +
     ggplot2::labs(

@@ -33,7 +33,7 @@ plot.wdtw_res <- function(x, time_step = 1,
   }
 
   p <- ggplot2::ggplot(data = df, ggplot2::aes(x = tau, y = i, fill = dtw_dist)) +
-    ggplot2::geom_tile() +
+    ggplot2::geom_tile(na.rm = TRUE) +
     ggplot2::scale_fill_gradientn(
       colors = grDevices::hcl.colors(100, "viridis", rev = TRUE),
       na.value = "grey80",
