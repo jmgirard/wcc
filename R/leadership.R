@@ -4,7 +4,7 @@
 #' A value of 1 indicates 'x' leads entirely, -1 indicates 'y' leads entirely,
 #' and 0 indicates equal leading or simultaneous behavior.
 #'
-#' @param optima_obj An object of class "wcc_optima".
+#' @param optima_obj An object of class "wcc_optima" or "wdtw_optima".
 #' @param epoch_size A positive integer specifying the number of windows to group
 #'   together to calculate the local asymmetry ratio.
 #' @param min_valid A positive integer specifying the minimum number of valid (non-NA)
@@ -13,8 +13,8 @@
 #' @export
 leadership_asymmetry <- function(optima_obj, epoch_size = 10, min_valid = 3) {
 
-  if (!inherits(optima_obj, "wcc_optima")) {
-    cli::cli_abort("Input {.arg optima_obj} must be a {.cls wcc_optima} object.")
+  if (!inherits(optima_obj, c("wcc_optima", "wdtw_optima"))) {
+    cli::cli_abort("Input {.arg optima_obj} must be a {.cls wcc_optima} or {.cls wdtw_optima} object.")
   }
 
   if (!rlang::is_integerish(epoch_size, n = 1) || epoch_size <= 0) {
