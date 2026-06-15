@@ -214,11 +214,11 @@ Visualizing the optima is helpful, but researchers ultimately need a continuous,
 Because `bsync` is designed around a consistent class structure, you can seamlessly chain the entire analytical process together using the native R pipe (`|>`):
 
 ```{r pipeline-lai, fig.width=7, fig.height=5}
-# Run the complete pipeline from WCC results to LAI visualization
+# Run the complete pipeline from results to LAI visualization
 wcc_results |>
-  pick_optima(L_size = 9, threshold = 0.25) |>
+  pick_optima() |>
   leadership_asymmetry(epoch_size = 10, min_valid = 3) |>
-  plot(time_step = 1 / fs, smooth = TRUE)
+  plot(smooth = TRUE)
 ```
 
 By grouping the windows into local epochs (in this case, groups of 10 windows), the LAI function smooths over momentary frame-by-frame jitter to reveal the broader structural periods of dominance. The resulting plot makes it immediately obvious when the conversation shifted from Person A driving the interaction to Person B taking over.

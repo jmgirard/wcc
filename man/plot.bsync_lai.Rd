@@ -4,16 +4,28 @@
 \alias{plot.bsync_lai}
 \title{Plot bsync_lai object}
 \usage{
-\method{plot}{bsync_lai}(x, time_step = 1, line_color = "#2166AC", smooth = FALSE, ...)
+\method{plot}{bsync_lai}(
+  x,
+  time_step = 1,
+  x_label = NULL,
+  line_color = "#2166AC",
+  smooth = FALSE,
+  smooth_color = "#B2182B",
+  ...
+)
 }
 \arguments{
 \item{x}{An object of class "bsync_lai".}
 
 \item{time_step}{A numeric value specifying the duration of each index. Default is 1.}
 
-\item{line_color}{Character string specifying the color of the LAI line. Default is "black".}
+\item{x_label}{An optional character string to override the default x-axis label.}
+
+\item{line_color}{Character string specifying the color of the LAI line. Default is "#2166AC".}
 
 \item{smooth}{Logical indicating whether to add a loess smoothing line. Default is `FALSE`.}
+
+\item{smooth_color}{Character string specifying the color of the smoothing line. Default is "#B2182B".}
 
 \item{...}{Additional arguments (not used).}
 }

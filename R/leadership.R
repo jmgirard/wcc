@@ -114,20 +114,32 @@ print.bsync_lai <- function(x, n = 5, ...) {
 #'
 #' @param x An object of class "bsync_lai".
 #' @param time_step A numeric value specifying the duration of each index. Default is 1.
-#' @param line_color Character string specifying the color of the LAI line. Default is "black".
+#' @param x_label An optional character string to override the default x-axis label.
+#' @param line_color Character string specifying the color of the LAI line. Default is "#2166AC".
 #' @param smooth Logical indicating whether to add a loess smoothing line. Default is `FALSE`.
+#' @param smooth_color Character string specifying the color of the smoothing line. Default is "#B2182B".
 #' @param ... Additional arguments (not used).
 #' @export
-plot.bsync_lai <- function(x, time_step = 1, line_color = "#2166AC", smooth = FALSE, ...) {
+plot.bsync_lai <- function(
+  x,
+  time_step = 1,
+  x_label = NULL,
+  line_color = "#2166AC",
+  smooth = FALSE,
+  smooth_color = "#B2182B",
+  ...
+) {
 
   df <- as.data.frame(x)
 
   if (time_step != 1) {
     df$i <- df$i * time_step
-    x_label <- "Elapsed Time (Seconds)"
+    default_x_label <- "Elapsed Time (Seconds)"
   } else {
-    x_label <- "Elapsed Time Window Index"
+    default_x_label <- "Elapsed Time Window Index"
   }
+
+  final_x_label <- if (!is.null(x_label)) x_label else default_x_label
 
   p <- ggplot2::ggplot(data = df, ggplot2::aes(x = i, y = asymmetry_index)) +
     # Add a baseline for perfectly balanced dynamics
@@ -142,12 +154,12 @@ plot.bsync_lai <- function(x, time_step = 1, line_color = "#2166AC", smooth = FA
     ggplot2::labs(
       title = "Dynamic Leadership Asymmetry",
       subtitle = "Values > 0 indicate 'x' leads; Values < 0 indicate 'y' leads",
-      x = x_label,
+      x = final_x_label,
       y = "Asymmetry Index"
     )
 
   if (smooth) {
-    p <- p + ggplot2::geom_smooth(method = "loess", se = FALSE, color = "#B2182B", linewidth = 1)
+    p <- p + ggplot2::geom_smooth(method = "loess", se = FALSE, color = smooth_color, linewidth = 1)
   }
 
   p
